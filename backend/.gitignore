@@ -1,0 +1,25 @@
+# Dependências e arquivos de build
+node_modules/
+dist/
+
+# Variáveis de ambiente
+.env
+
+# Configurações de IDE
+.vscode/
+
+# Logs e arquivos de cache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Arquivos temporários do TypeScript
+*.tsbuildinfo
+
+# Arquivos do Prisma
+/prisma/*.db
+
+# Arquivos do S.O.
+.DS_Store
+Thumbs.db
