@@ -1,0 +1,126 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Doador {
+  id                      Int                    @id @default(autoincrement())
+  nome                    String
+  data_nascimento         DateTime?              @map("dataNascimento")
+  peso_kg                 Float?                 @map("pesoKg")
+  genero                  String?
+  tipo_sanguineo          String?                @map("tipoSanguineo")
+  email                   String                 @unique
+  cpf                     String                 @unique
+  senha                   String
+  telefone                String?
+  criado_em               DateTime               @default(now()) @map("criadoEm")
+
+  // Relacionamentos com outras tabelas
+  agendamentos            Agendamento[]
+  formulariosElegibilidade Formulario_Elegibilidade[]
+  historicosClinicos      Historico_Clinico[]
+  refreshTokens           RefreshToken[]
+}
+
+model Hemocentro {
+  id             Int           @id @default(autoincrement())
+  nome           String
+  endereco       String
+  telefone       String?
+  avaliacao      String?
+  criado_em      DateTime      @default(now()) @map("criadoEm")
+
+  // Relacionamento com a tabela Agendamento
+  agendamentos   Agendamento[]
+}
+
+model Agendamento {
+  id             Int       @id @default(autoincrement())
+  doador_id      Int       @map("doadorId")
+  hemocentro_id  Int       @map("hemocentroId")
+  data_hora      DateTime  @map("dataHora")
+  status         String
+  criado_em      DateTime  @default(now()) @map("criadoEm")
+
+  doador         Doador    @relation(fields: [doador_id], references: [id])
+  hemocentro     Hemocentro @relation(fields: [hemocentro_id], references: [id])
+  doacao         Doacao?
+}
+
+model Formulario_Elegibilidade {
+  id                         Int       @id @default(autoincrement())
+  doador_id                  Int       @map("doadorId")
+  data_preenchimento         DateTime  @map("dataPreenchimento")
+  teve_resfriado             Boolean   @default(false) @map("teveResfriado")
+  data_fim_sintomas_resfriado DateTime? @map("dataFimSintomasResfriado")
+  esta_gravida               Boolean   @default(false) @map("estaGravida")
+  data_parto                 DateTime? @map("dataParto")
+  esta_amamentando           Boolean   @default(false) @map("estaAmamentando")
+  fez_tatuagem               Boolean   @default(false) @map("fezTatuagem")
+  data_tatuagem              DateTime? @map("dataTatuagem")
+  esteve_area_malaria        Boolean   @default(false) @map("esteveAreaMalaria")
+  data_retorno_area_malaria  DateTime? @map("dataRetornoAreaMalaria")
+  teve_hepatite              Boolean   @default(false) @map("teveHepatite")
+  data_diagnostico_hepatite  DateTime? @map("dataDiagnosticoHepatite")
+  tipo_hepatite              String?   @map("tipoHepatite")
+  usou_drogas_injetaveis     Boolean   @default(false) @map("usouDrogasInjetaveis")
+  teve_malaria               Boolean   @default(false) @map("teveMalaria")
+  status_aprovacao           String    @map("statusAprovacao")
+
+  doador                     Doador    @relation(fields: [doador_id], references: [id])
+}
+
+model Historico_Clinico {
+  id                        Int       @id @default(autoincrement())
+  doador_id                 Int       @map("doadorId")
+  data_avaliacao            DateTime  @map("dataAvaliacao")
+  historico_hepatite        Boolean   @default(false) @map("historicoHepatite")
+  historico_doenca_chagas   Boolean   @default(false) @map("historicoDoencaChagas")
+  historico_hiv_aids        Boolean   @default(false) @map("historicoHivAids")
+  historico_htlv_i_ii       Boolean   @default(false) @map("historicoHtlvII")
+  uso_drogas_injetaveis     Boolean   @default(false) @map("usoDrogasInjetaveis")
+  detalhes_adicionais       String?   @map("detalhesAdicionais")
+  apto_doacao               Boolean   @default(true) @map("aptoDoacao")
+
+  doador                    Doador    @relation(fields: [doador_id], references: [id])
+}
+
+model Doacao {
+  id                   Int           @id @default(autoincrement())
+  agendamento_id       Int           @unique @map("agendamentoId")
+  data_realizacao      DateTime      @map("dataRealizacao")
+  quantidade_ml        Int           @map("quantidadeMl")
+  criado_em            DateTime      @default(now()) @map("criadoEm")
+  
+  // Relacionamentos
+  agendamento          Agendamento   @relation(fields: [agendamento_id], references: [id])
+  estoqueSangue        Estoque_Sangue?
+}
+
+model Estoque_Sangue {
+  id               Int       @id @default(autoincrement())
+  doacao_id        Int       @unique @map("doacaoId")
+  tipo_sanguineo   String    @map("tipoSanguineo")
+  data_validade    DateTime  @map("dataValidade")
+  status           String
+  criado_em        DateTime  @default(now()) @map("criadoEm")
+
+  // Relacionamento
+  doacao           Doacao    @relation(fields: [doacao_id], references: [id])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+
+  doador    Doador   @relation(fields: [doadorId], references: [id])
+  doadorId  Int
+  
+  createdAt DateTime @default(now())
+}
