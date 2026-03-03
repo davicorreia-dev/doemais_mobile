@@ -93,54 +93,44 @@ npm run dev
 
 O servidor estará disponível em: http://localhost:3000
 
-## 4. Endpoints da API
+## 4. Segurança e Autenticação Global
 
-A API já possui os seguintes endpoints de autenticação, validados por DTOs:
+O projeto adota a filosofia **"Secure by Default"** para garantir que nenhuma rota sensível seja exposta por esquecimento.
 
-### **POST /api/auth/register**
-- **Descrição:** Cadastra um novo doador.  
-- **Body:** `RegisterDoadorDto`  
-- **Retorno:** `201 Created` e os dados do doador.  
+### 4.1. Middleware de Autenticação
+Diferente da abordagem tradicional de aplicar middlewares em cada rota, o `authMiddleware` é injetado globalmente no `app.ts`. 
 
-### **POST /api/auth/login**
-- **Descrição:** Autentica um doador e gera um token de acesso.  
-- **Body:** `LoginDoadorDto`  
-- **Retorno:** `200 OK`, um JWT e os dados básicos do doador.  
-
-### **POST /api/auth/refresh**
-- **Descrição:** Utiliza o `refreshToken` para obter um novo e válido `accessToken`, mantendo a sessão ativa sem exigir novo login.
-- **Body:** `RefreshTokenDto`  
-- **Retorno:** `200 OK` e o novo `accessToken`.  
-
-### **POST /api/auth/logout**
-- **Descrição:** Revoga o `refreshToken` no banco de dados, invalidando imediatamente a sessão de longa duração para aquele dispositivo.
-- **Body:** `RefreshTokenDto`  
-- **Retorno:** `200 OK` e mensagem de sucesso. 
+- **Rotas Protegidas:** Por padrão, todas as rotas da API exigem um header `Authorization: Bearer <token>`.
+- **Rotas Públicas:** Apenas os endpoints de `/api/auth` (login, register, refresh, logout) são adicionados à lista de exceções no `app.ts`.
+- **Injeção de Contexto:** Tokens válidos decodificam o `doadorId` e o injetam diretamente no objeto `req`. Isso permite que qualquer controlador acesse o ID do usuário logado via `req.doadorId`.
 
 ---
 
-## 5. Tratamento de Erros Centralizado
+## 5. Endpoints da API
 
-Para garantir consistência, manutenibilidade e respostas padronizadas em caso de erros, o projeto implementa um sistema de tratamento de erros centralizado. Isso evita a repetição de lógica de try-catch nos controladores e serviços, promovendo um código mais limpo e escalável.
+Abaixo estão os endpoints de autenticação, todos validados por **DTOs** e protegidos pela estratégia de tokens:
 
-### 5.1. Como Funciona
-**Classes de Erro Personalizadas (src/utils/errors.ts):**
+### **Públicos (Auth)**
+- `POST /api/auth/register`: Cadastro de novo doador. Retorna `201 Created`.
+- `POST /api/auth/login`: Autentica o usuário e gera o par de tokens (`accessToken` e `refreshToken`).
+- `POST /api/auth/refresh`: Utiliza um `refreshToken` válido para emitir um novo `accessToken`.
+- `POST /api/auth/logout`: Remove o `refreshToken` do banco de dados, invalidando a sessão.
 
-- `CustomError`: Classe base que estende `Error` e inclui um `statusCode` HTTP.
-- Classes derivadas: `ConflictError (409)`, `UnauthorizedError (401)`, `BadRequestError (400)`, entre outras.
-- Exemplo de uso nos serviços: `throw new ConflictError('Usuário com este e-mail ou CPF já existe.');`.
+### **Protegidos**
+- *Qualquer nova rota (ex: `/api/doadores`, `/api/agendamentos`) criada no sistema estará automaticamente protegida pelo JWT.*
 
-**Middleware Global de Erros (src/middlewares/error.middleware.ts):**
+---
 
- - Captura todos os erros passados via `next(error)` nos controladores ou middlewares.
- - Verifica se o erro é uma instância de `CustomError` para retornar o `statusCode` e `message` apropriados.
- - Para erros inesperados, retorna um `500 Internal Server Error` genérico.
- - Formato de resposta de erro: `{ message: "Descrição do erro" }`.
- - Logs de erros são feitos no console para depuração.
+## 6. Tratamento de Erros Centralizado
 
-**Integração:**
+Para garantir consistência e manutenibilidade, o projeto implementa um sistema de tratamento de erros centralizado que evita blocos `try-catch` repetitivos.
 
-- Os serviços lançam erros personalizados.
-- Os controladores usam `next(error)` para propagar erros.
-- O middleware é registrado no final da cadeia em `app.ts`: `app.use(errorMiddleware);`.
-- O middleware de validação (`validation.middleware.ts`) também usa `BadRequestError` para erros de DTO.
+### 6.1. Classes de Erro (src/utils/errors.ts)
+- `CustomError`: Classe base com `statusCode`.
+- `ConflictError (409)`: Usado em duplicação de E-mail ou CPF.
+- `UnauthorizedError (401)`: Usado para falhas de login ou tokens inválidos/expirados.
+- `BadRequestError (400)`: Erros de validação de dados enviados pelo cliente.
+
+### 6.2. Middleware Global de Erros
+Registrado em `app.ts`, este middleware captura todas as exceções lançadas nos serviços ou controladores e retorna uma resposta padronizada:
+`{ "message": "Descrição amigável do erro" }`.
