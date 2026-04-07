@@ -1,0 +1,63 @@
+import { Image, Text, View } from "react-native";
+import Button from "../../../components/Button";
+import Styles from "../AuthChoiceScreen/AuthChoiceStyles"
+import StylesButton from "../../../components/SocialButton/styles";
+import { CommonActions } from "@react-navigation/native";
+import SocialButton from "../../../components/SocialButton";
+
+import { useFonts, Lexend_100Thin, Lexend_200ExtraLight, Lexend_300Light, Lexend_400Regular, Lexend_500Medium, Lexend_600SemiBold, Lexend_700Bold } from "@expo-google-fonts/lexend";
+import { useRoute } from "@react-navigation/native";
+
+
+
+export default function AuthChoiceScreen({ navigation }: any) {
+
+    return (
+
+        <View style={Styles.container}>
+
+            <Image style={Styles.image} source={require("../../../assets/images/Logo - Horizontal.png")} />
+
+
+            {/* props de cada button de login e register*/}
+            <Button
+                title="Faça seu Login"
+                backgroundColor="#FFFFFF"
+                textColor="#E0323C"
+                onPress={() => navigation.navigate("Login")}
+
+            />
+
+
+            {/* <Button
+                title="Faça seu Login"
+                backgroundColor="#FFFFFF"
+                textColor="#E0323C"
+                onPress={() => navigation.navigate("MainTabs")}
+
+            /> */}
+
+
+            <Button
+                title="Cadastre-se"
+                backgroundColor="#E0323C"
+                textColor="#FFFFFF"
+                onPress={() => navigation.navigate("Register")}
+            />
+
+            <View style={StylesButton.containerSocialButtons}>
+                <SocialButton
+                    title="Entrar com o Google"
+                    iconSource={require("../../../assets/images/googleicon.png")}
+                />
+
+                <SocialButton //props dos botões sociais
+                    title="Entrar com o Facebook"
+                    iconSource={require("../../../assets/images/facebook 1.png")}
+
+                />
+            </View>
+
+        </View>
+    )
+}
