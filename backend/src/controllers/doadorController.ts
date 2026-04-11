@@ -13,3 +13,18 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
     next(error);
   }
 };
+
+export const downloadCertificate = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id = req.doadorId as number;
+    const pdfBuffer = await doadorService.generateDonationCertificate(id);
+
+    // Headers para download do arquivo
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=certificado-doacao.pdf');
+    
+    res.status(200).send(pdfBuffer);
+  } catch (error) {
+    next(error);
+  }
+};
