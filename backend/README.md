@@ -108,16 +108,14 @@ Diferente da abordagem tradicional de aplicar middlewares em cada rota, o `authM
 
 ## 5. Endpoints da API
 
-Abaixo estão os endpoints de autenticação, todos validados por **DTOs** e protegidos pela estratégia de tokens:
+### **Públicos (Autenticação)**
+- `POST /api/auth/register`: Cadastro de novo doador.
+- `POST /api/auth/login`: Autentica e gera os tokens de acesso.
+- `POST /api/auth/refresh`: Renova o `accessToken` expirado.
+- `POST /api/auth/logout`: Encerra a sessão e revoga o `refreshToken`.
 
-### **Públicos (Auth)**
-- `POST /api/auth/register`: Cadastro de novo doador. Retorna `201 Created`.
-- `POST /api/auth/login`: Autentica o usuário e gera o par de tokens (`accessToken` e `refreshToken`).
-- `POST /api/auth/refresh`: Utiliza um `refreshToken` válido para emitir um novo `accessToken`.
-- `POST /api/auth/logout`: Remove o `refreshToken` do banco de dados, invalidando a sessão.
-
-### **Protegidos**
-- *Qualquer nova rota (ex: `/api/doadores`, `/api/agendamentos`) criada no sistema estará automaticamente protegida pelo JWT.*
+### **Protegidos (Usuário)**
+- `GET /api/doadores/me`: Retorna o perfil completo do doador autenticado (excluindo dados sensíveis como senha).
 
 ---
 
