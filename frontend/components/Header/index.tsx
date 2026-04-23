@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 //props do header
 type HeaderProps = {
+    marginTop?: number;
     title?: string;
     subtitle?: string;
     onBack?(): void;
@@ -14,11 +15,13 @@ type HeaderProps = {
     titleSize?: number;
     subtitleSize?: number;
     icon?: string;
-
+    iconColor?: string;
+    minHeight?: number;
+    containerStyle?: any;
 }
 
 
-export default function Header({ title, onBack, subtitle, titleColor, subtitleColor, titleSize, icon, subtitleSize }: HeaderProps) {
+export default function Header({ title, onBack, subtitle, titleColor, subtitleColor, titleSize, icon, iconColor, subtitleSize, marginTop, minHeight, containerStyle }: HeaderProps) {
 
     const [fontsLoaded] = useFonts({
         Lexend_100Thin,
@@ -35,7 +38,7 @@ export default function Header({ title, onBack, subtitle, titleColor, subtitleCo
     const navigation = useNavigation<any>();
 
     return (
-        <View style={styles.header}>
+        <View style={[styles.header, { marginTop, minHeight }, containerStyle]}>
             <TouchableOpacity onPress={() => navigation.goBack()}
                 style={styles.iconBack}
             >
@@ -43,7 +46,7 @@ export default function Header({ title, onBack, subtitle, titleColor, subtitleCo
                 <Ionicons
                     name={icon}
                     size={24}
-                    color="#E0323C"
+                    color={iconColor || "#E0323C"}
                 />
             </TouchableOpacity>
 

@@ -21,8 +21,9 @@ import QuizScreen from './app/screens/QuizFlow/QuizScreen';
 
 // IMPORTANTE: Este é o seu MENU NOVO (Vermelho)
 // Ele já é um TabNavigator por dentro, então não precisamos criar outro aqui.
-import MainTabsScreen from './app/screens/MainTabs/MainTabs'; 
+import MainTabsScreen from './app/screens/MainTabs/MainTabs';
 
+import SettingsProfileScreen from './app/screens/SettingsProfileScreen/SettingsProfileScreen';
 // Se você quiser usar a tela de Settings depois, importe ela aqui, 
 // mas ela deve ser adicionada lá dentro do arquivo MainTabs.tsx se quiser que apareça no menu.
 // import SettingsScreen from './app/screens/Settings/SettingsScreen'; 
@@ -33,9 +34,9 @@ export default function App() {
   return (
     <NavigationContainer>
       <StatusBar style="auto" />
-      
-      <Stack.Navigator 
-        initialRouteName="AuthChoice" 
+
+      <Stack.Navigator
+        initialRouteName="AuthChoice"
         screenOptions={{ headerShown: false }}
       >
         {/* --- FLUXO DE AUTENTICAÇÃO --- */}
@@ -49,16 +50,17 @@ export default function App() {
         <Stack.Screen name="PasswordResetSuccessScreen" component={PasswordResetSuccessScreen} />
         <Stack.Screen name="LgpdScreen" component={LgpdScreen} />
         <Stack.Screen name="CompleteProfileScreen" component={CompleteProfileScreen} />
-        
+
         {/* Telas sem Header */}
         <Stack.Screen name="RegisterSuccessScreen" component={RegisterSuccessScreen} />
         <Stack.Screen name="OnboardingScreen" component={OnboardingScreen} />
         <Stack.Screen name="QuizScreen" component={QuizScreen} />
-        
+
         {/* --- O GRANDE MOMENTO --- */}
         {/* Aqui nós chamamos direto o arquivo MainTabsScreen (O menu vermelho) */}
         {/* Removemos a função intermediária que criava o menu duplicado */}
         <Stack.Screen name="MainTabs" component={MainTabsScreen} />
+        <Stack.Screen name="SettingsProfileScreen" component={SettingsProfileScreen} />
 
       </Stack.Navigator>
     </NavigationContainer>

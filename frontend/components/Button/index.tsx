@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, DimensionValue } from "react-native";
+import { Text, TouchableOpacity, DimensionValue, StyleProp, ViewStyle } from "react-native";
 import styles from "./styles";
 
 
@@ -11,10 +11,11 @@ type ButtonProps = {
     borderRadius?: number;
     width?: DimensionValue;
     disabled?: boolean;
+    style?: StyleProp<ViewStyle>;
 };
 
 
-export default function Button({ title, backgroundColor, textColor, onPress, borderRadius, width, disabled}: ButtonProps) {
+export default function Button({ title, backgroundColor, textColor, onPress, borderRadius, width, disabled, style}: ButtonProps) {
     return (
         <TouchableOpacity onPress={onPress} disabled={disabled}
             //props do button para passar em outras telas
@@ -25,7 +26,8 @@ export default function Button({ title, backgroundColor, textColor, onPress, bor
                     borderRadius: borderRadius || styles.button.borderRadius,
                     width: width || styles.button.width,
                     opacity: disabled ? 0.5 : 1 
-                }
+                },
+                style
             ]}>
 
             <Text style={[styles.TextLogin, { color: textColor || styles.TextLogin.color }]}>
