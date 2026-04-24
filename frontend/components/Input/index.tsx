@@ -24,7 +24,7 @@ export default function Input({
 
     return (
         <View style={styles.containerInput}>
-            <Text style={styles.label}>{label}</Text>
+            {label ? <Text style={styles.label}>{label}</Text> : null}
             <TextInput
                 keyboardType={keyboardType}
                 style={styles.Input}

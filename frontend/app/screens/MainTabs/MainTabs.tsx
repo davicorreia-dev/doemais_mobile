@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { View, Text } from 'react-native';
 
 import HomeScreen from '../HomeScreen/HomeScreen';
+import EligibilityFormsScreen from '../EligibilityFormsScreen/EligibilityFormsScreen';
 
 const PlaceholderScreen = ({ name }: { name: string }) => (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -50,7 +51,7 @@ export default function MainTabs() {
             
             <Tab.Screen 
                 name="Elegibilidade" 
-                children={() => <PlaceholderScreen name="Formulário de Elegibilidade" />} 
+                component={EligibilityFormsScreen}  
             />
             
             <Tab.Screen 
