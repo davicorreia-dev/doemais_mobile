@@ -79,7 +79,7 @@ export default function RegisterScreen() {
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                
+
                 <Header
                     icon="arrow-back-outline"
                     title="Criar uma conta"
@@ -89,6 +89,9 @@ export default function RegisterScreen() {
                     subtitleSize={20}
                     titleSize={24}
                     onBack={() => navigation.goBack()}
+                    marginTop={30}
+                    minHeight={50}
+                //melhorar a visualização do header nas telas de login, register e lgpd
                 />
 
                 <View style={Styles.InputContainer}>
