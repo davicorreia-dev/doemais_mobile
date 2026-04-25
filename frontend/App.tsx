@@ -24,6 +24,7 @@ import QuizScreen from './app/screens/QuizFlow/QuizScreen';
 import MainTabsScreen from './app/screens/MainTabs/MainTabs';
 
 import SettingsProfileScreen from './app/screens/SettingsProfileScreen/SettingsProfileScreen';
+import ProfileSetupPhotoScreen from './app/screens/SettingsProfileScreen/ProfileSetupPhotoScreen';
 // Se você quiser usar a tela de Settings depois, importe ela aqui, 
 // mas ela deve ser adicionada lá dentro do arquivo MainTabs.tsx se quiser que apareça no menu.
 // import SettingsScreen from './app/screens/Settings/SettingsScreen'; 
@@ -60,7 +61,10 @@ export default function App() {
         {/* Aqui nós chamamos direto o arquivo MainTabsScreen (O menu vermelho) */}
         {/* Removemos a função intermediária que criava o menu duplicado */}
         <Stack.Screen name="MainTabs" component={MainTabsScreen} />
+
+        {/* --- TELA DE FOTO DE PERFIL --- */}
         <Stack.Screen name="SettingsProfileScreen" component={SettingsProfileScreen} />
+        <Stack.Screen name="ProfileSetupPhotoScreen" component={ProfileSetupPhotoScreen} />
 
       </Stack.Navigator>
     </NavigationContainer>

@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import Header from '../../../components/Header';
 import Styles from './Styles';
 import Input from '../../../components/Input';
 import SelectInput from '../../../components/SelectInput/SelectInput';
 import Button from '../../../components/Button';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SettingsProfileScreen() {
 
@@ -15,6 +16,24 @@ export default function SettingsProfileScreen() {
     const [phone, setPhone] = useState('');
     const [name, setName] = useState('');
     const [city, setCity] = useState('');
+
+    useEffect(() => {
+        async function loadProfileData() {
+            try {
+                const savedData = await AsyncStorage.getItem('@user_profile_data');
+                if (savedData) {
+                    const parsedData = JSON.parse(savedData);
+                    setName(parsedData.name || '');
+                    setPhone(parsedData.phone || '');
+                    setValue(parsedData.bloodType || '');
+                    setCity(parsedData.city || '');
+                }
+            } catch (error) {
+                console.error("Erro ao carregar dados do perfil", error);
+            }
+        }
+        loadProfileData();
+    }, []);
 
     const handlePhoneChange = (text: string) => {
         let v = text.replace(/\D/g, '');
@@ -37,26 +56,18 @@ export default function SettingsProfileScreen() {
             city
         };
 
-        console.log('Dados prontos para enviar para a API:', payload);
+        console.log('Dados prontos para salvar localmente:', payload);
 
         try {
-            // Exemplo de configuração base para envio via API:
-            /*
-            const response = await fetch('YOUR_API_ENDPOINT_HERE', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload)
-            });
-            const result = await response.json();
-            */
+            // Salva os dados no AsyncStorage
+            await AsyncStorage.setItem('@user_profile_data', JSON.stringify(payload));
 
-            // Depois do envio correto, navega para a próxima tela:
-            navigation.navigate('MainTabs');
+            // Depois do envio/salvamento correto, navega para a próxima tela:
+            navigation.navigate('ProfileSetupPhotoScreen');
 
         } catch (error) {
-            console.error("Erro ao enviar os dados", error);
+            console.error("Erro ao salvar os dados", error);
+            Alert.alert("Erro", "Não foi possível salvar os dados do perfil.");
         }
     };
 
@@ -96,11 +107,11 @@ export default function SettingsProfileScreen() {
                         <Text style={Styles.title}>Configuração do perfil</Text>
 
                         <Text style={Styles.subtitle}>
-                            Quase pronto para configurar seu perfil, preencha as informações abaixo. {'\n'}
+                            Quase pronto para configurar seu perfil, preencha as informações abaixo.
                             Apenas 3 etapas.
                         </Text>
 
-                        <View style={{ gap: 15 }}>
+                        <View style={Styles.containerInputs}>
                             <Input
                                 label="Nome Completo"
                                 value={name}

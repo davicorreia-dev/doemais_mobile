@@ -1,10 +1,51 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, TextInput, Image, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons'; // Usando ícones padrão por enquanto
 import Styles from './Styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function HomeScreen() {
-    
+    const [profileImage, setProfileImage] = useState<string | null>(null);
+
+    // Estados para os dados de texto (com valor padrão para não quebrar a tela)
+    const [userName, setUserName] = useState<string>('João Souza');
+    const [bloodType, setBloodType] = useState<string>('A+'); // Repita a lógica do nome para este aqui!
+
+    useFocusEffect(
+        useCallback(() => {
+            async function loadProfileData() {
+                try {
+                    // 1. Carrega a imagem
+                    const savedUri = await AsyncStorage.getItem('@profile_image');
+                    if (savedUri) {
+                        setProfileImage(savedUri);
+                    } else {
+                        setProfileImage(null);
+                    }
+
+                    // 2. Carrega os dados de texto do perfil
+                    const savedData = await AsyncStorage.getItem('@user_profile_data');
+                    if (savedData) {
+                        const parsedData = JSON.parse(savedData);
+
+
+                        if (parsedData.name) {
+                            setUserName(parsedData.name);
+                        }
+
+                        if (parsedData.bloodType) {
+                            setBloodType(parsedData.bloodType);
+                        }
+                    }
+                } catch (error) {
+                    console.log("Erro ao carregar dados do perfil:", error);
+                }
+            }
+            loadProfileData();
+        }, [])
+    );
+
     // Dados mocados para o layout
     const bloodTypes = ['A+', 'O+', 'B+', 'AB+', 'A-', 'O-', 'B-', 'AB-'];
     const stats = [
@@ -19,26 +60,30 @@ export default function HomeScreen() {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <StatusBar barStyle="light-content" backgroundColor="#E0323C" />
-            
+
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
-                
+
                 {/* --- HEADER VERMELHO --- */}
                 <View style={Styles.headerContainer}>
                     <View style={Styles.headerTop}>
                         <View style={Styles.userInfo}>
-                            {/* Placeholder para Foto */}
-                            <View style={Styles.avatarPlaceholder}>
-                                <Ionicons name="person" size={20} color="#E0323C" />
-                            </View>
+                            {/* Placeholder para Foto ou Foto Real */}
+                            {profileImage ? (
+                                <Image source={{ uri: profileImage }} style={Styles.avatarPlaceholder} />
+                            ) : (
+                                <View style={Styles.avatarPlaceholder}>
+                                    <Ionicons name="person" size={20} color="#E0323C" />
+                                </View>
+                            )}
                             <View>
-                                <Text style={Styles.userName}>João Souza</Text>
+                                <Text style={Styles.userName}>{userName}</Text>
                                 <View style={Styles.bloodTypeTag}>
-                                    <Text style={Styles.bloodTypeText}>A+</Text>
+                                    <Text style={Styles.bloodTypeText}>{bloodType}</Text>
                                 </View>
                             </View>
                         </View>
                         <View style={Styles.headerIcons}>
-                            <TouchableOpacity><Ionicons name="mail-outline" size={24} color="#333" style={{marginRight: 15}} /></TouchableOpacity>
+                            <TouchableOpacity><Ionicons name="mail-outline" size={24} color="#333" style={{ marginRight: 15 }} /></TouchableOpacity>
                             <TouchableOpacity><Ionicons name="notifications-outline" size={24} color="#333" /></TouchableOpacity>
                         </View>
                     </View>
@@ -46,8 +91,8 @@ export default function HomeScreen() {
                     {/* Barra de Busca */}
                     <View style={Styles.searchContainer}>
                         <Ionicons name="search" size={20} color="#999" style={{ marginRight: 10 }} />
-                        <TextInput 
-                            placeholder="Buscar Sangue" 
+                        <TextInput
+                            placeholder="Buscar Sangue"
                             style={Styles.searchInput}
                         />
                     </View>
