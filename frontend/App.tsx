@@ -36,7 +36,7 @@ export default function App() {
       <StatusBar style="auto" />
 
       <Stack.Navigator
-        initialRouteName="AuthChoice"
+        initialRouteName="MainTabs"
         screenOptions={{ headerShown: false }}
       >
         {/* --- FLUXO DE AUTENTICAÇÃO --- */}
