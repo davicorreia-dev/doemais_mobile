@@ -10,12 +10,12 @@ import { QUIZ_MODULES } from './quizData';
 export default function QuizScreen() {
     const navigation = useNavigation<any>();
     const route = useRoute();
-    
+
     // Recebe o ID do módulo via parâmetro: 'GRIPE', 'IMPEDIMENTOS_DEFINITIVOS'...
     const { moduleId } = route.params as { moduleId: string } || { moduleId: 'IMPEDIMENTOS_DEFINITIVOS' };
-    
+
     const module = QUIZ_MODULES[moduleId];
-    
+
     const [currentIndex, setCurrentIndex] = useState(0);
     const [showBlockModal, setShowBlockModal] = useState(false);
 
@@ -38,7 +38,7 @@ export default function QuizScreen() {
             if (currentIndex < module.questions.length - 1) {
                 setCurrentIndex(currentIndex + 1);
             } else {
-                alert("Módulo concluído!"); 
+                alert("Módulo concluído!");
                 // navigation.goBack();
             }
         }
@@ -66,8 +66,8 @@ export default function QuizScreen() {
             {/* Cabeçalho Vermelho */}
             <View style={Styles.header}>
                 {/* Navegação topo */}
-                <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%', paddingHorizontal: 20, position: 'absolute', top: 50}}>
-                    
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%', paddingHorizontal: 20, position: 'absolute', top: 50 }}>
+
                     {/* Botão navegação */}
                     <TouchableOpacity onPress={handleBack}>
                         <Ionicons name="chevron-back" size={28} color="#FFF" />
@@ -81,17 +81,17 @@ export default function QuizScreen() {
 
                 {/* Círculo Branco com o Ícone PNG do Módulo */}
                 <View style={Styles.headerIconContainer}>
-                    <Image 
-                        source={module.icon} 
+                    <Image
+                        source={module.icon}
                         style={Styles.headerImage}
                         resizeMode="contain"
                     />
                 </View>
             </View>
-            
+
             <View style={Styles.card}>
-                <View style={{width: '100%'}}>
-                    <Text style={{textAlign: 'left', fontWeight: 'bold', marginBottom: 10}}>
+                <View style={{ width: '100%' }}>
+                    <Text style={{ textAlign: 'left', fontWeight: 'bold', marginBottom: 10 }}>
                         {currentIndex + 1}.
                     </Text>
                     <Text style={Styles.questionText}>
@@ -103,9 +103,9 @@ export default function QuizScreen() {
                 <View style={Styles.buttonGroup}>
                     {currentQuestion.options ? (
                         currentQuestion.options.map((option) => (
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 key={option.value}
-                                style={[Styles.optionButton, { marginBottom: 10 }]} 
+                                style={[Styles.optionButton, { marginBottom: 10 }]}
                                 onPress={() => handleResponse(option.isBlocker)}
                             >
                                 <Text style={Styles.optionText}>{option.label}</Text>
@@ -113,15 +113,15 @@ export default function QuizScreen() {
                         ))
                     ) : (
                         <>
-                            <TouchableOpacity 
-                                style={Styles.optionButton} 
+                            <TouchableOpacity
+                                style={Styles.optionButton}
                                 onPress={() => handleResponse(currentQuestion.safeAnswer !== 'SIM')}
                             >
                                 <Text style={Styles.optionText}>Sim</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity 
-                                style={[Styles.optionButton, { marginTop: 15 }]} 
+                            <TouchableOpacity
+                                style={[Styles.optionButton, { marginTop: 15 }]}
                                 onPress={() => handleResponse(currentQuestion.safeAnswer !== 'NAO')}
                             >
                                 <Text style={Styles.optionText}>Não</Text>
@@ -141,24 +141,24 @@ export default function QuizScreen() {
                 <View style={Styles.blockContainer}>
                     <View style={Styles.blockCard}>
                         <Ionicons name="alert-circle-outline" size={60} color="#E0323C" style={Styles.blockIcon} />
-                        
+
                         {/* Título */}
                         <Text style={Styles.blockTitle}>
                             {modalData.title}
                         </Text>
-                        
+
                         {/* Mensagem */}
                         <Text style={Styles.blockMessage}>
                             {modalData.message}
                         </Text>
-                        
-                        <Text style={{fontSize: 12, color: '#999', marginBottom: 20, textAlign: 'center'}}>
+
+                        <Text style={{ fontSize: 12, color: '#999', marginBottom: 20, textAlign: 'center' }}>
                             Aguarde o período necessário. A DOE+ agradece a sua intenção!
                         </Text>
 
-                        <Button 
-                            title="Retornar ao início" 
-                            textColor="#FFF" 
+                        <Button
+                            title="Retornar ao início"
+                            textColor="#FFF"
                             width="100%"
                             onPress={handleExit}
                         />

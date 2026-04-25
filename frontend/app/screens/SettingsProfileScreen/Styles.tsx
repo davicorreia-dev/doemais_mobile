@@ -8,6 +8,14 @@ const Styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
     },
+
+    containerInputs: {
+        gap: 15,
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+
     iconContainer: {
         marginBottom: 30,
         backgroundColor: '#E0323C',
@@ -18,7 +26,7 @@ const Styles = StyleSheet.create({
         fontSize: 24,
         fontFamily: 'Lexend_700Bold',
         color: '#353535',
-        textAlign: 'center',
+
         marginBottom: 20,
     },
     subtitle: {
@@ -27,7 +35,7 @@ const Styles = StyleSheet.create({
         color: '#666666',
 
         marginBottom: 40,
-        paddingHorizontal: 20,
+
         lineHeight: 22,
     },
 });
