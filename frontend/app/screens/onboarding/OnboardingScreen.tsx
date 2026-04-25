@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { View, Text, Image, StatusBar } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import Button from '../../../components/Button'; 
+import Button from '../../../components/Button';
 import Styles from './Styles';
 
 // Configuração dos Slides
@@ -15,7 +15,7 @@ const slides = [
     },
     {
         id: '2',
-        title: 'Enconte locais de\ndoação perto de você.',
+        title: 'Encontre locais de\ndoação perto de você.',
         text: 'Utilize nosso mapa para localizar hemocentros e pontos de coleta mais próximos da sua localização.',
         image: require('../../../assets/images/location-tracking.png'),
     },
@@ -35,30 +35,30 @@ export default function OnboardingScreen() {
         if (currentIndex < slides.length - 1) {
             setCurrentIndex(currentIndex + 1);
         } else {
-            navigation.navigate('RegisterScreen'); 
+            navigation.navigate('RegisterScreen');
         }
     };
 
     const currentSlide = slides[currentIndex];
-    
+
     // Cálculo da barra de progresso
     const progressPercent = ((currentIndex + 1) / slides.length) * 100;
 
     return (
         <View style={Styles.container}>
             <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-            
+
             {/* Faixa Vermelha Superior igual ao design */}
             <View style={Styles.topBar} />
 
             <View style={Styles.content}>
                 <Text style={Styles.title}>{currentSlide.title}</Text>
-                
-                <Image 
-                    source={currentSlide.image} 
-                    style={Styles.image} 
+
+                <Image
+                    source={currentSlide.image}
+                    style={Styles.image}
                 />
-                
+
                 <Text style={Styles.description}>
                     {currentSlide.text}
                 </Text>

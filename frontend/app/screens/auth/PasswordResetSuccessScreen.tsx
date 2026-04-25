@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
 import Button from '../../../components/Button';
-import Styles from './Styles';
+import Styles from './StylesPasswordResetSucess';
 
 export default function PasswordResetSuccessScreen() {
     const navigation = useNavigation<any>();
@@ -18,13 +18,13 @@ export default function PasswordResetSuccessScreen() {
     return (
         <View style={Styles.container}>
             <View style={Styles.card}>
-                
+
                 <View style={Styles.iconContainer}>
                     <Ionicons name="checkmark-circle" size={80} color="#00C247" />
                 </View>
 
                 <Text style={Styles.title}>Senha redefinida com sucesso!</Text>
-                
+
                 <Text style={Styles.subtitle}>
                     Sua senha foi redefinida com sucesso. Agora você já pode acessar sua conta.
                 </Text>

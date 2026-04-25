@@ -1,6 +1,6 @@
 import { Image, Text, View } from "react-native";
 import Button from "../../../components/Button";
-import Styles from "../AuthChoiceScreen/AuthChoiceStyles"
+import Styles from "./AuthChoiceStyles"
 import StylesButton from "../../../components/SocialButton/styles";
 import { CommonActions } from "@react-navigation/native";
 import SocialButton from "../../../components/SocialButton";

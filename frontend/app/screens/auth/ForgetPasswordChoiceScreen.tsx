@@ -1,6 +1,6 @@
 import { Image, Text, View } from "react-native";
 import Header from "../../../components/Header";
-import Styles from "./ForgetPasswordChoiceStyles";
+import Styles from "./ForgetPasswordChoiceStyles"
 import { useNavigation } from "@react-navigation/native";
 import Input from "../../../components/Input";
 import Button from "../../../components/Button";

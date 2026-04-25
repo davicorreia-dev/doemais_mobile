@@ -5,11 +5,11 @@ import { useNavigation } from '@react-navigation/native';
 import Header from '../../../components/Header';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
-import Styles from './Styles';
+import Styles from './StylesNewPassword';
 
 export default function NewPasswordScreen() {
     const navigation = useNavigation<any>();
-    
+
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -28,8 +28,8 @@ export default function NewPasswordScreen() {
     };
 
     return (
-        <KeyboardAvoidingView 
-            style={Styles.container} 
+        <KeyboardAvoidingView
+            style={Styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -73,7 +73,7 @@ export default function NewPasswordScreen() {
                         />
 
                         {newPassword !== confirmPassword && confirmPassword.length > 0 && (
-                             <Text style={Styles.errorText}>As senhas devem corresponder.</Text>
+                            <Text style={Styles.errorText}>As senhas devem corresponder.</Text>
                         )}
                     </View>
 

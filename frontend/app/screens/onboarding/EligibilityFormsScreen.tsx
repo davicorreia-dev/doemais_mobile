@@ -3,8 +3,8 @@ import { Image, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'reac
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
-import { QUIZ_MODULES, type FormGender, type QuizModule } from '../QuizFlow/quizData';
-import styles from './styles';
+import { QUIZ_MODULES, type FormGender, type QuizModule } from '../app/QuizFlow/quizData';
+import styles from './StylesEligibily';
 
 type AuthGender = 'M' | 'F' | 'MALE' | 'FEMALE';
 

@@ -7,7 +7,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Header from '../../../components/Header';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
-import Styles from './Styles';
+import Styles from './StylesCompleteProfile';
 import { api } from '../../services/api';
 import { isValidAge, isValidWeight } from '../../utils/validators';
 
@@ -31,7 +31,7 @@ export default function CompleteProfileScreen() {
     const [gender, setGender] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [webDateText, setWebDateText] = useState('');
-    
+
     //Estado para controlar o carregamento da requisição
     const [loading, setLoading] = useState(false);
 
@@ -41,9 +41,9 @@ export default function CompleteProfileScreen() {
             return;
         }
         if (selectedDate) {
-            setDate(selectedDate);   
+            setDate(selectedDate);
             const formattedDate = selectedDate.toLocaleDateString('pt-BR');
-            setDobLabel(formattedDate); 
+            setDobLabel(formattedDate);
             console.log("Data Mobile selecionada:", formattedDate);
         }
     };
@@ -77,7 +77,7 @@ export default function CompleteProfileScreen() {
             Alert.alert("Data Inválida", "Por favor, verifique a data de nascimento.");
             return;
         }
-        
+
         //Validação de Sangue
         if (!selectedBlood && !unknownBlood) {
             Alert.alert("Atenção", "Selecione seu tipo sanguíneo ou marque 'Não sei'.");
@@ -87,7 +87,7 @@ export default function CompleteProfileScreen() {
         //Validação de Idade (16 a 69 anos)
         if (!isValidAge(date)) {
             Alert.alert(
-                "Idade não permitida", 
+                "Idade não permitida",
                 "Para se cadastrar como doador, você deve ter entre 16 e 69 anos."
             );
             return;
@@ -96,7 +96,7 @@ export default function CompleteProfileScreen() {
         //Validação de Peso Mínimo 50kg
         if (!isValidWeight(weight)) {
             Alert.alert(
-                "Peso insuficiente", 
+                "Peso insuficiente",
                 "Para doar sangue, é necessário pesar no mínimo 50kg."
             );
             return;
@@ -137,8 +137,8 @@ export default function CompleteProfileScreen() {
     };
 
     return (
-        <KeyboardAvoidingView 
-            style={Styles.container} 
+        <KeyboardAvoidingView
+            style={Styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -150,7 +150,7 @@ export default function CompleteProfileScreen() {
                 />
 
                 <View style={Styles.content}>
-                    
+
                     {/* Data */}
                     {Platform.OS === 'web' ? (
                         <View style={{ marginBottom: 20 }}>
@@ -163,7 +163,7 @@ export default function CompleteProfileScreen() {
                                     let formatted = text.replace(/\D/g, '');
                                     if (formatted.length > 2) formatted = formatted.replace(/^(\d{2})(\d)/g, '$1/$2');
                                     if (formatted.length > 5) formatted = formatted.replace(/^(\d{2})\/(\d{2})(\d)/g, '$1/$2/$3');
-                                    
+
                                     setWebDateText(formatted);
 
                                     if (setDobLabel) setDobLabel(formatted);
@@ -173,7 +173,7 @@ export default function CompleteProfileScreen() {
                                         const day = parseInt(parts[0], 10);
                                         const month = parseInt(parts[1], 10) - 1;
                                         const year = parseInt(parts[2], 10);
-                                        
+
                                         const dateObj = new Date(year, month, day);
 
                                         if (!isNaN(dateObj.getTime())) {
@@ -194,7 +194,7 @@ export default function CompleteProfileScreen() {
                                     <Input
                                         label="Data de Nascimento*"
                                         placeholder="DD/MM/AAAA"
-                                        value={dobLabel} 
+                                        value={dobLabel}
                                     />
                                 </View>
                             </TouchableOpacity>
@@ -234,7 +234,7 @@ export default function CompleteProfileScreen() {
                     {/* Peso */}
                     <Text style={Styles.weightLabel}>Peso (kg)*</Text>
                     <View style={Styles.weightInputContainer}>
-                        <TextInput 
+                        <TextInput
                             style={Styles.weightTextInput}
                             placeholder="Ex: 70"
                             placeholderTextColor="#C4C4C4"

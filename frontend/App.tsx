@@ -5,26 +5,26 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 
 // --- IMPORTS DAS TELAS ---
-import AuthChoiceScreen from './app/screens/AuthChoiceScreen/AuthChoiceScreen';
-import LoginScreen from './app/screens/LoginScreen/LoginScreen';
-import RegisterScreen from './app/screens/RegisterScreen/RegisterScreen';
-import ForgotPasswordCodeScreen from './app/screens/ForgotPasswordCodeScreen/ForgotPasswordCodeScreen';
-import ForgetPasswordScreen from './app/screens/ForgetPasswordScreen/ForgetPasswordScreen';
-import ForgetPasswordChoiceScreen from './app/screens/ForgetPasswordChoiceScreen/ForgetPasswordChoiceScreen';
-import NewPasswordScreen from './app/screens/NewPasswordScreen/NewPasswordScreen';
-import PasswordResetSuccessScreen from './app/screens/PasswordResetSuccessScreen/PasswordResetSuccessScreen';
-import LgpdScreen from './app/screens/LgpdScreen/LgpdScreen';
-import RegisterSuccessScreen from './app/screens/RegisterSuccessScreen/RegisterSuccessScreen';
-import CompleteProfileScreen from './app/screens/CompleteProfileScreen/CompleteProfileScreen';
-import OnboardingScreen from './app/screens/OnboardingScreen/OnboardingScreen';
-import QuizScreen from './app/screens/QuizFlow/QuizScreen';
+import AuthChoiceScreen from './app/screens/auth/AuthChoiceScreen';
+import LoginScreen from './app/screens/auth/LoginScreen';
+import RegisterScreen from './app/screens/auth/RegisterScreen';
+import ForgotPasswordCodeScreen from './app/screens/auth/ForgotPasswordCodeScreen';
+import ForgetPasswordScreen from './app/screens/auth/ForgetPasswordScreen';
+import ForgetPasswordChoiceScreen from './app/screens/auth/ForgetPasswordChoiceScreen';
+import NewPasswordScreen from './app/screens/auth/NewPasswordScreen';
+import PasswordResetSuccessScreen from './app/screens/auth/PasswordResetSuccessScreen';
+import LgpdScreen from './app/screens/onboarding/LgpdScreen';
+import RegisterSuccessScreen from './app/screens/auth/RegisterSuccessScreen';
+import CompleteProfileScreen from './app/screens/onboarding/CompleteProfileScreen';
+import OnboardingScreen from './app/screens/onboarding/OnboardingScreen';
+import QuizScreen from './app/screens/app/QuizFlow/QuizScreen';
 
 // IMPORTANTE: Este é o seu MENU NOVO (Vermelho)
 // Ele já é um TabNavigator por dentro, então não precisamos criar outro aqui.
-import MainTabsScreen from './app/screens/MainTabs/MainTabs';
+import MainTabsScreen from './app/screens/app/MainTabs/MainTabs';
 
-import SettingsProfileScreen from './app/screens/SettingsProfileScreen/SettingsProfileScreen';
-import ProfileSetupPhotoScreen from './app/screens/SettingsProfileScreen/ProfileSetupPhotoScreen';
+import SettingsProfileScreen from './app/screens/settings/SettingsProfileScreen';
+import ProfileSetupPhotoScreen from './app/screens/settings/ProfileSetupPhotoScreen';
 // Se você quiser usar a tela de Settings depois, importe ela aqui, 
 // mas ela deve ser adicionada lá dentro do arquivo MainTabs.tsx se quiser que apareça no menu.
 // import SettingsScreen from './app/screens/Settings/SettingsScreen'; 
@@ -36,8 +36,9 @@ export default function App() {
     <NavigationContainer>
       <StatusBar style="auto" />
 
+      {/* AuthChoice tela padrão   */}
       <Stack.Navigator
-        initialRouteName="MainTabs"
+        initialRouteName="AuthChoice"
         screenOptions={{ headerShown: false }}
       >
         {/* --- FLUXO DE AUTENTICAÇÃO --- */}

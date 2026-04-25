@@ -7,7 +7,7 @@ import { useFonts, Lexend_100Thin, Lexend_200ExtraLight, Lexend_300Light, Lexend
 // Seus componentes
 import Header from "../../../components/Header";
 import Input from "../../../components/Input";
-import Styles from "./styles";
+import Styles from "./stylesLogin";
 import SocialButton from "../../../components/SocialButton";
 import Button from "../../../components/Button";
 
@@ -46,9 +46,9 @@ export default function LoginScreen() {
             console.log("Tentando logar com:", email);
 
             // Chama a API (/api/auth/login)
-            const response = await api('/api/auth/login', 'POST', { 
-                email: email.toLowerCase().trim(), 
-                senha: password 
+            const response = await api('/api/auth/login', 'POST', {
+                email: email.toLowerCase().trim(),
+                senha: password
             });
 
             console.log("Login OK:", response);
@@ -57,11 +57,11 @@ export default function LoginScreen() {
             if (response.token) {
                 await AsyncStorage.setItem('@doemais:token', response.token);
                 await AsyncStorage.setItem('@doemais:user', JSON.stringify(response.user || response.doador));
-                
+
                 // Redireciona para o Quiz (Home)
                 navigation.reset({
                     index: 0,
-                    routes: [{ name: 'MainTabs' }], 
+                    routes: [{ name: 'MainTabs' }],
                 });
             } else {
                 throw new Error("Token não recebido.");
@@ -70,8 +70,8 @@ export default function LoginScreen() {
         } catch (error: any) {
             console.error("Erro Login:", error);
             // Mensagem amigável se for erro de senha
-            const msg = error.message.includes('401') || error.message.includes('404') 
-                ? 'E-mail ou senha incorretos.' 
+            const msg = error.message.includes('401') || error.message.includes('404')
+                ? 'E-mail ou senha incorretos.'
                 : error.message;
             Alert.alert('Falha no Login', msg);
         } finally {
@@ -80,20 +80,20 @@ export default function LoginScreen() {
     };
 
     if (!fontsLoaded) {
-        return null; 
+        return null;
     }
 
     return (
         <KeyboardAvoidingView style={{ flex: 1, backgroundColor: '#fff' }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                
+
                 <Header
                     icon="arrow-back-outline"
                     titleSize={20}
                     title="Seja bem-vindo(a)! Sua solidariedade pode salvar vidas."
                     onBack={() => navigation.goBack()} // Adicionei ação de voltar
                 />
-                
+
                 <View>
                     <View style={Styles.inputcontainer}>
                         {/* 3. CONECTADO: Input de E-mail */}
@@ -126,7 +126,7 @@ export default function LoginScreen() {
                             onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
                         />
 
-                        <SocialButton 
+                        <SocialButton
                             title="Entrar com o Facebook"
                             iconSource={require("../../../assets/images/facebook 1.png")}
                             onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}

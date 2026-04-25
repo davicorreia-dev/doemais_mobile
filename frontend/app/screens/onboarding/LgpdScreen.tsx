@@ -5,7 +5,7 @@ import Checkbox from 'expo-checkbox';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
 import Button from '../../../components/Button';
-import Styles from './Styles';
+import Styles from './StylesLgpd';
 
 export default function LgpdScreen() {
     const navigation = useNavigation<any>();
@@ -22,7 +22,7 @@ export default function LgpdScreen() {
         }
 
         navigation.navigate("CompleteProfileScreen", {
-            basicData: basicData 
+            basicData: basicData
         });
     };
 
@@ -50,7 +50,7 @@ export default function LgpdScreen() {
                 </Text>
             </View>
 
-            <Button 
+            <Button
                 title="Continuar"
                 textColor="#fff"
                 onPress={handleContinue}

@@ -3,8 +3,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Text } from 'react-native';
 
-import HomeScreen from '../HomeScreen/HomeScreen';
-import EligibilityFormsScreen from '../EligibilityFormsScreen/EligibilityFormsScreen';
+import HomeScreen from '../HomeScreen';
+import EligibilityFormsScreen from '../../onboarding/EligibilityFormsScreen';
 
 const PlaceholderScreen = ({ name }: { name: string }) => (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -48,15 +48,15 @@ export default function MainTabs() {
             })}
         >
             <Tab.Screen name="Início" component={HomeScreen} />
-            
-            <Tab.Screen 
-                name="Elegibilidade" 
-                component={EligibilityFormsScreen}  
+
+            <Tab.Screen
+                name="Elegibilidade"
+                component={EligibilityFormsScreen}
             />
-            
-            <Tab.Screen 
-                name="Mais" 
-                children={() => <PlaceholderScreen name="Mais Opções" />} 
+
+            <Tab.Screen
+                name="Mais"
+                children={() => <PlaceholderScreen name="Mais Opções" />}
             />
         </Tab.Navigator>
     );

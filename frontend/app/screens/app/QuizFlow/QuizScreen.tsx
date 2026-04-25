@@ -3,8 +3,8 @@ import { Alert, Image, Modal, ScrollView, StatusBar, Text, TouchableOpacity, Vie
 import { NavigationProp, ParamListBase, useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
-import Button from '../../../components/Button';
-import Input from '../../../components/Input';
+import Button from '../../../../components/Button';
+import Input from '../../../../components/Input';
 import Styles from './Styles';
 import { QUIZ_MODULES, type QuizQuestion } from './quizData';
 
