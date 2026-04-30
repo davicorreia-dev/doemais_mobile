@@ -1,16 +1,7 @@
 import { Alert, Platform } from 'react-native';
 
-// Configuração dinâmica do IP da API
-let API_URL = '';
-
-if (Platform.OS === 'web') {
-    API_URL = 'http://localhost:3000';
-} else if (Platform.OS === 'android') {
-    // IP da sua rede local, ajuste conforme necessário com o da sua rede
-    API_URL = 'http://192.168.1.146:3000'; 
-} else {
-    API_URL = 'http://localhost:3000';
-}
+// Configuração da API do Render
+const API_URL = 'https://doemais-mobile.onrender.com';
 
 /**
  * Serviço centralizado para requisições HTTP
