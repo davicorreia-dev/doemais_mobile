@@ -23,8 +23,13 @@ import QuizScreen from './app/screens/QuizFlow/QuizScreen';
 // Ele já é um TabNavigator por dentro, então não precisamos criar outro aqui.
 import MainTabsScreen from './app/screens/MainTabs/MainTabs';
 
+<<<<<<< Updated upstream
 import SettingsProfileScreen from './app/screens/SettingsProfileScreen/SettingsProfileScreen';
 import ProfileSetupPhotoScreen from './app/screens/SettingsProfileScreen/ProfileSetupPhotoScreen';
+=======
+import SettingsProfileScreen from './app/screens/Settings/SettingsProfileScreen';
+import ProfileSetupPhotoScreen from './app/screens/Settings/ProfileSetupPhotoScreen';
+>>>>>>> Stashed changes
 // Se você quiser usar a tela de Settings depois, importe ela aqui, 
 // mas ela deve ser adicionada lá dentro do arquivo MainTabs.tsx se quiser que apareça no menu.
 // import SettingsScreen from './app/screens/Settings/SettingsScreen'; 
