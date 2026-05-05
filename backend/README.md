@@ -117,6 +117,8 @@ Diferente da abordagem tradicional de aplicar middlewares em cada rota, o `authM
 ### **Protegidos (Usuário)**
 - `GET /api/doadores/me`: Retorna o perfil completo do doador autenticado (excluindo dados sensíveis como senha).
 - `GET /api/doadores/certificate`: Gera e retorna um certificado de doação em formato PDF.
+- `PUT /doador/me`: Atualiza o perfil do doador autenticado.
+
 ---
 
 ## 6. Tratamento de Erros Centralizado

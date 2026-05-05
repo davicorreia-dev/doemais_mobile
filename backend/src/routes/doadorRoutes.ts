@@ -1,10 +1,14 @@
 import { Router } from 'express';
-import { getProfile } from '../controllers/doadorController';
+import { getProfile, updateProfile } from '../controllers/doadorController';
+import validationMiddleware from '../middlewares/validation.middleware';
+import { UpdateDoadorDto } from '../dtos/doador.dto';
 
 const router = Router();
 
-// Como o middleware é global, não precisamos passar nada aqui.
-// Esta rota já nasce protegida!
+// Como o middleware é global, a rota já está protegida
 router.get('/me', getProfile);
+
+// Rota PUT para atualizar as informações do usuário
+router.put('/me', validationMiddleware(UpdateDoadorDto), updateProfile);
 
 export default router;
