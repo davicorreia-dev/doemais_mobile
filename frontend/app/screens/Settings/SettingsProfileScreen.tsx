@@ -8,6 +8,7 @@ import SelectInput from '../../../components/SelectInput/SelectInput';
 import Button from '../../../components/Button';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { api } from '../../services/api';
 
 export default function SettingsProfileScreen() {
 
@@ -15,18 +16,17 @@ export default function SettingsProfileScreen() {
     const [value, setValue] = useState(''); // blood type
     const [phone, setPhone] = useState('');
     const [name, setName] = useState('');
-    const [city, setCity] = useState('');
 
     useEffect(() => {
         async function loadProfileData() {
             try {
-                const savedData = await AsyncStorage.getItem('@user_profile_data');
-                if (savedData) {
-                    const parsedData = JSON.parse(savedData);
-                    setName(parsedData.name || '');
-                    setPhone(parsedData.phone || '');
-                    setValue(parsedData.bloodType || '');
-                    setCity(parsedData.city || '');
+                // Busca os dados completos e REAIS do banco de dados (Render)
+                const response = await api('/api/doadores/me', 'GET');
+
+                if (response) {
+                    setName(response.nome || '');
+                    setPhone(response.telefone || '');
+                    setValue(response.tipo_sanguineo || '');
                 }
             } catch (error) {
                 console.error("Erro ao carregar dados do perfil", error);
@@ -46,29 +46,6 @@ export default function SettingsProfileScreen() {
             v = `${v.substring(0, 10)}-${v.substring(10)}`;
         }
         setPhone(v);
-    };
-
-    const handleSubmit = async () => {
-        const payload = {
-            name,
-            phone,
-            bloodType: value,
-            city
-        };
-
-        console.log('Dados prontos para salvar localmente:', payload);
-
-        try {
-            // Salva os dados no AsyncStorage
-            await AsyncStorage.setItem('@user_profile_data', JSON.stringify(payload));
-
-            // Depois do envio/salvamento correto, navega para a próxima tela:
-            navigation.navigate('ProfileSetupPhotoScreen');
-
-        } catch (error) {
-            console.error("Erro ao salvar os dados", error);
-            Alert.alert("Erro", "Não foi possível salvar os dados do perfil.");
-        }
     };
 
     const BLOOD_TYPES = [
@@ -116,6 +93,7 @@ export default function SettingsProfileScreen() {
                                 label="Nome Completo"
                                 value={name}
                                 onChangeText={setName}
+                                editable={false} // Somente leitura
                             />
 
                             <Input
@@ -123,6 +101,7 @@ export default function SettingsProfileScreen() {
                                 keyboardType="numeric"
                                 value={phone}
                                 onChangeText={handlePhoneChange}
+                                editable={false} // Somente leitura
                             />
 
                             <SelectInput
@@ -130,22 +109,6 @@ export default function SettingsProfileScreen() {
                                 options={BLOOD_TYPES}
                                 value={value}
                                 onChange={setValue}
-                            />
-
-                            <Input
-                                label="Cidade"
-                                value={city}
-                                onChangeText={setCity}
-                            />
-
-                            <Button
-                                title="Próximo"
-                                onPress={handleSubmit}
-                                textColor="white"
-                                borderRadius={10}
-                                width={270}
-                                style={{ alignSelf: 'center' }}
-
                             />
                         </View>
 

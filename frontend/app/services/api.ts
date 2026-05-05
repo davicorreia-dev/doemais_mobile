@@ -1,4 +1,5 @@
 import { Alert, Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Configuração da API do Render
 const API_URL = 'https://doemais-mobile.onrender.com';
@@ -9,10 +10,18 @@ const API_URL = 'https://doemais-mobile.onrender.com';
 export const api = async (endpoint: string, method: string = 'GET', body?: any) => {
     const url = `${API_URL}${endpoint}`;
     
-    const headers = {
+    // Recuperar o JWT salvo no dispositivo
+    const token = await AsyncStorage.getItem('@doemais:token');
+
+    const headers: Record<string, string> = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
     };
+
+    // Se o token existir, injeta no cabeçalho
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
 
     try {
         const response = await fetch(url, {

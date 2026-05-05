@@ -40,23 +40,24 @@ export default function LoginScreen() {
             return;
         }
 
+        const payload = {
+            email: email.trim().toLowerCase(),
+            senha: password
+        }
+
         setLoading(true);
 
         try {
-            console.log("Tentando logar com:", email);
+            console.log("Tentando logar com:", payload);
 
             // Chama a API (/api/auth/login)
-            const response = await api('/api/auth/login', 'POST', {
-                email: email.toLowerCase().trim(),
-                senha: password
-            });
+            const response = await api('/api/auth/login', 'POST', payload);
 
-            console.log("Login OK:", response);
 
             // Se recebeu o token, salva e entra
-            if (response.token) {
-                await AsyncStorage.setItem('@doemais:token', response.token);
-                await AsyncStorage.setItem('@doemais:user', JSON.stringify(response.user || response.doador));
+            if (response.accessToken) {
+                await AsyncStorage.setItem('@doemais:token', response.accessToken);
+                await AsyncStorage.setItem('@doemais:user', JSON.stringify(response.doador));
 
                 // Redireciona para o Quiz (Home)
                 navigation.reset({
