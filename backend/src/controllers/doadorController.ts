@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as doadorService from '../services/doadorService';
+import { UpdateDoadorDto } from '../dtos/doador.dto';
 
 export const getProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -9,6 +10,22 @@ export const getProfile = async (req: Request, res: Response, next: NextFunction
     const profile = await doadorService.getDoadorProfile(id);
     
     res.status(200).json(profile);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateProfile = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id = req.doadorId as number;
+    const updateData: UpdateDoadorDto = req.body;
+
+    const updatedProfile = await doadorService.updateDoadorProfile(id, updateData);
+
+    res.status(200).json({
+      message: 'Perfil atualizado com sucesso.',
+      doador: updatedProfile,
+    });
   } catch (error) {
     next(error);
   }

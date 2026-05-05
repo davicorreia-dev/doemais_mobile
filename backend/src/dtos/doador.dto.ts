@@ -56,3 +56,35 @@ export class RefreshTokenDto {
   @IsNotEmpty({ message: 'O refresh token é obrigatório.' })
   refreshToken!: string;
 }
+
+export class UpdateDoadorDto {
+  @IsString({ message: 'O nome deve ser uma string.' })
+  @IsOptional()
+  nome?: string;
+
+  @IsEmail({}, { message: 'O e-mail informado não é válido.' })
+  @IsOptional()
+  email?: string;
+
+  @IsString({ message: 'O telefone deve ser uma string.' })
+  @IsPhoneNumber('BR', { message: 'O telefone informado não é válido.' })
+  @IsOptional()
+  telefone?: string;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate({ message: 'A data de nascimento deve ser uma data válida.' })
+  data_nascimento?: Date;
+
+  @IsOptional()
+  @IsNumber({}, { message: 'O peso deve ser um número válido.' })
+  peso_kg?: number;
+
+  @IsString({ message: 'O gênero deve ser uma string.' })
+  @IsOptional()
+  genero?: string;
+
+  @IsString({ message: 'O tipo sanguíneo deve ser uma string.' })
+  @IsOptional()
+  tipo_sanguineo?: string;
+}
