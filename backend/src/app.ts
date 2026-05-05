@@ -1,6 +1,7 @@
 import express from 'express';
 import authRoutes from './routes/authRoutes';
 import doadorRoutes from './routes/doadorRoutes';
+import formularioElegibilidadeRoutes from './routes/formularioElegibilidadeRoutes';
 import { authMiddleware } from './middlewares/auth.middleware';
 import errorMiddleware from './middlewares/error.middleware';
 
@@ -23,7 +24,8 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/auth', authRoutes);
-app.use('/api/doadores', doadorRoutes); 
+app.use('/api/doadores', doadorRoutes);
+app.use('/api/doadores', formularioElegibilidadeRoutes);
 
 app.use(errorMiddleware);
 
