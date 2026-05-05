@@ -96,3 +96,65 @@ export class UpdateDoadorDto {
   @IsOptional()
   tipo_sanguineo?: string;
 }
+export class CreateFormularioElegibilidadeDto {
+  @IsOptional()
+  @Type(() => Boolean)
+  teve_resfriado?: boolean;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate({ message: 'A data deve ser válida.' })
+  data_fim_sintomas_resfriado?: Date;
+
+  @IsOptional()
+  @Type(() => Boolean)
+  esta_gravida?: boolean;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate({ message: 'A data deve ser válida.' })
+  data_parto?: Date;
+
+  @IsOptional()
+  @Type(() => Boolean)
+  esta_amamentando?: boolean;
+
+  @IsOptional()
+  @Type(() => Boolean)
+  fez_tatuagem?: boolean;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate({ message: 'A data deve ser válida.' })
+  data_tatuagem?: Date;
+
+  @IsOptional()
+  @Type(() => Boolean)
+  esteve_area_malaria?: boolean;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate({ message: 'A data deve ser válida.' })
+  data_retorno_area_malaria?: Date;
+
+  @IsOptional()
+  @Type(() => Boolean)
+  teve_hepatite?: boolean;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate({ message: 'A data deve ser válida.' })
+  data_diagnostico_hepatite?: Date;
+
+  @IsString({ message: 'O tipo de hepatite deve ser uma string.' })
+  @IsOptional()
+  tipo_hepatite?: string;
+
+  @IsOptional()
+  @Type(() => Boolean)
+  usou_drogas_injetaveis?: boolean;
+
+  @IsOptional()
+  @Type(() => Boolean)
+  teve_malaria?: boolean;
+}
