@@ -18,6 +18,7 @@ model Doador {
   cpf                     String                 @unique
   senha                   String
   telefone                String?
+  cidade                  String?
   criado_em               DateTime               @default(now()) @map("criadoEm")
 
   // Relacionamentos com outras tabelas

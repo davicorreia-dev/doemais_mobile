@@ -24,6 +24,10 @@ export class RegisterDoadorDto {
   @IsOptional()
   telefone?: string;
 
+  @IsString({ message: 'A cidade deve ser uma string.' })
+  @IsOptional()
+  cidade?: string;
+
   @IsOptional()
   @Type(() => Date)  // Converte a string para Date
   @IsDate({ message: 'A data de nascimento deve ser uma data válida.' })
@@ -70,6 +74,10 @@ export class UpdateDoadorDto {
   @IsPhoneNumber('BR', { message: 'O telefone informado não é válido.' })
   @IsOptional()
   telefone?: string;
+
+  @IsString({ message: 'A cidade deve ser uma string.' })
+  @IsOptional()
+  cidade?: string;
 
   @IsOptional()
   @Type(() => Date)
