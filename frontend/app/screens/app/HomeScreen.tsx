@@ -3,14 +3,22 @@ import { View, Text, ScrollView, TextInput, Image, TouchableOpacity, SafeAreaVie
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons'; // Usando ícones padrão por enquanto
 import Styles from './StylesHome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { api } from '../../services/api';
+
 
 export default function HomeScreen() {
+    const navigation = useNavigation<any>();
     const [profileImage, setProfileImage] = useState<string | null>(null);
 
-    // Estados para os dados de texto (com valor padrão para não quebrar a tela)
+    // Dados mockados para o layout
     const [userName, setUserName] = useState<string>('João Souza');
-    const [bloodType, setBloodType] = useState<string>('A+'); // Repita a lógica do nome para este aqui!
+    const handleGetUser = async () => {
+        const response = await api('/api/users/me', 'GET');
+        return response;
+    };
+    const [bloodType, setBloodType] = useState<string>('B+');
+
 
     useFocusEffect(
         useCallback(() => {
@@ -25,17 +33,19 @@ export default function HomeScreen() {
                     }
 
                     // 2. Carrega os dados de texto do perfil
-                    const savedData = await AsyncStorage.getItem('@user_profile_data');
+                    const savedData = await AsyncStorage.getItem('@doemais:user');
                     if (savedData) {
                         const parsedData = JSON.parse(savedData);
 
 
-                        if (parsedData.name) {
-                            setUserName(parsedData.name);
+                        if (parsedData.nome) {
+                            // A chave vinda do backend é 'nome', então usamos parsedData.nome
+                            setUserName(parsedData.nome);
                         }
 
-                        if (parsedData.bloodType) {
-                            setBloodType(parsedData.bloodType);
+                        if (parsedData.tipo_sanguineo) {
+                            // O backend envia 'tipo_sanguineo'
+                            setBloodType(parsedData.tipo_sanguineo);
                         }
                     }
                 } catch (error) {
@@ -67,14 +77,16 @@ export default function HomeScreen() {
                 <View style={Styles.headerContainer}>
                     <View style={Styles.headerTop}>
                         <View style={Styles.userInfo}>
-                            {/* Placeholder para Foto ou Foto Real */}
-                            {profileImage ? (
-                                <Image source={{ uri: profileImage }} style={Styles.avatarPlaceholder} />
-                            ) : (
-                                <View style={Styles.avatarPlaceholder}>
-                                    <Ionicons name="person" size={20} color="#E0323C" />
-                                </View>
-                            )}
+                            {/* Placeholder para Foto ou Foto Real com navegação */}
+                            <TouchableOpacity onPress={() => navigation.navigate('SettingsProfileScreen')}>
+                                {profileImage ? (
+                                    <Image source={{ uri: profileImage }} style={Styles.avatarPlaceholder} />
+                                ) : (
+                                    <View style={Styles.avatarPlaceholder}>
+                                        <Ionicons name="person" size={20} color="#E0323C" />
+                                    </View>
+                                )}
+                            </TouchableOpacity>
                             <View>
                                 <Text style={Styles.userName}>{userName}</Text>
                                 <View style={Styles.bloodTypeTag}>

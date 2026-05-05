@@ -6,10 +6,7 @@ import Input from "../../../components/Input";
 import Styles from "./RegisterStyles";
 import Button from "../../../components/Button";
 import { isValidName, isValidEmail, isValidCPF, isValidPhone } from '../../utils/validators';
-
-
-
-
+import { api } from '../../services/api';
 
 export default function RegisterScreen() {
 
@@ -22,8 +19,9 @@ export default function RegisterScreen() {
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleNext = () => {
+    const handleNext = async () => {
         //Campos Vazios
         if (!name || !email || !cpf || !password || !confirmPassword) {
             Alert.alert("Campos Obrigatórios", "Por favor, preencha todos os campos marcados com *.");
@@ -64,15 +62,18 @@ export default function RegisterScreen() {
             return;
         }
 
-        //Se passou por tudo, segue o baile!
+        // Se passou por tudo, prepara os dados
+        const payload = {
+            nome: name.trim(),
+            email: email.trim().toLowerCase(),
+            cpf: cpf.replace(/\D/g, ''),
+            senha: password,
+            telefone: phone ? phone.replace(/\D/g, '') : ''
+        };
+
+        // Navegamos para a próxima tela do fluxo passando os dados
         navigation.navigate("LgpdScreen", {
-            basicData: {
-                nome: name.trim(),
-                email: email.trim().toLowerCase(),
-                cpf: cpf.replace(/\D/g, ''),
-                senha: password,
-                telefone: phone ? phone.replace(/\D/g, '') : ''
-            }
+            basicData: payload
         });
     };
 
@@ -149,11 +150,12 @@ export default function RegisterScreen() {
 
                 <View style={{ marginTop: 40, alignItems: 'center', paddingBottom: 20 }}>
                     <Button
-                        title="Continuar"
+                        title={loading ? "Carregando..." : "Continuar"}
                         textColor="#fff"
                         width={309}
                         borderRadius={10}
                         onPress={handleNext}
+                        disabled={loading}
                     />
                 </View>
 

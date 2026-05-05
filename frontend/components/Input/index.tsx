@@ -1,4 +1,6 @@
-import { TextInput, Text, View } from "react-native";
+import React, { useState } from "react";
+import { TextInput, Text, View, TouchableOpacity } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
 import type { KeyboardTypeOptions } from "react-native";
 import styles from "./styles";
 
@@ -21,19 +23,34 @@ export default function Input({
     keyboardType,
     autoCapitalize
 }: InputProps) {
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     return (
         <View style={styles.containerInput}>
             {label ? <Text style={styles.label}>{label}</Text> : null}
-            <TextInput
-                keyboardType={keyboardType}
-                style={styles.Input}
-                value={value}
-                placeholder={placeholder}
-                secureTextEntry={secureTextEntry}
-                onChangeText={onChangeText}
-                autoCapitalize={autoCapitalize}
-            />
+            <View style={styles.inputContainer}>
+                <TextInput
+                    keyboardType={keyboardType}
+                    style={styles.inputStyle}
+                    value={value}
+                    placeholder={placeholder}
+                    secureTextEntry={secureTextEntry && !isPasswordVisible}
+                    onChangeText={onChangeText}
+                    autoCapitalize={autoCapitalize}
+                />
+                {secureTextEntry && (
+                    <TouchableOpacity
+                        style={styles.iconContainer}
+                        onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                    >
+                        <Ionicons
+                            name={isPasswordVisible ? 'eye-off' : 'eye'}
+                            size={20}
+                            color="#999"
+                        />
+                    </TouchableOpacity>
+                )}
+            </View>
         </View>
     );
 }
