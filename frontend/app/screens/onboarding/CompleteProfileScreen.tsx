@@ -29,6 +29,7 @@ export default function CompleteProfileScreen() {
     const [unknownBlood, setUnknownBlood] = useState(false);
 
     const [gender, setGender] = useState('');
+    const [cidade, setCidade] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [webDateText, setWebDateText] = useState('');
 
@@ -64,11 +65,11 @@ export default function CompleteProfileScreen() {
     };
 
     const handleFinish = async () => {
-        console.log("Botão clicado. Estado atual:", { dobLabel, date, gender, weight });
+        console.log("Botão clicado. Estado atual:", { dobLabel, date, gender, weight, cidade });
 
         //Campos Vazios
-        if (!dobLabel || !gender || !weight) {
-            Alert.alert("Atenção", "Preencha os campos obrigatórios (Data, Gênero, Peso).");
+        if (!dobLabel || !gender || !weight || !cidade) {
+            Alert.alert("Atenção", "Preencha os campos obrigatórios (Data, Gênero, Peso, Cidade).");
             return;
         }
 
@@ -118,6 +119,7 @@ export default function CompleteProfileScreen() {
                 data_nascimento: date.toISOString(),
                 peso_kg: Number(weight),
                 genero: gender,
+                cidade: cidade,
                 tipo_sanguineo: unknownBlood ? 'Nao sei' : selectedBlood
             };
 
@@ -230,6 +232,14 @@ export default function CompleteProfileScreen() {
                             />
                         </View>
                     </TouchableOpacity>
+
+                    {/* Cidade */}
+                    <Input
+                        label="Cidade*"
+                        placeholder="Digite sua cidade"
+                        value={cidade}
+                        onChangeText={setCidade}
+                    />
 
                     {/* Peso */}
                     <Text style={Styles.weightLabel}>Peso (kg)*</Text>
