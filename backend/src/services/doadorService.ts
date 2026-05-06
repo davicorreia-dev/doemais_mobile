@@ -50,14 +50,14 @@ export const updateDoadorProfile = async (id: number, updateData: UpdateDoadorDt
   const updatedDoador = await prisma.doador.update({
     where: { id },
     data: {
-      ...(updateData.nome && { nome: updateData.nome }),
-      ...(updateData.email && { email: updateData.email }),
-      ...(updateData.telefone && { telefone: updateData.telefone }),
-      ...(updateData.cidade && { cidade: updateData.cidade }),
-      ...(updateData.data_nascimento && { data_nascimento: updateData.data_nascimento }),
-      ...(updateData.peso_kg && { peso_kg: updateData.peso_kg }),
-      ...(updateData.genero && { genero: updateData.genero }),
-      ...(updateData.tipo_sanguineo && { tipo_sanguineo: updateData.tipo_sanguineo }),
+      ...(updateData.nome !== undefined && { nome: updateData.nome }),
+      ...(updateData.email !== undefined && { email: updateData.email }),
+      ...(updateData.telefone !== undefined && { telefone: updateData.telefone }),
+      ...(updateData.cidade !== undefined && { cidade: updateData.cidade }),
+      ...(updateData.data_nascimento !== undefined && { data_nascimento: updateData.data_nascimento }),
+      ...(updateData.peso_kg !== undefined && { peso_kg: updateData.peso_kg }),
+      ...(updateData.genero !== undefined && { genero: updateData.genero }),
+      ...(updateData.tipo_sanguineo !== undefined && { tipo_sanguineo: updateData.tipo_sanguineo }),
     },
     select: {
       id: true,
