@@ -11,13 +11,8 @@ export default function HomeScreen() {
     const navigation = useNavigation<any>();
     const [profileImage, setProfileImage] = useState<string | null>(null);
 
-    // Dados mockados para o layout
-    const [userName, setUserName] = useState<string>('João Souza');
-    const handleGetUser = async () => {
-        const response = await api('/api/users/me', 'GET');
-        return response;
-    };
-    const [bloodType, setBloodType] = useState<string>('B+');
+    const [userName, setUserName] = useState<string>('Carregando...');
+    const [bloodType, setBloodType] = useState<string>('-');
 
 
     useFocusEffect(
@@ -32,20 +27,16 @@ export default function HomeScreen() {
                         setProfileImage(null);
                     }
 
-                    // 2. Carrega os dados de texto do perfil
-                    const savedData = await AsyncStorage.getItem('@doemais:user');
-                    if (savedData) {
-                        const parsedData = JSON.parse(savedData);
-
-
-                        if (parsedData.nome) {
-                            // A chave vinda do backend é 'nome', então usamos parsedData.nome
-                            setUserName(parsedData.nome);
+                    // 2. Busca os dados reais do backend (igual na tela de configurações)
+                    const response = await api('/api/doadores/me', 'GET');
+                    
+                    if (response) {
+                        if (response.nome) {
+                            setUserName(response.nome);
                         }
-
-                        if (parsedData.tipo_sanguineo) {
-                            // O backend envia 'tipo_sanguineo'
-                            setBloodType(parsedData.tipo_sanguineo);
+                        
+                        if (response.tipo_sanguineo) {
+                            setBloodType(response.tipo_sanguineo);
                         }
                     }
                 } catch (error) {

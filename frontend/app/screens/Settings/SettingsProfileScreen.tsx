@@ -16,6 +16,8 @@ export default function SettingsProfileScreen() {
     const [value, setValue] = useState(''); // blood type
     const [phone, setPhone] = useState('');
     const [name, setName] = useState('');
+    const [city, setCity] = useState('');
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         async function loadProfileData() {
@@ -27,6 +29,7 @@ export default function SettingsProfileScreen() {
                     setName(response.nome || '');
                     setPhone(response.telefone || '');
                     setValue(response.tipo_sanguineo || '');
+                    setCity(response.cidade || '');
                 }
             } catch (error) {
                 console.error("Erro ao carregar dados do perfil", error);
@@ -47,6 +50,36 @@ export default function SettingsProfileScreen() {
         }
         setPhone(v);
     };
+
+    const handleSave = async () => {
+
+        //Validação
+        if (!name || !phone || !city || !value) {
+            Alert.alert("Atenção", "Falta preencher os campos");
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const payload = {
+                nome: name,
+                telefone: phone,
+                cidade: city,
+                tipo_sanguineo: value
+            };
+
+            await api('/api/doadores/me', 'PUT', payload);
+            Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
+            navigation.goBack();
+        } catch (error: any) {
+            console.error("Erro ao salvar o perfil", error);
+            Alert.alert("Erro", error.message || "Não foi possível salvar o perfil.", error);
+        } finally {
+            setLoading(false);
+        }
+
+    }
 
     const BLOOD_TYPES = [
         { label: 'A+', value: 'A+' },
@@ -93,7 +126,6 @@ export default function SettingsProfileScreen() {
                                 label="Nome Completo"
                                 value={name}
                                 onChangeText={setName}
-                                editable={false} // Somente leitura
                             />
 
                             <Input
@@ -101,7 +133,12 @@ export default function SettingsProfileScreen() {
                                 keyboardType="numeric"
                                 value={phone}
                                 onChangeText={handlePhoneChange}
-                                editable={false} // Somente leitura
+                            />
+
+                            <Input
+                                label="Cidade"
+                                value={city}
+                                onChangeText={setCity}
                             />
 
                             <SelectInput
@@ -109,6 +146,13 @@ export default function SettingsProfileScreen() {
                                 options={BLOOD_TYPES}
                                 value={value}
                                 onChange={setValue}
+                            />
+
+                            <Button
+                                title={loading ? 'Salvando...' : 'Salvar'}
+                                onPress={handleSave}
+                                textColor="#fff"
+                                disabled={loading}
                             />
                         </View>
 
