@@ -39,15 +39,16 @@ export default function SettingsProfileScreen() {
     }, []);
 
     const handlePhoneChange = (text: string) => {
-        let v = text.replace(/\D/g, '');
+        // Remove tudo o que não é dígito
+        let v = text.replace(/\D/g, ''); 
+        
+        // Limita a 11 números no máximo
         v = v.substring(0, 11);
 
-        if (v.length > 2) {
-            v = `(${v.substring(0, 2)}) ${v.substring(2)}`;
-        }
-        if (v.length > 9) {
-            v = `${v.substring(0, 10)}-${v.substring(10)}`;
-        }
+        // Aplica a formatação via Regex
+        v = v.replace(/^(\d{2})(\d)/g, '($1) $2'); // Coloca parênteses em volta dos dois primeiros dígitos
+        v = v.replace(/(\d)(\d{4})$/, '$1-$2');    // Coloca o hífen antes dos 4 últimos dígitos
+        
         setPhone(v);
     };
 
