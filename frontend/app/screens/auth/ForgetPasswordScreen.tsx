@@ -9,7 +9,7 @@ export default function ForgetPasswordScreen() {
     const navigation = useNavigation<any>();
 
     return (
-        <View>
+        <View style={{ flex: 1, backgroundColor: '#fff' }}>
             <Header
                 onBack={() => navigation.navigate("LoginScreen")}
                 title="Esqueceu sua senha"

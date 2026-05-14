@@ -13,6 +13,7 @@ import Button from "../../../components/Button";
 
 // Nossa API
 import { api } from "../../services/api";
+import { StatusBar } from "expo-status-bar";
 
 export default function LoginScreen() {
     const navigation = useNavigation<any>();
@@ -85,78 +86,96 @@ export default function LoginScreen() {
     }
 
     return (
-        <KeyboardAvoidingView style={{ flex: 1, backgroundColor: '#fff' }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={{ flex: 1, backgroundColor: '#fff' }}>
+            <StatusBar backgroundColor="#E0323C" style="light" />
+            <Header
+                marginTop={30}
+                minHeight={50}
+                icon="arrow-back-outline"
+                iconColor="#FFF"
+                onBack={() => {
+                    if (navigation.canGoBack()) {
+                        navigation.goBack();
+                    } else {
+                        navigation.navigate("AuthChoice");
+                    }
+                }}
+                containerStyle={{ backgroundColor: '#E0323C' }}
+            />
 
-                <Header
-                    icon="arrow-back-outline"
-                    titleSize={20}
-                    title="Seja bem-vindo(a)! Sua solidariedade pode salvar vidas."
-                    onBack={() => navigation.goBack()} // Adicionei ação de voltar
-                />
 
-                <View>
-                    <View style={Styles.inputcontainer}>
-                        {/* 3. CONECTADO: Input de E-mail */}
-                        <Input
-                            label="E-mail:"
-                            keyboardType="email-address"
-                            value={email}            // O valor vem do estado
-                            onChangeText={setEmail}  // Ao digitar, atualiza o estado
-                            autoCapitalize="none"
-                        />
+            <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                    <View>
 
-                        {/* 4. CONECTADO: Input de Senha */}
-                        <Input
-                            label="Senha:"
-                            value={password}
-                            onChangeText={setPassword}
-                            secureTextEntry
-                        />
 
-                        <Text style={Styles.ForgetPassword}
-                            onPress={() => navigation.navigate("ForgetPasswordChoiceScreen")}> Esqueceu sua senha? </Text>
-
-                    </View>
-
-                    <View style={Styles.SocialbuttonsContainer}>
-
-                        <SocialButton
-                            title="Entrar com o Google"
-                            iconSource={require("../../../assets/images/googleicon.png")}
-                            onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
-                        />
-
-                        <SocialButton
-                            title="Entrar com o Facebook"
-                            iconSource={require("../../../assets/images/facebook 1.png")}
-                            onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
-                        />
-
-                        {/* 5. CONECTADO: O Botão agora chama o handleLogin */}
-                        <Button
-                            title={loading ? "Entrando..." : "Entrar"}
-                            textColor="white"
-                            borderRadius={10}
-                            width={270}
-                            onPress={handleLogin} // <--- AQUI ESTAVA FALTANDO!
-                            disabled={loading}    // Evita clique duplo
-                        />
-                    </View>
-
-                    <View style={Styles.containerRegister}>
-                        <Text style={Styles.registerText}>
-                            Não tem uma conta ainda?{" "}
-                            <Text
-                                style={Styles.RegisterUnderline}
-                                onPress={() => navigation.navigate("RegisterScreen")} // Confirme se o nome da rota é esse no App.tsx
-                            >
-                                Cadastre-se.
-                            </Text>
+                        <Text style={Styles.TitleContainer}>
+                            Seja bem-vindo(a)! Sua solidariedade pode salvar vidas.
                         </Text>
-                    </View>
-                </View >
-            </ScrollView>
-        </KeyboardAvoidingView>
+
+
+                        <View style={Styles.inputcontainer}>
+                            {/* 3. CONECTADO: Input de E-mail */}
+                            <Input
+                                label="E-mail:"
+                                keyboardType="email-address"
+                                value={email}            // O valor vem do estado
+                                onChangeText={setEmail}  // Ao digitar, atualiza o estado
+                                autoCapitalize="none"
+                            />
+
+                            {/* 4. CONECTADO: Input de Senha */}
+                            <Input
+                                label="Senha:"
+                                value={password}
+                                onChangeText={setPassword}
+                                secureTextEntry
+                            />
+
+                            <Text style={Styles.ForgetPassword}
+                                onPress={() => navigation.navigate("ForgetPasswordChoiceScreen")}> Esqueceu sua senha? </Text>
+
+                        </View>
+
+                        <View style={Styles.SocialbuttonsContainer}>
+
+                            <SocialButton
+                                title="Entrar com o Google"
+                                iconSource={require("../../../assets/images/googleicon.png")}
+                                onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
+                            />
+
+                            <SocialButton
+                                title="Entrar com o Facebook"
+                                iconSource={require("../../../assets/images/facebook 1.png")}
+                                onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
+                            />
+
+                            {/* 5. CONECTADO: O Botão agora chama o handleLogin */}
+                            <Button
+                                title={loading ? "Entrando..." : "Entrar"}
+                                textColor="white"
+                                borderRadius={10}
+                                width={270}
+                                onPress={handleLogin}
+                                disabled={loading}
+                            />
+                        </View>
+
+                        <View style={Styles.containerRegister}>
+                            <Text style={Styles.registerText}>
+                                Não tem uma conta ainda?{" "}
+                                <Text
+                                    style={Styles.RegisterUnderline}
+                                    onPress={() => navigation.navigate("Register")} // Confirme se o nome da rota é esse no App.tsx
+                                >
+                                    Cadastre-se.
+                                </Text>
+                            </Text>
+                        </View>
+                    </View >
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </View>
     )
 }

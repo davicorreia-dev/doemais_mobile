@@ -16,6 +16,17 @@ const Styles = StyleSheet.create({
     //     resizeMode: 'contain'
     // },
 
+    TitleContainer: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        fontFamily: 'Lexend_700Bold',
+        width: "83%",
+        alignSelf: "center",
+        textAlign: "center",
+        color: "#E0323C",
+        marginTop: 30,
+    },
+
     ForgetPassword: {
         fontSize: 14,
         fontWeight: 'bold',

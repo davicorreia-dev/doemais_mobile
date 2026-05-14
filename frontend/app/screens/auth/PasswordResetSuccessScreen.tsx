@@ -10,8 +10,11 @@ export default function PasswordResetSuccessScreen() {
 
     const handleGoToLogin = () => {
         navigation.reset({
-            index: 0,
-            routes: [{ name: 'Login' }],
+            index: 1,
+            routes: [
+                { name: 'AuthChoice' },
+                { name: 'Login' },
+            ],
         });
     };
 

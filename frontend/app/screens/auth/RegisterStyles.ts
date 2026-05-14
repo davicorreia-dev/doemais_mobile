@@ -9,21 +9,23 @@ const Styles = StyleSheet.create({
         flexGrow: 1
     },
     InputContainer: {
+        marginTop: 20,
         flexDirection: 'column',
         width: '100%',
         alignItems: 'center',
-        gap: 20
 
     },
 
-    Imagelogo: {
-        marginTop: 40,
-        marginBottom: 40,
-        alignSelf: 'center',
-        width: 211.03,
-        height: 60,
-        resizeMode: 'contain',
+    TitleContainer: {
+        marginTop: 20,
+        fontSize: 16,
+        fontWeight: '600',
+        fontFamily: 'Lexend_600SemiBold',
+        color: '#E0323C',
+        textAlign: 'center',
+        paddingHorizontal: 20
     },
+
     ContainerTerms: {
         marginTop: 40,
         alignContent: 'center',
@@ -31,12 +33,12 @@ const Styles = StyleSheet.create({
         alignItems: 'center',
     },
 
-    ButtonCreate: {
-        marginTop: 40,
-        alignItems: 'center',
-        alignSelf: 'center',
-    }
 
+    checkbox: {
+        width: 306,
+        alignSelf: 'center',
+        marginVertical: 10,
+    },
 })
 
 
