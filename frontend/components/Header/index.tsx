@@ -39,7 +39,13 @@ export default function Header({ title, onBack, subtitle, titleColor, subtitleCo
 
     return (
         <View style={[styles.header, { marginTop, minHeight }, containerStyle]}>
-            <TouchableOpacity onPress={() => navigation.goBack()}
+            <TouchableOpacity onPress={() => {
+                if (onBack) {
+                    onBack();
+                } else if (navigation.canGoBack()) {
+                    navigation.goBack();
+                }
+            }}
                 style={styles.iconBack}
             >
 

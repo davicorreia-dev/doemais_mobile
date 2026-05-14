@@ -11,8 +11,11 @@ export default function RegisterSuccessScreen() {
     const handleStart = () => {
         // Redireciona para o Login por enquanto
         navigation.reset({
-            index: 0,
-            routes: [{ name: 'Login' }],
+            index: 1,
+            routes: [
+                { name: 'AuthChoice' },
+                { name: 'Login' },
+            ],
         });
     };
 
