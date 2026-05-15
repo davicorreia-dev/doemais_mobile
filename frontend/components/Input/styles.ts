@@ -32,8 +32,15 @@ const Styles = StyleSheet.create({
         fontFamily: 'Lexend_600SemiBold',
         marginLeft: 12,
         marginBottom: 2,
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 12,
+        fontFamily: 'Lexend_400Regular',
+        marginLeft: 12,
+        marginTop: -8,
+        marginBottom: 8,
     }
-
 
 });
 

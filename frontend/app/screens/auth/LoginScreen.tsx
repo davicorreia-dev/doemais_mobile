@@ -14,13 +14,39 @@ import Button from "../../../components/Button";
 // Nossa API
 import { api } from "../../services/api";
 import { StatusBar } from "expo-status-bar";
+import z from "zod";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const loginSchema = z.object({
+    email: z.string().min(1, "O e-mail é obrigatório.").email("E-mail inválido"),
+    password: z.string().min(8, "Senha deve ter pelo menos 8 caracteres")
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
+
+// Validar a resposta da API do backend
+const loginResponseSchema = z.object({
+    accessToken: z.string().min(15, "Token não retornado pelo servidor"),
+    refreshToken: z.string().optional(),
+    doador: z.object({
+        id: z.string().or(z.number()),
+        nome: z.string(),
+        email: z.string().email(),
+    })
+});
 
 export default function LoginScreen() {
     const navigation = useNavigation<any>();
 
-    // 1. ADICIONADO: States para controlar os inputs e o carregamento
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+        resolver: zodResolver(loginSchema),
+        defaultValues: {
+            email: "",
+            password: ""
+        }
+    });
+
     const [loading, setLoading] = useState(false);
 
     const [fontsLoaded] = useFonts({
@@ -33,17 +59,11 @@ export default function LoginScreen() {
         Lexend_700Bold,
     });
 
-    // 2. ADICIONADO: A Função que faz o Login acontecer
-    const handleLogin = async () => {
-        // Validação básica
-        if (!email || !password) {
-            Alert.alert('Atenção', 'Por favor, preencha e-mail e senha.');
-            return;
-        }
 
+    const onSubmit = async (data: LoginFormData) => {
         const payload = {
-            email: email.trim().toLowerCase(),
-            senha: password
+            email: data.email.trim().toLowerCase(),
+            senha: data.password
         }
 
         setLoading(true);
@@ -54,11 +74,16 @@ export default function LoginScreen() {
             // Chama a API (/api/auth/login)
             const response = await api('/api/auth/login', 'POST', payload);
 
+            // Valida o retorno do backend usando o Zod
+            const parsedResponse = loginResponseSchema.parse(response);
 
             // Se recebeu o token, salva e entra
-            if (response.accessToken) {
-                await AsyncStorage.setItem('@doemais:token', response.accessToken);
-                await AsyncStorage.setItem('@doemais:user', JSON.stringify(response.doador));
+            if (parsedResponse.accessToken) {
+                await AsyncStorage.setItem('@doemais:token', parsedResponse.accessToken);
+                await AsyncStorage.setItem('@doemais:user', JSON.stringify(parsedResponse.doador));
+                if (parsedResponse.refreshToken) {
+                    await AsyncStorage.setItem('@doemais:refreshToken', parsedResponse.refreshToken);
+                }
 
                 // Redireciona para o Quiz (Home)
                 navigation.reset({
@@ -115,21 +140,35 @@ export default function LoginScreen() {
 
 
                         <View style={Styles.inputcontainer}>
-                            {/* 3. CONECTADO: Input de E-mail */}
-                            <Input
-                                label="E-mail:"
-                                keyboardType="email-address"
-                                value={email}            // O valor vem do estado
-                                onChangeText={setEmail}  // Ao digitar, atualiza o estado
-                                autoCapitalize="none"
+
+                            <Controller
+                                control={control}
+                                name="email"
+                                render={({ field: { onChange, value } }) => (
+                                    <Input
+                                        label="E-mail:"
+                                        keyboardType="email-address"
+                                        value={value}
+                                        onChangeText={onChange}
+                                        autoCapitalize="none"
+                                        error={errors.email?.message}
+                                    />
+                                )}
                             />
 
                             {/* 4. CONECTADO: Input de Senha */}
-                            <Input
-                                label="Senha:"
-                                value={password}
-                                onChangeText={setPassword}
-                                secureTextEntry
+                            <Controller
+                                control={control}
+                                name="password"
+                                render={({ field: { onChange, value } }) => (
+                                    <Input
+                                        label="Senha:"
+                                        value={value}
+                                        onChangeText={onChange}
+                                        secureTextEntry
+                                        error={errors.password?.message}
+                                    />
+                                )}
                             />
 
                             <Text style={Styles.ForgetPassword}
@@ -151,13 +190,13 @@ export default function LoginScreen() {
                                 onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
                             />
 
-                            {/* 5. CONECTADO: O Botão agora chama o handleLogin */}
+                            {/* 5. CONECTADO: O Botão agora chama o onSubmit */}
                             <Button
                                 title={loading ? "Entrando..." : "Entrar"}
                                 textColor="white"
                                 borderRadius={10}
                                 width={270}
-                                onPress={handleLogin}
+                                onPress={handleSubmit(onSubmit)}
                                 disabled={loading}
                             />
                         </View>

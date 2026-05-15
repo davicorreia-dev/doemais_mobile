@@ -58,25 +58,22 @@ export const loginDoador = async (loginData: LoginDoadorDto) => {
     throw new UnauthorizedError('Credenciais inválidas.');
   }
 
-  const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+  const accessTokenSecret = process.env.JWT_SECRET;
   if (!accessTokenSecret) {
-    throw new Error('Chave do Access Token não configurada.');
+    throw new Error('Chave do Access Token não configurada (JWT_SECRET).');
   }
   
   const payload = { doadorId: doador.id };
-  const expiresInSeconds = parseInt(
-    process.env.ACCESS_TOKEN_EXPIRATION_SECONDS || '300', 
-    10
-  );
+  const expiresIn = process.env.JWT_EXPIRES_IN || '15m';
   
   const options: SignOptions = {
-    expiresIn: expiresInSeconds
+    expiresIn: expiresIn
   };
 
   const accessToken = jwt.sign(payload, accessTokenSecret, options);
 
   const refreshToken = randomBytes(64).toString('hex');
-  const expirationDays = parseInt(process.env.REFRESH_TOKEN_EXPIRATION_DAYS || '7');
+  const expirationDays = parseInt(process.env.JWT_REFRESH_EXPIRES_IN_DAYS || '7', 10);
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + expirationDays);
 
@@ -116,19 +113,16 @@ export const refreshAccessToken = async (tokenData: RefreshTokenDto) => {
     throw new UnauthorizedError('Refresh token expirado.');
   }
 
-  const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+  const accessTokenSecret = process.env.JWT_SECRET;
   if (!accessTokenSecret) {
-    throw new Error('Chave do Access Token não configurada.');
+    throw new Error('Chave do Access Token não configurada (JWT_SECRET).');
   }
 
   const payload = { doadorId: savedToken.doadorId };
-  const expiresInSeconds = parseInt(
-    process.env.ACCESS_TOKEN_EXPIRATION_SECONDS || '300', 
-    10
-  );
+  const expiresIn = process.env.JWT_EXPIRES_IN || '15m';
 
   const options: SignOptions = {
-    expiresIn: expiresInSeconds
+    expiresIn: expiresIn
   };
 
   const newAccessToken = jwt.sign(payload, accessTokenSecret, options);
