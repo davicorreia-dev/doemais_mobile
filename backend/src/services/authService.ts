@@ -122,7 +122,7 @@ export const refreshAccessToken = async (tokenData: RefreshTokenDto) => {
   const expiresIn = process.env.JWT_EXPIRES_IN || '15m';
 
   const options: SignOptions = {
-    expiresIn: expiresIn as any
+    expiresIn: expiresIn
   };
 
   const newAccessToken = jwt.sign(payload, accessTokenSecret, options);
