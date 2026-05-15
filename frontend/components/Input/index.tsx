@@ -12,6 +12,7 @@ type InputProps = {
     onChangeText?: (text: string) => void;
     keyboardType?: KeyboardTypeOptions;
     autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters'; 
+    error?: string;
 };
 
 export default function Input({ 
@@ -21,14 +22,15 @@ export default function Input({
     secureTextEntry, 
     onChangeText, 
     keyboardType,
-    autoCapitalize
+    autoCapitalize,
+    error
 }: InputProps) {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     return (
         <View style={styles.containerInput}>
             {label ? <Text style={styles.label}>{label}</Text> : null}
-            <View style={styles.inputContainer}>
+            <View style={[styles.inputContainer, error ? { borderColor: 'red', borderWidth: 1 } : null]}>
                 <TextInput
                     keyboardType={keyboardType}
                     style={styles.inputStyle}
@@ -51,6 +53,7 @@ export default function Input({
                     </TouchableOpacity>
                 )}
             </View>
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
         </View>
     );
 }
