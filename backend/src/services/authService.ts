@@ -67,7 +67,7 @@ export const loginDoador = async (loginData: LoginDoadorDto) => {
   const expiresIn = process.env.JWT_EXPIRES_IN || '15m';
   
   const options: SignOptions = {
-    expiresIn: expiresIn
+    expiresIn: expiresIn as any
   };
 
   const accessToken = jwt.sign(payload, accessTokenSecret, options);
@@ -122,7 +122,7 @@ export const refreshAccessToken = async (tokenData: RefreshTokenDto) => {
   const expiresIn = process.env.JWT_EXPIRES_IN || '15m';
 
   const options: SignOptions = {
-    expiresIn: expiresIn
+    expiresIn: expiresIn as any
   };
 
   const newAccessToken = jwt.sign(payload, accessTokenSecret, options);
