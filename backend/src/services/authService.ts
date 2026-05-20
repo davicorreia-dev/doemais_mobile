@@ -64,13 +64,20 @@ export const loginDoador = async (loginData: LoginDoadorDto) => {
   }
   
   const payload = { doadorId: doador.id };
-  const expiresIn = process.env.JWT_EXPIRES_IN || '15m';
-  
+
+  const expiresIn = (
+    process.env.JWT_EXPIRES_IN || '15m'
+  ) as SignOptions['expiresIn'];
+
   const options: SignOptions = {
-    expiresIn: expiresIn as any
+    expiresIn
   };
 
-  const accessToken = jwt.sign(payload, accessTokenSecret, options);
+  const accessToken = jwt.sign(
+    payload,
+    accessTokenSecret,
+    options
+  );
 
   const refreshToken = randomBytes(64).toString('hex');
   const expirationDays = parseInt(process.env.JWT_REFRESH_EXPIRES_IN_DAYS || '7', 10);
@@ -119,13 +126,20 @@ export const refreshAccessToken = async (tokenData: RefreshTokenDto) => {
   }
 
   const payload = { doadorId: savedToken.doadorId };
-  const expiresIn = process.env.JWT_EXPIRES_IN || '15m';
+
+  const expiresIn = (
+    process.env.JWT_EXPIRES_IN || '15m'
+  ) as SignOptions['expiresIn'];
 
   const options: SignOptions = {
-    expiresIn: expiresIn
+    expiresIn
   };
 
-  const newAccessToken = jwt.sign(payload, accessTokenSecret, options);
+  const newAccessToken = jwt.sign(
+    payload,
+    accessTokenSecret,
+    options
+  );
 
   return {
     accessToken: newAccessToken,
