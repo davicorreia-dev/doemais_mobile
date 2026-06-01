@@ -1,101 +1,187 @@
-import { IsNotEmpty, IsEmail, MinLength, IsString, IsPhoneNumber, IsDate, IsOptional, IsNumber } from 'class-validator';
-import { Type } from 'class-transformer';
+/**
+ * Data Transfer Objects para operações de Doador
+ * 
+ * Cada DTO é especializado para um caso de uso específico:
+ * - RegisterDoadorDto: Criação de conta
+ * - LoginDoadorDto: Autenticação
+ * - UpdateDoadorDto: Atualização de perfil
+ * - RefreshTokenDto: Renovação de token
+ */
 
+import {
+  IsNotEmpty,
+  IsEmail,
+  MinLength,
+  IsString,
+  IsPhoneNumber,
+  IsDate,
+  IsOptional,
+  IsNumber,
+  Matches,
+  MaxLength,
+  Min,
+  Max,
+  IsEnum,
+} from 'class-validator';
+import { Type, Transform } from 'class-transformer';
+import {
+  IsCPF,
+  IsValidDonorAge,
+  IsValidDonorWeight,
+  IsValidBloodType,
+} from '../utils/validators';
+
+/**
+ * DTO para registro de novo doador
+ */
 export class RegisterDoadorDto {
   @IsString({ message: 'O nome deve ser uma string.' })
   @IsNotEmpty({ message: 'O nome é obrigatório.' })
+  @MinLength(3, { message: 'O nome deve ter no mínimo 3 caracteres.' })
+  @MaxLength(100, { message: 'O nome deve ter no máximo 100 caracteres.' })
   nome!: string;
 
   @IsEmail({}, { message: 'O e-mail informado não é válido.' })
   @IsNotEmpty({ message: 'O e-mail é obrigatório.' })
+  @MaxLength(100, { message: 'O e-mail deve ter no máximo 100 caracteres.' })
+  @Transform(({ value }) => value?.toLowerCase().trim())
   email!: string;
 
   @IsString({ message: 'O CPF deve ser uma string.' })
   @IsNotEmpty({ message: 'O CPF é obrigatório.' })
+  @IsCPF({ message: 'O CPF informado é inválido.' })
+  @Transform(({ value }) => value?.replace(/\D/g, ''))
   cpf!: string;
 
   @IsString({ message: 'A senha deve ser uma string.' })
   @IsNotEmpty({ message: 'A senha é obrigatória.' })
-  @MinLength(6, { message: 'A senha deve ter no mínimo 6 caracteres.' })
+  @MinLength(8, { message: 'A senha deve ter no mínimo 8 caracteres.' })
+  @MaxLength(128, { message: 'A senha deve ter no máximo 128 caracteres.' })
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+    {
+      message:
+        'A senha deve conter: uma letra maiúscula, uma minúscula, um número e um caractere especial (@$!%*?&).',
+    }
+  )
   senha!: string;
 
   @IsString({ message: 'O telefone deve ser uma string.' })
   @IsPhoneNumber('BR', { message: 'O telefone informado não é válido.' })
   @IsOptional()
+  @Transform(({ value }) => value?.replace(/\D/g, ''))
   telefone?: string;
 
   @IsString({ message: 'A cidade deve ser uma string.' })
   @IsOptional()
-  cidade?: string;
-
-  @IsOptional()
-  @Type(() => Date)  // Converte a string para Date
-  @IsDate({ message: 'A data de nascimento deve ser uma data válida.' })
-  data_nascimento?: Date;
-
-  @IsOptional()
-  @IsNumber({}, { message: 'O peso deve ser um número válido.' })
-  peso_kg?: number;
-
-  @IsString({ message: 'O gênero deve ser uma string.' })
-  @IsOptional()
-  genero?: string;
-
-  @IsString({ message: 'O tipo sanguíneo deve ser uma string.' })
-  @IsOptional()
-  tipo_sanguineo?: string;
-}
-
-export class LoginDoadorDto {
-  @IsEmail({}, { message: 'O e-mail informado não é válido.' })
-  @IsNotEmpty({ message: 'O e-mail é obrigatório.' })
-  email!: string;
-
-  @IsNotEmpty({ message: 'A senha é obrigatória.' })
-  senha!: string;
-}
-
-export class RefreshTokenDto {
-  @IsString()
-  @IsNotEmpty({ message: 'O refresh token é obrigatório.' })
-  refreshToken!: string;
-}
-
-export class UpdateDoadorDto {
-  @IsString({ message: 'O nome deve ser uma string.' })
-  @IsOptional()
-  nome?: string;
-
-  @IsEmail({}, { message: 'O e-mail informado não é válido.' })
-  @IsOptional()
-  email?: string;
-
-  @IsString({ message: 'O telefone deve ser uma string.' })
-  @IsPhoneNumber('BR', { message: 'O telefone informado não é válido.' })
-  @IsOptional()
-  telefone?: string;
-
-  @IsString({ message: 'A cidade deve ser uma string.' })
-  @IsOptional()
+  @MinLength(2, { message: 'O nome da cidade deve ter no mínimo 2 caracteres.' })
+  @MaxLength(50, { message: 'O nome da cidade deve ter no máximo 50 caracteres.' })
   cidade?: string;
 
   @IsOptional()
   @Type(() => Date)
   @IsDate({ message: 'A data de nascimento deve ser uma data válida.' })
+  @IsValidDonorAge()
   data_nascimento?: Date;
 
   @IsOptional()
   @IsNumber({}, { message: 'O peso deve ser um número válido.' })
+  @Min(50, { message: 'O peso mínimo é 50 kg.' })
+  @Max(150, { message: 'O peso máximo é 150 kg.' })
+  @IsValidDonorWeight()
   peso_kg?: number;
 
   @IsString({ message: 'O gênero deve ser uma string.' })
   @IsOptional()
+  @IsEnum(['M', 'F', 'Outro'], { message: 'O gênero deve ser M, F ou Outro.' })
   genero?: string;
 
   @IsString({ message: 'O tipo sanguíneo deve ser uma string.' })
   @IsOptional()
+  @IsValidBloodType()
   tipo_sanguineo?: string;
 }
+
+/**
+ * DTO para login de doador
+ */
+export class LoginDoadorDto {
+  @IsEmail({}, { message: 'O e-mail informado não é válido.' })
+  @IsNotEmpty({ message: 'O e-mail é obrigatório.' })
+  @Transform(({ value }) => value?.toLowerCase().trim())
+  email!: string;
+
+  @IsString({ message: 'A senha deve ser uma string.' })
+  @IsNotEmpty({ message: 'A senha é obrigatória.' })
+  senha!: string;
+}
+
+/**
+ * DTO para refresh de token
+ */
+export class RefreshTokenDto {
+  @IsString({ message: 'O refresh token deve ser uma string.' })
+  @IsNotEmpty({ message: 'O refresh token é obrigatório.' })
+  refreshToken!: string;
+}
+
+/**
+ * DTO para atualização de perfil de doador
+ * Todos os campos são opcionais pois é para atualização parcial
+ */
+export class UpdateDoadorDto {
+  @IsString({ message: 'O nome deve ser uma string.' })
+  @IsOptional()
+  @MinLength(3, { message: 'O nome deve ter no mínimo 3 caracteres.' })
+  @MaxLength(100, { message: 'O nome deve ter no máximo 100 caracteres.' })
+  nome?: string;
+
+  @IsEmail({}, { message: 'O e-mail informado não é válido.' })
+  @IsOptional()
+  @MaxLength(100, { message: 'O e-mail deve ter no máximo 100 caracteres.' })
+  @Transform(({ value }) => value?.toLowerCase().trim())
+  email?: string;
+
+  @IsString({ message: 'O telefone deve ser uma string.' })
+  @IsPhoneNumber('BR', { message: 'O telefone informado não é válido.' })
+  @IsOptional()
+  @Transform(({ value }) => value?.replace(/\D/g, ''))
+  telefone?: string;
+
+  @IsString({ message: 'A cidade deve ser uma string.' })
+  @IsOptional()
+  @MinLength(2, { message: 'O nome da cidade deve ter no mínimo 2 caracteres.' })
+  @MaxLength(50, { message: 'O nome da cidade deve ter no máximo 50 caracteres.' })
+  cidade?: string;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate({ message: 'A data de nascimento deve ser uma data válida.' })
+  @IsValidDonorAge()
+  data_nascimento?: Date;
+
+  @IsOptional()
+  @IsNumber({}, { message: 'O peso deve ser um número válido.' })
+  @Min(50, { message: 'O peso mínimo é 50 kg.' })
+  @Max(150, { message: 'O peso máximo é 150 kg.' })
+  @IsValidDonorWeight()
+  peso_kg?: number;
+
+  @IsString({ message: 'O gênero deve ser uma string.' })
+  @IsOptional()
+  @IsEnum(['M', 'F', 'Outro'], { message: 'O gênero deve ser M, F ou Outro.' })
+  genero?: string;
+
+  @IsString({ message: 'O tipo sanguíneo deve ser uma string.' })
+  @IsOptional()
+  @IsValidBloodType()
+  tipo_sanguineo?: string;
+}
+
+/**
+ * DTO para formulário de elegibilidade de doação
+ * Contém questões médicas para determinar se o doador pode doar
+ */
 export class CreateFormularioElegibilidadeDto {
   @IsOptional()
   @Type(() => Boolean)
@@ -148,6 +234,7 @@ export class CreateFormularioElegibilidadeDto {
 
   @IsString({ message: 'O tipo de hepatite deve ser uma string.' })
   @IsOptional()
+  @MaxLength(50, { message: 'O tipo de hepatite deve ter no máximo 50 caracteres.' })
   tipo_hepatite?: string;
 
   @IsOptional()
@@ -158,3 +245,8 @@ export class CreateFormularioElegibilidadeDto {
   @Type(() => Boolean)
   teve_malaria?: boolean;
 }
+
+/**
+ * DTO para atualização de formulário de elegibilidade
+ */
+export class UpdateFormularioElegibilidadeDto extends CreateFormularioElegibilidadeDto {}

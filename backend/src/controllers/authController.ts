@@ -1,45 +1,109 @@
-import { Request, Response, NextFunction } from 'express'; 
+import { Request, Response, NextFunction } from 'express';
 import { RegisterDoadorDto, LoginDoadorDto, RefreshTokenDto } from '../dtos/doador.dto';
-import { registerDoador, loginDoador, refreshAccessToken, logout} from '../services/authService';
+import {
+  registerDoador,
+  loginDoador,
+  refreshAccessToken,
+  logout,
+} from '../services/authService';
+import ApiResponseHandler from '../utils/response';
 
-export const register = async (req: Request, res: Response, next: NextFunction) => { // Adicionar next
+/**
+ * Registra um novo doador
+ * 
+ * POST /api/auth/register
+ */
+export const register = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const doadorData: RegisterDoadorDto = req.body;
     const doador = await registerDoador(doadorData);
-    res.status(201).json({ message: 'Doador registrado com sucesso.', doador });
 
-  } catch (error: any) {
-    next(error); 
-  }
-};
-
-export const login = async (req: Request, res: Response, next: NextFunction) => { // Adicionar next
-  try {
-    const loginData: LoginDoadorDto = req.body;
-    const result = await loginDoador(loginData);
-    res.status(200).json(result);
-
-  } catch (error: any) {
+    ApiResponseHandler.success(
+      res,
+      'Doador registrado com sucesso.',
+      { doador },
+      201
+    );
+  } catch (error) {
     next(error);
   }
 };
 
-export const refresh = async (req: Request, res: Response) => {
+/**
+ * Faz login de um doador
+ * 
+ * POST /api/auth/login
+ */
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const tokenData: RefreshTokenDto = req.body;
-    const result = await refreshAccessToken(tokenData);
-    res.status(200).json(result);
-  } catch (error: any) {
-    res.status(401).json({ message: error.message });
+    const loginData: LoginDoadorDto = req.body;
+    const result = await loginDoador(loginData);
+
+    ApiResponseHandler.success(
+      res,
+      'Login realizado com sucesso.',
+      result,
+      200
+    );
+  } catch (error) {
+    next(error);
   }
 };
 
-export const logoutUser = async (req: Request, res: Response) => {
+/**
+ * Renova o Access Token
+ * 
+ * POST /api/auth/refresh
+ */
+export const refresh = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const tokenData: RefreshTokenDto = req.body;
+    const result = await refreshAccessToken(tokenData);
+
+    ApiResponseHandler.success(
+      res,
+      'Token renovado com sucesso.',
+      result,
+      200
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Faz logout revogando o Refresh Token
+ * 
+ * POST /api/auth/logout
+ */
+export const logoutUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const tokenData: RefreshTokenDto = req.body;
     const result = await logout(tokenData);
-    res.status(200).json(result);
-  } catch (error: any) {
-    res.status(500).json({ message: 'Erro ao fazer logout.' });
+
+    ApiResponseHandler.success(
+      res,
+      result.message,
+      null,
+      200
+    );
+  } catch (error) {
+    next(error);
   }
 };
