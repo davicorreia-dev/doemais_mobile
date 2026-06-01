@@ -68,30 +68,39 @@ npm install
 **Configure o Banco de Dados:**
 
 1. Crie um banco de dados PostgreSQL para o projeto (ex: `doemais_dev`).  
-2. Crie um arquivo **.env** na raiz do projeto e adicione a URL de conexão do seu banco de dados, além da chave JWT.
+2. Crie um arquivo **.env** na raiz do projeto e adicione a URL de conexão do seu banco de dados, a chave de acesso e os tempos de expiração.
 
 ```env
 # .env
 DATABASE_URL="postgresql://<usuario>:<senha>@<host>:<porta>/<banco>"
-JWT_SECRET="sua_chave_secreta_aqui"
+ACCESS_TOKEN_SECRET="sua_chave_secreta_aqui"
+ACCESS_TOKEN_EXPIRATION_SECONDS=300
+REFRESH_TOKEN_EXPIRATION_DAYS=7
+CORS_ORIGIN=http://localhost:3001
 ```
 
 **Execute as Migrações do Prisma:**
 
-```
-npx prisma migrate dev --name init
+```bash
+npx prisma migrate deploy
 ```
 
-Isso irá criar as tabelas no seu banco de dados com base no schema definido.
+Isso aplicará as migrations existentes no banco de dados. Se ainda não tiver criado o banco, use `npx prisma migrate dev --name init` apenas no ambiente de desenvolvimento local.
 
 ### 3.3. Execução da Aplicação
 
-Para iniciar o servidor em modo de desenvolvimento, com auto-reload:
+Para iniciar o servidor em modo de desenvolvimento com recarregamento automático:
 ```bash
 npm run dev
 ```
 
-O servidor estará disponível em: http://localhost:3000
+Para compilar o TypeScript e iniciar o servidor em modo de produção:
+```bash
+npm run build
+npm start
+```
+
+O servidor estará disponível em: `http://localhost:3000`
 
 ## 4. Segurança e Autenticação Global
 
@@ -117,7 +126,7 @@ Diferente da abordagem tradicional de aplicar middlewares em cada rota, o `authM
 ### **Protegidos (Usuário)**
 - `GET /api/doadores/me`: Retorna o perfil completo do doador autenticado (excluindo dados sensíveis como senha).
 - `GET /api/doadores/certificate`: Gera e retorna um certificado de doação em formato PDF.
-- `PUT /doador/me`: Atualiza o perfil do doador autenticado.
+- `PUT /api/doadores/me`: Atualiza o perfil do doador autenticado.
 
 ---
 
