@@ -1,3 +1,5 @@
+import env from './environment';
+
 export const CONSTANTS = {
   // Validações de Doador
   DONOR: {
@@ -12,8 +14,8 @@ export const CONSTANTS = {
   },
 
   JWT: {
-    EXPIRES_IN: process.env.JWT_EXPIRES_IN || '15m',
-    REFRESH_EXPIRES_IN_DAYS: parseInt(process.env.JWT_REFRESH_EXPIRES_IN_DAYS || '7', 10),
+    EXPIRES_IN: env.ACCESS_TOKEN_EXPIRATION_SECONDS,
+    REFRESH_EXPIRES_IN_DAYS: parseInt(env.REFRESH_TOKEN_EXPIRATION_DAYS, 10),
   },
 
   API: {

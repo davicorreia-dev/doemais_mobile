@@ -79,7 +79,7 @@ export const loginDoador = async (
 
   // Gera Access Token
   const payload = { doadorId: doador.id };
-  const accessToken = jwt.sign(payload, env.JWT_SECRET, {
+  const accessToken = jwt.sign(payload, env.ACCESS_TOKEN_SECRET, {
     expiresIn: CONSTANTS.JWT.EXPIRES_IN,
   } as any);
 
@@ -150,7 +150,7 @@ export const refreshAccessToken = async (
 
   // Gera novo Access Token
   const payload = { doadorId: savedToken.doadorId };
-  const newAccessToken = jwt.sign(payload, env.JWT_SECRET, {
+  const newAccessToken = jwt.sign(payload, env.ACCESS_TOKEN_SECRET, {
     expiresIn: CONSTANTS.JWT.EXPIRES_IN,
   } as any);
 

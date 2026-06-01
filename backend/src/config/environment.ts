@@ -1,8 +1,8 @@
 interface EnvironmentConfig {
   DATABASE_URL: string;
-  JWT_SECRET: string;
-  JWT_EXPIRES_IN: string;
-  JWT_REFRESH_EXPIRES_IN_DAYS: string;
+  ACCESS_TOKEN_SECRET: string;
+  ACCESS_TOKEN_EXPIRATION_SECONDS: string;
+  REFRESH_TOKEN_EXPIRATION_DAYS: string;
   PORT: string;
   NODE_ENV: string;
   CORS_ORIGIN: string;
@@ -11,7 +11,7 @@ interface EnvironmentConfig {
 function validateEnvironment(): EnvironmentConfig {
   const requiredEnvVars = [
     'DATABASE_URL',
-    'JWT_SECRET',
+    'ACCESS_TOKEN_SECRET',
   ];
 
   const missingEnvVars = requiredEnvVars.filter(
@@ -26,9 +26,11 @@ function validateEnvironment(): EnvironmentConfig {
 
   return {
     DATABASE_URL: process.env.DATABASE_URL!,
-    JWT_SECRET: process.env.JWT_SECRET!,
-    JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '15m',
-    JWT_REFRESH_EXPIRES_IN_DAYS: process.env.JWT_REFRESH_EXPIRES_IN_DAYS || '7',
+    ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET!,
+    ACCESS_TOKEN_EXPIRATION_SECONDS:
+      process.env.ACCESS_TOKEN_EXPIRATION_SECONDS || '300',
+    REFRESH_TOKEN_EXPIRATION_DAYS:
+      process.env.REFRESH_TOKEN_EXPIRATION_DAYS || '7',
     PORT: process.env.PORT || '3000',
     NODE_ENV: process.env.NODE_ENV || 'development',
     CORS_ORIGIN: process.env.CORS_ORIGIN || 'http://localhost:3001',

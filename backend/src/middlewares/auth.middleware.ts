@@ -24,7 +24,7 @@ export const authMiddleware = (
 
   try {
     // Verifica e decodifica o token JWT
-    const decoded = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
+    const decoded = jwt.verify(token, env.ACCESS_TOKEN_SECRET) as JwtPayload;
 
     // Injeta o ID do doador na requisição para uso posterior
     req.doadorId = decoded.doadorId;
