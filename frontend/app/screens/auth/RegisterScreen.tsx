@@ -17,7 +17,9 @@ const registerSchema = z.object({
     email: z.string().min(1, "O e-mail é obrigatório.").email("Verifique se o email foi digitado corretamente."),
     cpf: z.string().min(1, "O CPF é obrigatório.").refine(isValidCPF, "O CPF deve conter 11 dígitos numéricos."),
     phone: z.string().min(1, "O número de celular é obrigatório.").refine(isValidPhone, "Digite um número válido com DDD."),
-    password: z.string().min(8, "A senha deve ter pelo menos 8 caracteres."),
+    password: z.string()
+        .min(8, "A senha deve ter pelo menos 8 caracteres.")
+        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, "A senha deve conter: 1 maiúscula, 1 minúscula, 1 número e 1 caractere especial (@$!%*?&)."),
     confirmPassword: z.string().min(1, "A confirmação de senha é obrigatória.")
 }).refine((data) => data.password === data.confirmPassword, {
     message: "A confirmação de senha não confere.",

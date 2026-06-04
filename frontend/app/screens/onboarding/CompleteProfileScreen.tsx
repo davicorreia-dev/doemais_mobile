@@ -93,11 +93,11 @@ export default function CompleteProfileScreen() {
             return;
         }
 
-        //Validação de Peso Mínimo 50kg
+        //Validação de Peso Mínimo 50kg e Máximo 150kg
         if (!isValidWeight(weight)) {
             Alert.alert(
-                "Peso insuficiente",
-                "Para doar sangue, é necessário pesar no mínimo 50kg."
+                "Peso inválido",
+                "Para doar sangue, é necessário pesar entre 50kg e 150kg."
             );
             return;
         }
@@ -112,13 +112,15 @@ export default function CompleteProfileScreen() {
         setLoading(true);
 
         try {
+            const mappedGender = gender === 'Masculino' ? 'M' : gender === 'Feminino' ? 'F' : gender;
+
             // Objeto Final Payload para o Backend
             const payload = {
                 ...basicData,
                 data_nascimento: date.toISOString(),
                 peso_kg: Number(weight),
-                genero: gender,
-                tipo_sanguineo: unknownBlood ? 'Nao sei' : selectedBlood
+                genero: mappedGender,
+                tipo_sanguineo: unknownBlood ? 'NDA' : selectedBlood
             };
 
             console.log("Enviando dados:", payload);
