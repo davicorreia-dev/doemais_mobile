@@ -11,7 +11,7 @@ import { randomBytes } from 'crypto';
 
 export const registerDoador = async (
   doadorData: RegisterDoadorDto
-): Promise<DoadorResponse> => {
+): Promise<AuthResponse> => {
   const { email, cpf, senha, ...rest } = doadorData;
 
   // Verifica se email ou CPF já existem
@@ -53,7 +53,34 @@ export const registerDoador = async (
     },
   });
 
-  return newDoador;
+  // Gera Access Token
+  const payload = { doadorId: newDoador.id };
+  const accessToken = jwt.sign(payload, env.ACCESS_TOKEN_SECRET, {
+    expiresIn: CONSTANTS.JWT.EXPIRES_IN,
+  } as any);
+
+  // Gera Refresh Token
+  const refreshToken = randomBytes(64).toString('hex');
+  const expiresAt = new Date();
+  expiresAt.setDate(
+    expiresAt.getDate() + CONSTANTS.JWT.REFRESH_EXPIRES_IN_DAYS
+  );
+
+  // Cria novo refresh token
+  await prisma.refreshToken.create({
+    data: {
+      token: refreshToken,
+      expiresAt,
+      doadorId: newDoador.id,
+    },
+  });
+
+  return {
+    accessToken,
+    refreshToken,
+    expiresIn: CONSTANTS.JWT.EXPIRES_IN,
+    doador: newDoador,
+  };
 };
 
 

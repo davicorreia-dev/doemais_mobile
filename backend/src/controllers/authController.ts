@@ -20,12 +20,12 @@ export const register = async (
 ) => {
   try {
     const doadorData: RegisterDoadorDto = req.body;
-    const doador = await registerDoador(doadorData);
+    const result = await registerDoador(doadorData);
 
     ApiResponseHandler.success(
       res,
       'Doador registrado com sucesso.',
-      { doador },
+      result,
       201
     );
   } catch (error) {
