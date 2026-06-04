@@ -20,7 +20,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
   const token = authHeader.split(' ')[1];
 
   try {
-    const secret = process.env.ACCESS_TOKEN_SECRET;
+    const secret = process.env.JWT_SECRET;
     
     if (!secret) {
       throw new Error('Chave do Access Token não configurada.');

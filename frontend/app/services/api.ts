@@ -7,7 +7,7 @@ const API_URL = 'https://doemais-mobile.onrender.com';
 /**
  * Serviço centralizado para requisições HTTP
  */
-export const api = async (endpoint: string, method: string = 'GET', body?: any) => {
+export const api = async (endpoint: string, method: string = 'GET', body?: any, isRetry: boolean = false): Promise<any> => {
     const url = `${API_URL}${endpoint}`;
 
     // Recuperar o JWT salvo no dispositivo
@@ -34,6 +34,39 @@ export const api = async (endpoint: string, method: string = 'GET', body?: any) 
         const responseText = await response.text();
 
         if (!response.ok) {
+            // Se o token expirou (401), tentamos renovar usando o refreshToken
+            if (response.status === 401 && !isRetry && !endpoint.includes('/auth/login') && !endpoint.includes('/auth/refresh')) {
+                const refreshToken = await AsyncStorage.getItem('@doemais:refreshToken');
+                if (refreshToken) {
+                    try {
+                        console.log(`[API_LOG] Token expirado. Tentando renovar com refresh token...`);
+                        const refreshResponse = await fetch(`${API_URL}/api/auth/refresh`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ refreshToken }),
+                        });
+
+                        if (refreshResponse.ok) {
+                            const refreshData = await refreshResponse.json();
+                            if (refreshData.accessToken) {
+                                // Salva o novo token
+                                await AsyncStorage.setItem('@doemais:token', refreshData.accessToken);
+                                // Refaz a requisição original com a flag isRetry = true
+                                console.log(`[API_LOG] Token renovado! Refazendo a requisição original para ${endpoint}...`);
+                                return await api(endpoint, method, body, true);
+                            }
+                        } else {
+                            // Se o refresh falhou (refresh token expirou ou inválido), limpa tudo
+                            await AsyncStorage.removeItem('@doemais:token');
+                            await AsyncStorage.removeItem('@doemais:refreshToken');
+                            await AsyncStorage.removeItem('@doemais:user');
+                        }
+                    } catch (refreshErr) {
+                        console.error('Erro de rede ao tentar renovar token:', refreshErr);
+                    }
+                }
+            }
+
             let errorMessage = responseText;
             try {
                 const jsonError = JSON.parse(responseText);

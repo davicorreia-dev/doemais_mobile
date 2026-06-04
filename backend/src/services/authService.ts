@@ -34,7 +34,8 @@ export const registerDoador = async (doadorData: RegisterDoadorDto) => {
       id: true,
       nome: true,
       email: true,
-      criado_em: true
+      criado_em: true,
+      genero: true
     }
   });
 
@@ -58,7 +59,8 @@ export const loginDoador = async (loginData: LoginDoadorDto) => {
     throw new UnauthorizedError('Credenciais inválidas.');
   }
 
-  const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+  // Corrigido para procurar a chave JWT_SECRET no ficheiro .env
+  const accessTokenSecret = process.env.JWT_SECRET;
   if (!accessTokenSecret) {
     throw new Error('Chave do Access Token não configurada.');
   }
@@ -95,6 +97,7 @@ export const loginDoador = async (loginData: LoginDoadorDto) => {
       id: doador.id,
       nome: doador.nome,
       email: doador.email,
+      genero: doador.genero,
     }
   };
 };
@@ -116,7 +119,8 @@ export const refreshAccessToken = async (tokenData: RefreshTokenDto) => {
     throw new UnauthorizedError('Refresh token expirado.');
   }
 
-  const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+  // Corrigido também aqui para prevenir falhas na renovação do token
+  const accessTokenSecret = process.env.JWT_SECRET;
   if (!accessTokenSecret) {
     throw new Error('Chave do Access Token não configurada.');
   }

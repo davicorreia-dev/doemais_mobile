@@ -13,6 +13,29 @@ import Button from "../../../components/Button";
 
 // Nossa API
 import { api } from "../../services/api";
+import { StatusBar } from "expo-status-bar";
+import z from "zod";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const loginSchema = z.object({
+    email: z.string().min(1, "O e-mail é obrigatório.").email("E-mail inválido"),
+    password: z.string().min(8, "Senha deve ter pelo menos 8 caracteres")
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
+
+// Validar a resposta da API do backend
+const loginResponseSchema = z.object({
+    accessToken: z.string().min(15, "Token não retornado pelo servidor"),
+    refreshToken: z.string().optional(),
+    doador: z.object({
+        id: z.string().or(z.number()),
+        nome: z.string(),
+        email: z.string().email(),
+        genero: z.string().nullable().optional(),
+    })
+});
 
 export default function LoginScreen() {
     const navigation = useNavigation<any>();
