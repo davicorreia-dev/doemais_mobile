@@ -80,14 +80,14 @@ export class IsValidDonorAgeConstraint implements ValidatorConstraintInterface {
     const monthDiff = today.getMonth() - birthDate.getMonth();
 
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      return age - 1 >= 18 && age - 1 <= 69;
+      return age - 1 >= 16 && age - 1 <= 69;
     }
 
-    return age >= 18 && age <= 69;
+    return age >= 16 && age <= 69;
   }
 
   defaultMessage(): string {
-    return 'O doador deve ter entre 18 e 69 anos.';
+    return 'O doador deve ter entre 16 e 69 anos.';
   }
 }
 
@@ -142,12 +142,12 @@ export function IsValidDonorWeight(validationOptions?: ValidationOptions) {
 @ValidatorConstraint({ name: 'isValidBloodType', async: false })
 export class IsValidBloodTypeConstraint implements ValidatorConstraintInterface {
   validate(bloodType: string): boolean {
-    const validTypes = ['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'];
+    const validTypes = ['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'NDA'];
     return validTypes.includes(bloodType?.toUpperCase());
   }
 
   defaultMessage(): string {
-    return 'O tipo sanguíneo deve ser um dos: O+, O-, A+, A-, B+, B-, AB+, AB-.';
+    return 'O tipo sanguíneo deve ser um dos: O+, O-, A+, A-, B+, B-, AB+, AB-, NDA.';
   }
 }
 
