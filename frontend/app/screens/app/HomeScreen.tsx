@@ -30,13 +30,16 @@ export default function HomeScreen() {
                     // 2. Busca os dados reais do backend (igual na tela de configurações)
                     const response = await api('/api/doadores/me', 'GET');
 
-                    if (response) {
-                        if (response.nome) {
-                            setUserName(response.nome);
+                    // A API retorna os dados dentro da propriedade 'data'
+                    const userData = response.data || response;
+
+                    if (userData) {
+                        if (userData.nome) {
+                            setUserName(userData.nome);
                         }
 
-                        if (response.tipo_sanguineo) {
-                            setBloodType(response.tipo_sanguineo);
+                        if (userData.tipo_sanguineo) {
+                            setBloodType(userData.tipo_sanguineo);
                         }
                     }
                 } catch (error) {
