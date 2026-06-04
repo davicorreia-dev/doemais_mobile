@@ -74,8 +74,11 @@ export default function LoginScreen() {
             // Chama a API (/api/auth/login)
             const response = await api('/api/auth/login', 'POST', payload);
 
+            // O backend retorna os dados dentro da propriedade 'data'
+            const responseData = response.data || response;
+
             // Valida o retorno do backend usando o Zod
-            const parsedResponse = loginResponseSchema.parse(response);
+            const parsedResponse = loginResponseSchema.parse(responseData);
 
             // Se recebeu o token, salva e entra
             if (parsedResponse.accessToken) {
