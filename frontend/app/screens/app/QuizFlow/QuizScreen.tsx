@@ -62,27 +62,41 @@ export default function QuizScreen() {
         return null;
     }
 
-    // Nova função auxiliar: Apenas traduz e envia
+   // Nova função auxiliar: Apenas traduz e envia
     const submitAnswersToAPI = async (finalAnswers: Record<string, any>) => {
+        console.log("🛠️ RESPOSTAS BRUTAS COM OS IDs REAIS:", finalAnswers);
+
+        // O nosso Avaliador Inteligente:
+        const evaluate = (...keys: string[]) => {
+            const values = keys.map(k => finalAnswers[k]).filter(v => v !== undefined);
+            if (values.length === 0) return undefined; 
+            
+            // Verifica se a pessoa respondeu 'SIM' ou true em alguma das perguntas perigosas
+            return values.includes(true) || values.includes('SIM'); 
+        };
+
         const payloadDoBanco = {
-            teve_resfriado: finalAnswers.s1 ?? finalAnswers.s2 ?? finalAnswers.s3 ?? undefined,
-            esta_gravida: finalAnswers.g1 ?? finalAnswers.g2 ?? undefined,
-            esta_amamentando: finalAnswers.a1 ?? finalAnswers.a4 ?? undefined,
-            fez_tatuagem: finalAnswers.t1 ?? finalAnswers.t2 ?? undefined,
-            esteve_area_malaria: finalAnswers.m1 ?? finalAnswers.m2 ?? undefined,
-            teve_hepatite: finalAnswers.d1 ?? undefined,
-            usou_drogas_injetaveis: finalAnswers.d4 ?? undefined,
-            teve_malaria: finalAnswers.m4 ?? undefined,
+            teveResfriado: evaluate('s1', 's2', 's3', 's4', 's5'), // GRIPE
+            estaGravida: evaluate('g1', 'g2', 'g4', 'g5'), // GRAVIDEZ (Inclui aborto)
+            estaAmamentando: evaluate('a1', 'a2', 'a3', 'a4', 'a5'), // AMAMENTAÇÃO
+            fezTatuagem: evaluate('t1', 't2', 't3', 't5'), // TATUAGEM (t4 é ignorado porque 'false' é o bloqueio nele)
+            esteveAreaMalaria: evaluate('m1', 'm2', 'm3', 'm4', 'm5'), // ESTADOS_COM_MALARIA
+            teveHepatite: evaluate('d1', 'd2'), // IMPEDIMENTOS_DEFINITIVOS (Hepatites)
+            usouDrogasInjetaveis: evaluate('d4', 'r4'), // IMPEDIMENTOS/SITUAÇÃO DE RISCO (Drogas injetáveis)
+            teveMalaria: evaluate('d3', 'm4'), // IMPEDIMENTOS/MALARIA
         };
 
         const payloadLimpo = Object.fromEntries(
             Object.entries(payloadDoBanco).filter(([_, value]) => value !== undefined)
         );
 
-        // Só envia se houver algo para enviar
         if (Object.keys(payloadLimpo).length > 0) {
             console.log("Enviando JSON para o banco:", payloadLimpo);
-            await api('/api/doadores/elegibilidade', 'POST', payloadLimpo);
+            try {
+                await api('/api/doadores/elegibilidade', 'POST', payloadLimpo);
+            } catch (err) {
+                 console.error("Erro na API de elegibilidade:", err);
+            }
         }
     };
 
