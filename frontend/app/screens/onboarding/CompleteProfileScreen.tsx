@@ -114,10 +114,17 @@ export default function CompleteProfileScreen() {
         try {
             const mappedGender = gender === 'Masculino' ? 'M' : gender === 'Feminino' ? 'F' : gender;
 
+            // Ajuste de Fuso Horário (Timezone):
+            // Extraímos o ano, mês e dia locais exatos que o usuário escolheu e montamos a string ISO.
+            const localYear = date.getFullYear();
+            const localMonth = String(date.getMonth() + 1).padStart(2, '0');
+            const localDay = String(date.getDate()).padStart(2, '0');
+            const isoDateWithoutTimezoneShift = `${localYear}-${localMonth}-${localDay}T00:00:00.000Z`;
+
             // Objeto Final Payload para o Backend
             const payload = {
                 ...basicData,
-                data_nascimento: date.toISOString(),
+                data_nascimento: isoDateWithoutTimezoneShift,
                 peso_kg: Number(weight),
                 genero: mappedGender,
                 tipo_sanguineo: unknownBlood ? 'NDA' : selectedBlood

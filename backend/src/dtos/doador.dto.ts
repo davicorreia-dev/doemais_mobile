@@ -39,6 +39,9 @@ export class RegisterDoadorDto {
   @IsNotEmpty({ message: 'O nome é obrigatório.' })
   @MinLength(3, { message: 'O nome deve ter no mínimo 3 caracteres.' })
   @MaxLength(100, { message: 'O nome deve ter no máximo 100 caracteres.' })
+  @Matches(/^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ ]+$/, {
+    message: 'O nome deve conter apenas letras e espaços.',
+  })
   nome!: string;
 
   @IsEmail({}, { message: 'O e-mail informado não é válido.' })
