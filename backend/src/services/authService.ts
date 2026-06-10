@@ -1,24 +1,31 @@
 import { hashPassword, comparePassword } from '../utils/password';
 import { RegisterDoadorDto, LoginDoadorDto, RefreshTokenDto } from '../dtos/doador.dto';
-import { ConflictError, UnauthorizedError } from '../utils/errors';
+import { ConflictError, UnauthorizedError, BadRequestError } from '../utils/errors';
 import prisma from '../config/prisma';
-import jwt, { SignOptions } from 'jsonwebtoken';
+import env from '../config/environment';
+import CONSTANTS from '../config/constants';
+import { AuthResponse, DoadorResponse } from '../types/index';
+import jwt from 'jsonwebtoken';
 import { randomBytes } from 'crypto';
 
-export const registerDoador = async (doadorData: RegisterDoadorDto) => {
+export const registerDoador = async (
+  doadorData: RegisterDoadorDto
+): Promise<DoadorResponse> => {
   const { email, cpf, senha, ...rest } = doadorData;
 
   const existingDoador = await prisma.doador.findFirst({
     where: {
-      OR: [
-        { email },
-        { cpf }
-      ]
-    }
+      OR: [{ email }, { cpf }],
+    },
   });
-  
+
   if (existingDoador) {
-    throw new ConflictError('Usuário com este e-mail ou CPF já existe.');
+    if (existingDoador.email === email) {
+      throw new ConflictError('Este e-mail já está registrado.');
+    }
+    if (existingDoador.cpf === cpf) {
+      throw new ConflictError('Este CPF já está registrado.');
+    }
   }
 
   const hashedPassword = await hashPassword(senha);
@@ -34,15 +41,21 @@ export const registerDoador = async (doadorData: RegisterDoadorDto) => {
       id: true,
       nome: true,
       email: true,
+      cpf: true,
+      telefone: true,
+      cidade: true,
+      tipo_sanguineo: true,
       criado_em: true,
-      genero: true
-    }
+      genero: true // Mantido
+    },
   });
 
-  return newDoador;
+  return newDoador as unknown as DoadorResponse;
 };
 
-export const loginDoador = async (loginData: LoginDoadorDto) => {
+export const loginDoador = async (
+  loginData: LoginDoadorDto
+): Promise<AuthResponse> => {
   const { email, senha } = loginData;
 
   const doador = await prisma.doador.findUnique({
@@ -54,64 +67,73 @@ export const loginDoador = async (loginData: LoginDoadorDto) => {
   }
 
   const isPasswordValid = await comparePassword(senha, doador.senha);
-
   if (!isPasswordValid) {
     throw new UnauthorizedError('Credenciais inválidas.');
   }
 
-  // Corrigido para procurar a chave JWT_SECRET no ficheiro .env
-  const accessTokenSecret = process.env.JWT_SECRET;
+  const accessTokenSecret = process.env.JWT_SECRET || env.ACCESS_TOKEN_SECRET;
   if (!accessTokenSecret) {
     throw new Error('Chave do Access Token não configurada.');
   }
-  
-  const payload = { doadorId: doador.id };
-  const expiresInSeconds = parseInt(
-    process.env.ACCESS_TOKEN_EXPIRATION_SECONDS || '300', 
-    10
-  );
-  
-  const options: SignOptions = {
-    expiresIn: expiresInSeconds
-  };
 
-  const accessToken = jwt.sign(payload, accessTokenSecret, options);
+  const payload = { doadorId: doador.id };
+  const accessToken = jwt.sign(payload, accessTokenSecret, {
+    expiresIn: CONSTANTS.JWT.EXPIRES_IN,
+  } as any);
 
   const refreshToken = randomBytes(64).toString('hex');
-  const expirationDays = parseInt(process.env.REFRESH_TOKEN_EXPIRATION_DAYS || '7');
   const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + expirationDays);
+  expiresAt.setDate(
+    expiresAt.getDate() + CONSTANTS.JWT.REFRESH_EXPIRES_IN_DAYS
+  );
+
+  await prisma.refreshToken.deleteMany({
+    where: { doadorId: doador.id },
+  });
 
   await prisma.refreshToken.create({
     data: {
       token: refreshToken,
-      expiresAt: expiresAt,
+      expiresAt,
       doadorId: doador.id,
     },
   });
 
+  const doadorResponse: DoadorResponse = {
+    id: doador.id,
+    nome: doador.nome,
+    email: doador.email,
+    cpf: doador.cpf,
+    telefone: doador.telefone,
+    cidade: doador.cidade,
+    tipo_sanguineo: doador.tipo_sanguineo,
+    criado_em: doador.criado_em,
+    genero: doador.genero, // Adicionado para a nossa triagem funcionar
+  } as unknown as DoadorResponse;
+
   return {
     accessToken,
     refreshToken,
-    doador: {
-      id: doador.id,
-      nome: doador.nome,
-      email: doador.email,
-      genero: doador.genero,
-    }
+    expiresIn: CONSTANTS.JWT.EXPIRES_IN,
+    doador: doadorResponse,
   };
 };
 
-export const refreshAccessToken = async (tokenData: RefreshTokenDto) => {
+export const refreshAccessToken = async (
+  tokenData: RefreshTokenDto
+): Promise<{ accessToken: string; expiresIn: string }> => {
   const { refreshToken } = tokenData;
+
+  if (!refreshToken) {
+    throw new BadRequestError('Refresh token é obrigatório.');
+  }
 
   const savedToken = await prisma.refreshToken.findUnique({
     where: { token: refreshToken },
-    include: { doador: true },
   });
 
   if (!savedToken) {
-    throw new UnauthorizedError('Refresh token inválido.');
+    throw new UnauthorizedError('Refresh token inválido ou não encontrado.');
   }
 
   if (new Date() > savedToken.expiresAt) {
@@ -119,35 +141,38 @@ export const refreshAccessToken = async (tokenData: RefreshTokenDto) => {
     throw new UnauthorizedError('Refresh token expirado.');
   }
 
-  // Corrigido também aqui para prevenir falhas na renovação do token
-  const accessTokenSecret = process.env.JWT_SECRET;
+  const accessTokenSecret = process.env.JWT_SECRET || env.ACCESS_TOKEN_SECRET;
   if (!accessTokenSecret) {
     throw new Error('Chave do Access Token não configurada.');
   }
 
   const payload = { doadorId: savedToken.doadorId };
-  const expiresInSeconds = parseInt(
-    process.env.ACCESS_TOKEN_EXPIRATION_SECONDS || '300', 
-    10
-  );
-
-  const options: SignOptions = {
-    expiresIn: expiresInSeconds
-  };
-
-  const newAccessToken = jwt.sign(payload, accessTokenSecret, options);
+  const newAccessToken = jwt.sign(payload, accessTokenSecret, {
+    expiresIn: CONSTANTS.JWT.EXPIRES_IN,
+  } as any);
 
   return {
     accessToken: newAccessToken,
+    expiresIn: CONSTANTS.JWT.EXPIRES_IN,
   };
 };
 
-export const logout = async (tokenData: RefreshTokenDto) => {
+export const logout = async (
+  tokenData: RefreshTokenDto
+): Promise<{ message: string }> => {
   const { refreshToken } = tokenData;
 
-  await prisma.refreshToken.deleteMany({
+  if (!refreshToken) {
+    throw new BadRequestError('Refresh token é obrigatório.');
+  }
+
+  const result = await prisma.refreshToken.deleteMany({
     where: { token: refreshToken },
   });
+
+  if (result.count === 0) {
+    throw new UnauthorizedError('Refresh token não encontrado ou já revogado.');
+  }
 
   return { message: 'Logout realizado com sucesso.' };
 };

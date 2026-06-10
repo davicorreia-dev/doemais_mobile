@@ -29,12 +29,12 @@ export default function HomeScreen() {
 
                     // 2. Busca os dados reais do backend (igual na tela de configurações)
                     const response = await api('/api/doadores/me', 'GET');
-                    
+
                     if (response) {
                         if (response.nome) {
                             setUserName(response.nome);
                         }
-                        
+
                         if (response.tipo_sanguineo) {
                             setBloodType(response.tipo_sanguineo);
                         }
@@ -58,11 +58,34 @@ export default function HomeScreen() {
         { label: 'Publicações', value: '20', color: '#3E2C2C' },
     ];
 
+
+    const handleLogout = async () => {
+        try {
+            const refreshToken = await AsyncStorage.getItem('@doemais:refreshToken');
+            if (refreshToken) {
+                // Invalida o token no backend
+                await api('/api/auth/logout', 'POST', { refreshToken });
+            }
+        } catch (error) {
+            console.error("Erro ao fazer logout no servidor:", error);
+        } finally {
+            // Limpa tudo localmente independentemente do sucesso da API
+            await AsyncStorage.removeItem('@doemais:token');
+            await AsyncStorage.removeItem('@doemais:refreshToken');
+            await AsyncStorage.removeItem('@doemais:user');
+
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+            });
+        }
+    };
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <StatusBar barStyle="light-content" backgroundColor="#E0323C" />
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{}}>
 
                 {/* --- HEADER VERMELHO --- */}
                 <View style={Styles.headerContainer}>
@@ -86,8 +109,10 @@ export default function HomeScreen() {
                             </View>
                         </View>
                         <View style={Styles.headerIcons}>
-                            <TouchableOpacity><Ionicons name="mail-outline" size={24} color="#333" style={{ marginRight: 15 }} /></TouchableOpacity>
-                            <TouchableOpacity><Ionicons name="notifications-outline" size={24} color="#333" /></TouchableOpacity>
+                            <TouchableOpacity><Ionicons name="mail-outline" size={24} color="#333" style={{ marginRight: 0 }} /></TouchableOpacity>
+                            <TouchableOpacity onPress={handleLogout}><Ionicons name="log-out-outline" size={24} color="#333" style={{ marginRight: 0 }} />
+                            </TouchableOpacity>
+
                         </View>
                     </View>
 

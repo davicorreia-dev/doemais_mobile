@@ -93,11 +93,11 @@ export default function CompleteProfileScreen() {
             return;
         }
 
-        //Validação de Peso Mínimo 50kg
+        //Validação de Peso Mínimo 50kg e Máximo 150kg
         if (!isValidWeight(weight)) {
             Alert.alert(
-                "Peso insuficiente",
-                "Para doar sangue, é necessário pesar no mínimo 50kg."
+                "Peso inválido",
+                "Para doar sangue, é necessário pesar entre 50kg e 150kg."
             );
             return;
         }
@@ -112,13 +112,15 @@ export default function CompleteProfileScreen() {
         setLoading(true);
 
         try {
+            const mappedGender = gender === 'Masculino' ? 'M' : gender === 'Feminino' ? 'F' : gender;
+
             // Objeto Final Payload para o Backend
             const payload = {
                 ...basicData,
                 data_nascimento: date.toISOString(),
                 peso_kg: Number(weight),
-                genero: gender,
-                tipo_sanguineo: unknownBlood ? 'Nao sei' : selectedBlood
+                genero: mappedGender,
+                tipo_sanguineo: unknownBlood ? 'NDA' : selectedBlood
             };
 
             console.log("Enviando dados:", payload);
@@ -137,135 +139,147 @@ export default function CompleteProfileScreen() {
     };
 
     return (
-        <KeyboardAvoidingView
-            style={Styles.container}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                <Header
-                    icon="arrow-back-outline"
-                    title="Criar uma conta"
-                    subtitle="Requisitos Básicos"
-                    onBack={() => navigation.goBack()}
-                />
+        <View style={Styles.container}>
+            <Header
+                marginTop={30}
+                minHeight={50}
+                icon="arrow-back-outline"
+                iconColor="#FFF"
+                onBack={() => {
+                    if (navigation.canGoBack()) {
+                        navigation.goBack();
+                    } else {
+                        navigation.navigate("AuthChoice");
+                    }
+                }}
+                containerStyle={{ backgroundColor: '#E0323C' }}
+            />
 
-                <View style={Styles.content}>
 
-                    {/* Data */}
-                    <TouchableOpacity onPress={() => setShowDatePicker(true)} activeOpacity={0.8}>
-                        <View pointerEvents="none">
-                            <Input
-                                label="Data de Nascimento*"
-                                placeholder="DD/MM/AAAA"
-                                value={dobLabel}
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            >
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+
+                    <View style={Styles.content}>
+
+                        {/* Data */}
+                        <TouchableOpacity onPress={() => setShowDatePicker(true)} activeOpacity={0.8}>
+                            <View pointerEvents="none">
+                                <Input
+                                    label="Data de Nascimento*"
+                                    placeholder="DD/MM/AAAA"
+                                    value={dobLabel}
+                                />
+                            </View>
+                        </TouchableOpacity>
+
+                        {showDatePicker && (
+                            <DateTimePicker
+                                value={date || new Date()}
+                                mode="date"
+                                display="default"
+                                onChange={onChangeDate}
+                                maximumDate={new Date()}
+                            />
+                        )}
+
+                        {/* Gênero */}
+                        <TouchableOpacity onPress={() => setModalVisible(true)} activeOpacity={0.8}>
+                            <View pointerEvents="none">
+                                <Input
+                                    label="Gênero*"
+                                    placeholder="Selecione"
+                                    value={gender}
+                                />
+                            </View>
+                        </TouchableOpacity>
+
+                        {/* Peso */}
+                        <Text style={Styles.weightLabel}>Peso (kg)*</Text>
+                        <View style={Styles.weightInputContainer}>
+                            <TextInput
+                                style={Styles.weightTextInput}
+                                placeholder="Ex: 70"
+                                placeholderTextColor="#C4C4C4"
+                                keyboardType="numeric"
+                                value={weight}
+                                onChangeText={setWeight}
+                            />
+                            <Text style={Styles.kgText}>kg</Text>
+                        </View>
+
+                        {/* Sangue */}
+                        <View style={Styles.sectionHeader}>
+                            <Text style={Styles.sectionTitle}>Qual é o seu tipo sanguíneo?</Text>
+                        </View>
+
+                        <View style={Styles.bloodGrid}>
+                            {BLOOD_TYPES.map((type) => (
+                                <TouchableOpacity
+                                    key={type}
+                                    style={[
+                                        Styles.bloodButton,
+                                        selectedBlood === type && Styles.bloodButtonSelected
+                                    ]}
+                                    onPress={() => handleSelectBlood(type)}
+                                >
+                                    <Text style={[
+                                        Styles.bloodText,
+                                        selectedBlood === type && Styles.bloodTextSelected
+                                    ]}>
+                                        {type}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+
+                        {/* Não sei */}
+                        <View style={Styles.checkboxContainer}>
+                            <Checkbox
+                                value={unknownBlood}
+                                onValueChange={handleUnknownChange}
+                                color={unknownBlood ? '#E0323C' : undefined}
+                            />
+                            <Text style={Styles.checkboxText}>Não sei meu tipo sanguíneo</Text>
+                        </View>
+
+                        <View style={Styles.buttonContainer}>
+                            <Button
+                                title={loading ? "Enviando..." : "Finalizar Cadastro"}
+                                textColor="#fff"
+                                onPress={handleFinish}
+                                disabled={loading}
                             />
                         </View>
-                    </TouchableOpacity>
+                    </View>
 
-                    {showDatePicker && (
-                        <DateTimePicker
-                            value={date || new Date()}
-                            mode="date"
-                            display="default"
-                            onChange={onChangeDate}
-                            maximumDate={new Date()}
-                        />
-                    )}
-
-                    {/* Gênero */}
-                    <TouchableOpacity onPress={() => setModalVisible(true)} activeOpacity={0.8}>
-                        <View pointerEvents="none">
-                            <Input
-                                label="Gênero*"
-                                placeholder="Selecione"
-                                value={gender}
-                            />
+                    {/* Modal gênero */}
+                    <Modal
+                        animationType="fade"
+                        transparent={true}
+                        visible={modalVisible}
+                        onRequestClose={() => setModalVisible(false)}
+                    >
+                        <View style={Styles.modalOverlay}>
+                            <View style={Styles.modalContent}>
+                                <Text style={Styles.modalTitle}>Selecione o Gênero</Text>
+                                <TouchableOpacity style={Styles.modalOption} onPress={() => selectGender('Masculino')}>
+                                    <Text style={Styles.modalOptionText}>Masculino</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={Styles.modalOption} onPress={() => selectGender('Feminino')}>
+                                    <Text style={Styles.modalOptionText}>Feminino</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={Styles.modalClose} onPress={() => setModalVisible(false)}>
+                                    <Text style={Styles.modalCloseText}>Cancelar</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                    </TouchableOpacity>
+                    </Modal>
 
-                    {/* Peso */}
-                    <Text style={Styles.weightLabel}>Peso (kg)*</Text>
-                    <View style={Styles.weightInputContainer}>
-                        <TextInput
-                            style={Styles.weightTextInput}
-                            placeholder="Ex: 70"
-                            placeholderTextColor="#C4C4C4"
-                            keyboardType="numeric"
-                            value={weight}
-                            onChangeText={setWeight}
-                        />
-                        <Text style={Styles.kgText}>kg</Text>
-                    </View>
-
-                    {/* Sangue */}
-                    <View style={Styles.sectionHeader}>
-                        <Text style={Styles.sectionTitle}>Qual é o seu tipo sanguíneo?</Text>
-                    </View>
-
-                    <View style={Styles.bloodGrid}>
-                        {BLOOD_TYPES.map((type) => (
-                            <TouchableOpacity
-                                key={type}
-                                style={[
-                                    Styles.bloodButton,
-                                    selectedBlood === type && Styles.bloodButtonSelected
-                                ]}
-                                onPress={() => handleSelectBlood(type)}
-                            >
-                                <Text style={[
-                                    Styles.bloodText,
-                                    selectedBlood === type && Styles.bloodTextSelected
-                                ]}>
-                                    {type}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-
-                    {/* Não sei */}
-                    <View style={Styles.checkboxContainer}>
-                        <Checkbox
-                            value={unknownBlood}
-                            onValueChange={handleUnknownChange}
-                            color={unknownBlood ? '#E0323C' : undefined}
-                        />
-                        <Text style={Styles.checkboxText}>Não sei meu tipo sanguíneo</Text>
-                    </View>
-
-                    <View style={Styles.buttonContainer}>
-                        <Button
-                            title={loading ? "Enviando..." : "Finalizar Cadastro"}
-                            textColor="#fff"
-                            onPress={handleFinish}
-                            disabled={loading}
-                        />
-                    </View>
-                </View>
-
-                {/* Modal gênero */}
-                <Modal
-                    animationType="fade"
-                    transparent={true}
-                    visible={modalVisible}
-                    onRequestClose={() => setModalVisible(false)}
-                >
-                    <View style={Styles.modalOverlay}>
-                        <View style={Styles.modalContent}>
-                            <Text style={Styles.modalTitle}>Selecione o Gênero</Text>
-                            <TouchableOpacity style={Styles.modalOption} onPress={() => selectGender('Masculino')}>
-                                <Text style={Styles.modalOptionText}>Masculino</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={Styles.modalOption} onPress={() => selectGender('Feminino')}>
-                                <Text style={Styles.modalOptionText}>Feminino</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={Styles.modalClose} onPress={() => setModalVisible(false)}>
-                                <Text style={Styles.modalCloseText}>Cancelar</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </Modal>
-
-            </ScrollView>
-        </KeyboardAvoidingView>
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </View>
     );
 }

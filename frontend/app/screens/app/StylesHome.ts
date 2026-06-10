@@ -53,6 +53,7 @@ const Styles = StyleSheet.create({
         fontSize: 12,
     },
     headerIcons: {
+        gap: 10,
         flexDirection: 'row',
     },
     searchContainer: {
@@ -68,7 +69,7 @@ const Styles = StyleSheet.create({
         flex: 1,
         color: '#333',
     },
-    
+
     // Conteúdo
     contentContainer: {
         padding: 20,
@@ -80,7 +81,7 @@ const Styles = StyleSheet.create({
         marginBottom: 15,
         marginTop: 10,
     },
-    
+
     // Atividades Grid
     activitiesGrid: {
         flexDirection: 'row',

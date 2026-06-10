@@ -4,14 +4,12 @@ import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts, Lexend_100Thin, Lexend_200ExtraLight, Lexend_300Light, Lexend_400Regular, Lexend_500Medium, Lexend_600SemiBold, Lexend_700Bold } from "@expo-google-fonts/lexend";
 
-// Seus componentes
 import Header from "../../../components/Header";
 import Input from "../../../components/Input";
 import Styles from "./stylesLogin";
 import SocialButton from "../../../components/SocialButton";
 import Button from "../../../components/Button";
 
-// Nossa API
 import { api } from "../../services/api";
 import { StatusBar } from "expo-status-bar";
 import z from "zod";
@@ -25,7 +23,6 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-// Validar a resposta da API do backend
 const loginResponseSchema = z.object({
     accessToken: z.string().min(15, "Token não retornado pelo servidor"),
     refreshToken: z.string().optional(),
@@ -33,16 +30,21 @@ const loginResponseSchema = z.object({
         id: z.string().or(z.number()),
         nome: z.string(),
         email: z.string().email(),
-        genero: z.string().nullable().optional(),
+        genero: z.string().nullable().optional(), // Mantido da branch para leitura futura
     })
 });
 
 export default function LoginScreen() {
     const navigation = useNavigation<any>();
 
-    // 1. ADICIONADO: States para controlar os inputs e o carregamento
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+        resolver: zodResolver(loginSchema),
+        defaultValues: {
+            email: "",
+            password: ""
+        }
+    });
+
     const [loading, setLoading] = useState(false);
 
     const [fontsLoaded] = useFonts({
@@ -55,17 +57,10 @@ export default function LoginScreen() {
         Lexend_700Bold,
     });
 
-    // 2. ADICIONADO: A Função que faz o Login acontecer
-    const handleLogin = async () => {
-        // Validação básica
-        if (!email || !password) {
-            Alert.alert('Atenção', 'Por favor, preencha e-mail e senha.');
-            return;
-        }
-
+    const onSubmit = async (data: LoginFormData) => {
         const payload = {
-            email: email.trim().toLowerCase(),
-            senha: password
+            email: data.email.trim().toLowerCase(),
+            senha: data.password
         }
 
         setLoading(true);
@@ -73,16 +68,17 @@ export default function LoginScreen() {
         try {
             console.log("Tentando logar com:", payload);
 
-            // Chama a API (/api/auth/login)
             const response = await api('/api/auth/login', 'POST', payload);
+            const responseData = response.data || response;
+            const parsedResponse = loginResponseSchema.parse(responseData);
 
+            if (parsedResponse.accessToken) {
+                await AsyncStorage.setItem('@doemais:token', parsedResponse.accessToken);
+                await AsyncStorage.setItem('@doemais:user', JSON.stringify(parsedResponse.doador));
+                if (parsedResponse.refreshToken) {
+                    await AsyncStorage.setItem('@doemais:refreshToken', parsedResponse.refreshToken);
+                }
 
-            // Se recebeu o token, salva e entra
-            if (response.accessToken) {
-                await AsyncStorage.setItem('@doemais:token', response.accessToken);
-                await AsyncStorage.setItem('@doemais:user', JSON.stringify(response.doador));
-
-                // Redireciona para o Quiz (Home)
                 navigation.reset({
                     index: 0,
                     routes: [{ name: 'MainTabs' }],
@@ -93,7 +89,6 @@ export default function LoginScreen() {
 
         } catch (error: any) {
             console.error("Erro Login:", error);
-            // Mensagem amigável se for erro de senha
             const msg = error.message.includes('401') || error.message.includes('404')
                 ? 'E-mail ou senha incorretos.'
                 : error.message;
@@ -108,78 +103,101 @@ export default function LoginScreen() {
     }
 
     return (
-        <KeyboardAvoidingView style={{ flex: 1, backgroundColor: '#fff' }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={{ flex: 1, backgroundColor: '#fff' }}>
+            <StatusBar backgroundColor="#E0323C" style="light" />
+            <Header
+                marginTop={30}
+                minHeight={50}
+                icon="arrow-back-outline"
+                iconColor="#FFF"
+                onBack={() => {
+                    if (navigation.canGoBack()) {
+                        navigation.goBack();
+                    } else {
+                        navigation.navigate("AuthChoice");
+                    }
+                }}
+                containerStyle={{ backgroundColor: '#E0323C' }}
+            />
 
-                <Header
-                    icon="arrow-back-outline"
-                    titleSize={20}
-                    title="Seja bem-vindo(a)! Sua solidariedade pode salvar vidas."
-                    onBack={() => navigation.goBack()} // Adicionei ação de voltar
-                />
-
-                <View>
-                    <View style={Styles.inputcontainer}>
-                        {/* 3. CONECTADO: Input de E-mail */}
-                        <Input
-                            label="E-mail:"
-                            keyboardType="email-address"
-                            value={email}            // O valor vem do estado
-                            onChangeText={setEmail}  // Ao digitar, atualiza o estado
-                            autoCapitalize="none"
-                        />
-
-                        {/* 4. CONECTADO: Input de Senha */}
-                        <Input
-                            label="Senha:"
-                            value={password}
-                            onChangeText={setPassword}
-                            secureTextEntry
-                        />
-
-                        <Text style={Styles.ForgetPassword}
-                            onPress={() => navigation.navigate("ForgetPasswordChoiceScreen")}> Esqueceu sua senha? </Text>
-
-                    </View>
-
-                    <View style={Styles.SocialbuttonsContainer}>
-
-                        <SocialButton
-                            title="Entrar com o Google"
-                            iconSource={require("../../../assets/images/googleicon.png")}
-                            onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
-                        />
-
-                        <SocialButton
-                            title="Entrar com o Facebook"
-                            iconSource={require("../../../assets/images/facebook 1.png")}
-                            onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
-                        />
-
-                        {/* 5. CONECTADO: O Botão agora chama o handleLogin */}
-                        <Button
-                            title={loading ? "Entrando..." : "Entrar"}
-                            textColor="white"
-                            borderRadius={10}
-                            width={270}
-                            onPress={handleLogin} // <--- AQUI ESTAVA FALTANDO!
-                            disabled={loading}    // Evita clique duplo
-                        />
-                    </View>
-
-                    <View style={Styles.containerRegister}>
-                        <Text style={Styles.registerText}>
-                            Não tem uma conta ainda?{" "}
-                            <Text
-                                style={Styles.RegisterUnderline}
-                                onPress={() => navigation.navigate("RegisterScreen")} // Confirme se o nome da rota é esse no App.tsx
-                            >
-                                Cadastre-se.
-                            </Text>
+            <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                    <View>
+                        <Text style={Styles.TitleContainer}>
+                            Seja bem-vindo(a)! Sua solidariedade pode salvar vidas.
                         </Text>
-                    </View>
-                </View >
-            </ScrollView>
-        </KeyboardAvoidingView>
+
+                        <View style={Styles.inputcontainer}>
+                            <Controller
+                                control={control}
+                                name="email"
+                                render={({ field: { onChange, value } }) => (
+                                    <Input
+                                        label="E-mail:"
+                                        keyboardType="email-address"
+                                        value={value}
+                                        onChangeText={onChange}
+                                        autoCapitalize="none"
+                                        error={errors.email?.message}
+                                    />
+                                )}
+                            />
+
+                            <Controller
+                                control={control}
+                                name="password"
+                                render={({ field: { onChange, value } }) => (
+                                    <Input
+                                        label="Senha:"
+                                        value={value}
+                                        onChangeText={onChange}
+                                        secureTextEntry
+                                        error={errors.password?.message}
+                                    />
+                                )}
+                            />
+
+                            <Text style={Styles.ForgetPassword}
+                                onPress={() => navigation.navigate("ForgetPasswordChoiceScreen")}> Esqueceu sua senha? </Text>
+                        </View>
+
+                        <View style={Styles.SocialbuttonsContainer}>
+                            <SocialButton
+                                title="Entrar com o Google"
+                                iconSource={require("../../../assets/images/googleicon.png")}
+                                onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
+                            />
+
+                            <SocialButton
+                                title="Entrar com o Facebook"
+                                iconSource={require("../../../assets/images/facebook 1.png")}
+                                onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
+                            />
+
+                            <Button
+                                title={loading ? "Entrando..." : "Entrar"}
+                                textColor="white"
+                                borderRadius={10}
+                                width={270}
+                                onPress={handleSubmit(onSubmit)}
+                                disabled={loading}
+                            />
+                        </View>
+
+                        <View style={Styles.containerRegister}>
+                            <Text style={Styles.registerText}>
+                                Não tem uma conta ainda?{" "}
+                                <Text
+                                    style={Styles.RegisterUnderline}
+                                    onPress={() => navigation.navigate("Register")} 
+                                >
+                                    Cadastre-se.
+                                </Text>
+                            </Text>
+                        </View>
+                    </View >
+                </ScrollView>
+            </KeyboardAvoidingView>
+        </View>
     )
 }

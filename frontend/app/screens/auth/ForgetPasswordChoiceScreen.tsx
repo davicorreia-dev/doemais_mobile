@@ -10,7 +10,7 @@ export default function ForgetPasswordChoiceScreen() {
     const navigation = useNavigation<any>();
 
     return (
-        <View>
+        <View style={{ flex: 1, backgroundColor: '#fff' }}>
             <Header
                 icon="arrow-back-outline"
                 onBack={() => navigation.navigate("LoginScreen")}

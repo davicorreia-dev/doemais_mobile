@@ -28,18 +28,20 @@ export default function NewPasswordScreen() {
     };
 
     return (
-        <KeyboardAvoidingView
-            style={Styles.container}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                <Header
-                    icon="arrow-back-outline"
-                    title="Nova Senha"
-                    titleColor="#E0323C"
-                    titleSize={24}
-                    onBack={() => navigation.goBack()}
-                />
+        <View style={Styles.container}>
+            <Header
+                icon="arrow-back-outline"
+                title="Nova Senha"
+                titleColor="#E0323C"
+                titleSize={24}
+                onBack={() => navigation.goBack()}
+            />
+
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            >
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
 
                 <View style={Styles.content}>
                     <Text style={Styles.description}>
@@ -86,6 +88,7 @@ export default function NewPasswordScreen() {
                     </View>
                 </View>
             </ScrollView>
-        </KeyboardAvoidingView>
+            </KeyboardAvoidingView>
+        </View>
     );
 }

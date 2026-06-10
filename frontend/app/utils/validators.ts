@@ -40,8 +40,8 @@ export const isValidAge = (date: Date): boolean => {
     return age >= 16 && age <= 69;
 };
 
-// Valida Peso de acordo com a regra de doação: Mínimo 50kg
+// Valida Peso de acordo com a regra de doação: Entre 50kg e 150kg
 export const isValidWeight = (weight: string | number): boolean => {
     const numWeight = Number(weight);
-    return !isNaN(numWeight) && numWeight >= 50;
+    return !isNaN(numWeight) && numWeight >= 50 && numWeight <= 150;
 };
