@@ -1,27 +1,19 @@
-import { useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Image, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { NavigationProp, ParamListBase, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { QUIZ_MODULES, type FormGender, type QuizModule } from '../app/QuizFlow/quizData';
 import styles from './StylesEligibily';
 
-type AuthGender = 'M' | 'F' | 'MALE' | 'FEMALE';
-
-const MOCK_USER_GENDER: AuthGender = 'F';
-
-const useAuth = () => ({
-    user: {
-        genero: MOCK_USER_GENDER,
-    },
-});
-
-const normalizeGender = (value: AuthGender): FormGender => {
-    if (value === 'M' || value === 'MALE') {
+const normalizeGender = (value: string | null | undefined): FormGender => {
+    if (!value) return 'M';
+    const upper = value.toUpperCase();
+    if (upper === 'M' || upper === 'MALE' || upper === 'MASCULINO') {
         return 'M';
     }
 
-    if (value === 'F' || value === 'FEMALE') {
+    if (upper === 'F' || upper === 'FEMALE' || upper === 'FEMININO') {
         return 'F';
     }
 
@@ -46,8 +38,23 @@ const DISPLAY_ORDER = [
 
 export default function EligibilityFormsScreen() {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
-    const { user } = useAuth();
-    const gender = normalizeGender(user.genero);
+    
+    const [gender, setGender] = useState<FormGender>('M');
+
+    useEffect(() => {
+        async function loadUserGender() {
+            try {
+                const userData = await AsyncStorage.getItem('@doemais:user');
+                if (userData) {
+                    const parsedUser = JSON.parse(userData);
+                    setGender(normalizeGender(parsedUser.genero));
+                }
+            } catch (error) {
+                console.error("Erro ao carregar usuário do AsyncStorage:", error);
+            }
+        }
+        loadUserGender();
+    }, []);
 
     const visibleForms = useMemo(() => {
         return DISPLAY_ORDER

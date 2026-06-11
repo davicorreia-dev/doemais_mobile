@@ -9,24 +9,27 @@ export const authMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  // Pega o cabeçalho de autorização
   const authHeader = req.headers.authorization;
 
-  // Verifica se o formato está correto (Bearer <token>)
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return next(
       new UnauthorizedError('Token de acesso não fornecido ou mal formatado.')
     );
   }
 
-  // Separa o "Bearer" do token real
   const token = authHeader.split(' ')[1];
 
   try {
-    // Verifica e decodifica o token JWT
-    const decoded = jwt.verify(token, env.ACCESS_TOKEN_SECRET) as JwtPayload;
+    // Tenta usar a variável corrigida, com fallback para o novo padrão da main
+    const secret = process.env.JWT_SECRET || env.ACCESS_TOKEN_SECRET;
+    
+    if (!secret) {
+      throw new Error('Chave do Access Token não configurada.');
+    }
 
-    // Injeta o ID do doador na requisição para uso posterior
+    // Verifica e decodifica o token JWT
+    const decoded = jwt.verify(token, secret) as JwtPayload;
+
     req.doadorId = decoded.doadorId;
 
     next();

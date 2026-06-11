@@ -7,6 +7,7 @@ import Button from '../../../../components/Button';
 import Input from '../../../../components/Input';
 import Styles from './Styles';
 import { QUIZ_MODULES, type QuizQuestion } from './quizData';
+import { api } from '../../../services/api'; // <-- Adicionado o import da API
 
 type RouteParams = {
     moduleId?: string;
@@ -35,6 +36,10 @@ export default function QuizScreen() {
     const [blockMessage, setBlockMessage] = useState('');
     const [selectExpanded, setSelectExpanded] = useState(false);
     const [selectedMonthLabel, setSelectedMonthLabel] = useState('');
+    
+    // Acumulador de respostas!
+    const [answers, setAnswers] = useState<Record<string, any>>({});
+    const [isSubmitting, setIsSubmitting] = useState(false); // Para evitar duplo clique no final...
 
     useEffect(() => {
         setInputValue('');
@@ -57,10 +62,59 @@ export default function QuizScreen() {
         return null;
     }
 
-    const finishFlow = () => {
-        Alert.alert(module.successTitle, module.successMessage, [
-            { text: 'OK', onPress: () => navigation.goBack() },
-        ]);
+   // Nova função auxiliar: Apenas traduz e envia
+    const submitAnswersToAPI = async (finalAnswers: Record<string, any>) => {
+        console.log("🛠️ RESPOSTAS BRUTAS COM OS IDs REAIS:", finalAnswers);
+
+        // O nosso Avaliador Inteligente:
+        const evaluate = (...keys: string[]) => {
+            const values = keys.map(k => finalAnswers[k]).filter(v => v !== undefined);
+            if (values.length === 0) return undefined; 
+            
+            // Verifica se a pessoa respondeu 'SIM' ou true em alguma das perguntas perigosas
+            return values.includes(true) || values.includes('SIM'); 
+        };
+
+        const payloadDoBanco = {
+            teveResfriado: evaluate('s1', 's2', 's3', 's4', 's5'), // GRIPE
+            estaGravida: evaluate('g1', 'g2', 'g4', 'g5'), // GRAVIDEZ (Inclui aborto)
+            estaAmamentando: evaluate('a1', 'a2', 'a3', 'a4', 'a5'), // AMAMENTAÇÃO
+            fezTatuagem: evaluate('t1', 't2', 't3', 't5'), // TATUAGEM (t4 é ignorado porque 'false' é o bloqueio nele)
+            esteveAreaMalaria: evaluate('m1', 'm2', 'm3', 'm4', 'm5'), // ESTADOS_COM_MALARIA
+            teveHepatite: evaluate('d1', 'd2'), // IMPEDIMENTOS_DEFINITIVOS (Hepatites)
+            usouDrogasInjetaveis: evaluate('d4', 'r4'), // IMPEDIMENTOS/SITUAÇÃO DE RISCO (Drogas injetáveis)
+            teveMalaria: evaluate('d3', 'm4'), // IMPEDIMENTOS/MALARIA
+        };
+
+        const payloadLimpo = Object.fromEntries(
+            Object.entries(payloadDoBanco).filter(([_, value]) => value !== undefined)
+        );
+
+        if (Object.keys(payloadLimpo).length > 0) {
+            console.log("Enviando JSON para o banco:", payloadLimpo);
+            try {
+                await api('/api/doadores/elegibilidade', 'POST', payloadLimpo);
+            } catch (err) {
+                 console.error("Erro na API de elegibilidade:", err);
+            }
+        }
+    };
+
+    const finishFlow = async (finalAnswers: Record<string, any>) => {
+        setIsSubmitting(true);
+        try {
+            // Usa a nossa nova função!
+            await submitAnswersToAPI(finalAnswers);
+            
+            Alert.alert(module.successTitle, module.successMessage, [
+                { text: 'OK', onPress: () => navigation.goBack() },
+            ]);
+        } catch (error) {
+            console.error("Erro ao salvar triagem:", error);
+            Alert.alert("Erro", "Ocorreu um erro ao salvar o questionário. Tente novamente.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const exitToMenu = () => {
@@ -69,6 +123,7 @@ export default function QuizScreen() {
         setQuestionIndex(0);
         setInputValue('');
         setSelectedMonthLabel('');
+        setAnswers({}); // Limpa as respostas ao sair
         navigation.goBack();
     };
 
@@ -129,13 +184,22 @@ export default function QuizScreen() {
     const handleAdvance = (answer: boolean | string | number | null) => {
         const result = validateQuestion(answer);
 
+        // SEMPRE salvamos a resposta atual no acumulador (mesmo se for reprovado)
+        const newAnswers = { ...answers, [currentQuestion.id]: answer };
+        setAnswers(newAnswers);
+
+        // Se a resposta for ELIMINATÓRIA:
         if (result.blocked) {
+            // Mandamos para o banco em "background" para registrar a falha
+            submitAnswersToAPI(newAnswers).catch(e => console.error("Erro ao registrar bloqueio:", e));
+            // E exibimos a tela de bloqueio
             openBlock(result.message);
             return;
         }
 
+        // Se for a última pergunta (Aprovado)
         if (questionIndex >= module.questions.length - 1) {
-            finishFlow();
+            finishFlow(newAnswers);
             return;
         }
 
@@ -157,10 +221,10 @@ export default function QuizScreen() {
         if (currentQuestion.answerType === 'boolean') {
             return (
                 <View style={Styles.booleanActions}>
-                    <TouchableOpacity style={Styles.answerButton} onPress={() => handleAdvance(true)}>
+                    <TouchableOpacity style={Styles.answerButton} onPress={() => handleAdvance(true)} disabled={isSubmitting}>
                         <Text style={Styles.answerButtonText}>Sim</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={Styles.answerButton} onPress={() => handleAdvance(false)}>
+                    <TouchableOpacity style={Styles.answerButton} onPress={() => handleAdvance(false)} disabled={isSubmitting}>
                         <Text style={Styles.answerButtonText}>Não</Text>
                     </TouchableOpacity>
                 </View>
@@ -228,7 +292,7 @@ export default function QuizScreen() {
             return (
                 <View style={Styles.choiceList}>
                     {currentQuestion.options.map((option) => (
-                        <TouchableOpacity key={option.value} style={Styles.choiceButton} onPress={() => handleAdvance(option.value)}>
+                        <TouchableOpacity key={option.value} style={Styles.choiceButton} onPress={() => handleAdvance(option.value)} disabled={isSubmitting}>
                             <Text style={Styles.choiceButtonText}>{option.label}</Text>
                         </TouchableOpacity>
                     ))}
@@ -247,6 +311,7 @@ export default function QuizScreen() {
                 />
                 <TouchableOpacity
                     style={Styles.nextButton}
+                    disabled={isSubmitting}
                     onPress={() => {
                         if (inputValue.trim() === '') {
                             Alert.alert('Atenção', 'Preencha a resposta para continuar.');
@@ -265,7 +330,7 @@ export default function QuizScreen() {
                         handleAdvance(typedValue);
                     }}
                 >
-                    <Text style={Styles.nextButtonText}>Próximo</Text>
+                    <Text style={Styles.nextButtonText}>{isSubmitting ? 'Aguarde...' : 'Próximo'}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -276,7 +341,7 @@ export default function QuizScreen() {
             <StatusBar backgroundColor="#E0323C" barStyle="light-content" />
 
             <View style={Styles.header}>
-                <TouchableOpacity style={[Styles.navButton, Styles.navButtonLeft]} onPress={handlePrevious}>
+                <TouchableOpacity style={[Styles.navButton, Styles.navButtonLeft]} onPress={handlePrevious} disabled={isSubmitting}>
                     <Ionicons name="chevron-back" size={28} color="#FFF" />
                 </TouchableOpacity>
 

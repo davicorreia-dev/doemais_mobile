@@ -4,14 +4,12 @@ import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts, Lexend_100Thin, Lexend_200ExtraLight, Lexend_300Light, Lexend_400Regular, Lexend_500Medium, Lexend_600SemiBold, Lexend_700Bold } from "@expo-google-fonts/lexend";
 
-// Seus componentes
 import Header from "../../../components/Header";
 import Input from "../../../components/Input";
 import Styles from "./stylesLogin";
 import SocialButton from "../../../components/SocialButton";
 import Button from "../../../components/Button";
 
-// Nossa API
 import { api } from "../../services/api";
 import { StatusBar } from "expo-status-bar";
 import z from "zod";
@@ -25,7 +23,6 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-// Validar a resposta da API do backend
 const loginResponseSchema = z.object({
     accessToken: z.string().min(15, "Token não retornado pelo servidor"),
     refreshToken: z.string().optional(),
@@ -33,6 +30,7 @@ const loginResponseSchema = z.object({
         id: z.string().or(z.number()),
         nome: z.string(),
         email: z.string().email(),
+        genero: z.string().nullable().optional(), // Mantido da branch para leitura futura
     })
 });
 
@@ -59,7 +57,6 @@ export default function LoginScreen() {
         Lexend_700Bold,
     });
 
-
     const onSubmit = async (data: LoginFormData) => {
         const payload = {
             email: data.email.trim().toLowerCase(),
@@ -71,16 +68,10 @@ export default function LoginScreen() {
         try {
             console.log("Tentando logar com:", payload);
 
-            // Chama a API (/api/auth/login)
             const response = await api('/api/auth/login', 'POST', payload);
-
-            // O backend retorna os dados dentro da propriedade 'data'
             const responseData = response.data || response;
-
-            // Valida o retorno do backend usando o Zod
             const parsedResponse = loginResponseSchema.parse(responseData);
 
-            // Se recebeu o token, salva e entra
             if (parsedResponse.accessToken) {
                 await AsyncStorage.setItem('@doemais:token', parsedResponse.accessToken);
                 await AsyncStorage.setItem('@doemais:user', JSON.stringify(parsedResponse.doador));
@@ -88,7 +79,6 @@ export default function LoginScreen() {
                     await AsyncStorage.setItem('@doemais:refreshToken', parsedResponse.refreshToken);
                 }
 
-                // Redireciona para o Quiz (Home)
                 navigation.reset({
                     index: 0,
                     routes: [{ name: 'MainTabs' }],
@@ -99,7 +89,6 @@ export default function LoginScreen() {
 
         } catch (error: any) {
             console.error("Erro Login:", error);
-            // Mensagem amigável se for erro de senha
             const msg = error.message.includes('401') || error.message.includes('404')
                 ? 'E-mail ou senha incorretos.'
                 : error.message;
@@ -131,19 +120,14 @@ export default function LoginScreen() {
                 containerStyle={{ backgroundColor: '#E0323C' }}
             />
 
-
             <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                     <View>
-
-
                         <Text style={Styles.TitleContainer}>
                             Seja bem-vindo(a)! Sua solidariedade pode salvar vidas.
                         </Text>
 
-
                         <View style={Styles.inputcontainer}>
-
                             <Controller
                                 control={control}
                                 name="email"
@@ -159,7 +143,6 @@ export default function LoginScreen() {
                                 )}
                             />
 
-                            {/* 4. CONECTADO: Input de Senha */}
                             <Controller
                                 control={control}
                                 name="password"
@@ -176,11 +159,9 @@ export default function LoginScreen() {
 
                             <Text style={Styles.ForgetPassword}
                                 onPress={() => navigation.navigate("ForgetPasswordChoiceScreen")}> Esqueceu sua senha? </Text>
-
                         </View>
 
                         <View style={Styles.SocialbuttonsContainer}>
-
                             <SocialButton
                                 title="Entrar com o Google"
                                 iconSource={require("../../../assets/images/googleicon.png")}
@@ -193,7 +174,6 @@ export default function LoginScreen() {
                                 onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
                             />
 
-                            {/* 5. CONECTADO: O Botão agora chama o onSubmit */}
                             <Button
                                 title={loading ? "Entrando..." : "Entrar"}
                                 textColor="white"
@@ -209,7 +189,7 @@ export default function LoginScreen() {
                                 Não tem uma conta ainda?{" "}
                                 <Text
                                     style={Styles.RegisterUnderline}
-                                    onPress={() => navigation.navigate("Register")} // Confirme se o nome da rota é esse no App.tsx
+                                    onPress={() => navigation.navigate("Register")} 
                                 >
                                     Cadastre-se.
                                 </Text>
