@@ -70,10 +70,6 @@ export const getFormularioElegibilidade = async (doadorId: number) => {
     orderBy: { data_preenchimento: 'desc' },
   });
 
-  if (!formulario) {
-    throw new BadRequestError('Nenhum formulário de elegibilidade encontrado.');
-  }
-
   return formulario;
 };
 

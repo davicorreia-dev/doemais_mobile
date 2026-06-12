@@ -175,6 +175,8 @@ export default function EligibilityFormsScreen() {
                     if (formResponse) {
                         const formData = formResponse.data || formResponse;
                         setLatestForm(formData);
+                    } else {
+                        setLatestForm(null);
                     }
                 } catch (error) {
                     console.error("Erro ao carregar dados da triagem:", error);
