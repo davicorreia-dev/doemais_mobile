@@ -219,6 +219,15 @@ export class CreateFormularioElegibilidadeDto {
 
   @IsOptional()
   @Type(() => Boolean)
+  fez_piercing?: boolean;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate({ message: 'A data deve ser válida.' })
+  data_piercing?: Date;
+
+  @IsOptional()
+  @Type(() => Boolean)
   esteve_area_malaria?: boolean;
 
   @IsOptional()

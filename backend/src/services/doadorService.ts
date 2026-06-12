@@ -20,6 +20,9 @@ export const getDoadorProfile = async (id: number): Promise<DoadorResponse> => {
       telefone: true,
       cidade: true,
       tipo_sanguineo: true,
+      genero: true,
+      data_nascimento: true,
+      peso_kg: true,
       criado_em: true,
     },
   });
@@ -87,6 +90,9 @@ export const updateDoadorProfile = async (
       telefone: true,
       cidade: true,
       tipo_sanguineo: true,
+      genero: true,
+      data_nascimento: true,
+      peso_kg: true,
       criado_em: true,
     },
   });

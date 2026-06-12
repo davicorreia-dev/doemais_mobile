@@ -64,6 +64,8 @@ model Formulario_Elegibilidade {
   esta_amamentando           Boolean   @default(false) @map("estaAmamentando")
   fez_tatuagem               Boolean   @default(false) @map("fezTatuagem")
   data_tatuagem              DateTime? @map("dataTatuagem")
+  fez_piercing               Boolean   @default(false) @map("fezPiercing")
+  data_piercing              DateTime? @map("dataPiercing")
   esteve_area_malaria        Boolean   @default(false) @map("esteveAreaMalaria")
   data_retorno_area_malaria  DateTime? @map("dataRetornoAreaMalaria")
   teve_hepatite              Boolean   @default(false) @map("teveHepatite")

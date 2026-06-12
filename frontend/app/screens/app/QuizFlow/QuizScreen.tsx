@@ -2,6 +2,46 @@ import { useEffect, useMemo, useState } from 'react';
 import { Alert, Image, Modal, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { NavigationProp, ParamListBase, useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const saveModuleResult = async (moduleId: string, status: 'approved' | 'blocked') => {
+    try {
+        const historyRaw = await AsyncStorage.getItem('@doemais:quiz_history');
+        const history = historyRaw ? JSON.parse(historyRaw) : {};
+        history[moduleId] = {
+            status,
+            date: Date.now(),
+        };
+        await AsyncStorage.setItem('@doemais:quiz_history', JSON.stringify(history));
+    } catch (e) {
+        console.error("Erro ao salvar histórico do quiz no AsyncStorage:", e);
+    }
+};
+
+const isMonthWithinDays = (monthValue: string, daysLimit: number): boolean => {
+    const monthsMap: Record<string, number> = {
+        JAN: 0, FEV: 1, MAR: 2, ABR: 3, MAI: 4, JUN: 5,
+        JUL: 6, AGO: 7, SET: 8, OUT: 9, NOV: 10, DEZ: 11
+    };
+    
+    const selectedMonth = monthsMap[monthValue];
+    if (selectedMonth === undefined) return false;
+
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
+    
+    let year = currentYear;
+    if (selectedMonth > currentMonth) {
+        year = currentYear - 1;
+    }
+    
+    const selectedDate = new Date(year, selectedMonth, today.getDate());
+    const diffTime = today.getTime() - selectedDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays >= 0 && diffDays < daysLimit;
+};
 
 import Button from '../../../../components/Button';
 import Input from '../../../../components/Input';
@@ -76,14 +116,15 @@ export default function QuizScreen() {
         };
 
         const payloadDoBanco = {
-            teveResfriado: evaluate('s1', 's2', 's3', 's4', 's5'), // GRIPE
-            estaGravida: evaluate('g1', 'g2', 'g4', 'g5'), // GRAVIDEZ (Inclui aborto)
-            estaAmamentando: evaluate('a1', 'a2', 'a3', 'a4', 'a5'), // AMAMENTAÇÃO
-            fezTatuagem: evaluate('t1', 't2', 't3', 't5'), // TATUAGEM (t4 é ignorado porque 'false' é o bloqueio nele)
-            esteveAreaMalaria: evaluate('m1', 'm2', 'm3', 'm4', 'm5'), // ESTADOS_COM_MALARIA
-            teveHepatite: evaluate('d1', 'd2'), // IMPEDIMENTOS_DEFINITIVOS (Hepatites)
-            usouDrogasInjetaveis: evaluate('d4', 'r4'), // IMPEDIMENTOS/SITUAÇÃO DE RISCO (Drogas injetáveis)
-            teveMalaria: evaluate('d3', 'm4'), // IMPEDIMENTOS/MALARIA
+            teve_resfriado: evaluate('s1', 's2', 's3', 's4', 's5'), // GRIPE
+            esta_gravida: evaluate('g1', 'g2', 'g4', 'g5'), // GRAVIDEZ (Inclui aborto)
+            esta_amamentando: evaluate('a1', 'a2', 'a3', 'a4', 'a5'), // AMAMENTAÇÃO
+            fez_tatuagem: evaluate('t1', 't2', 't3', 't5'), // TATUAGEM (t4 é ignorado porque 'false' é o bloqueio nele)
+            fez_piercing: evaluate('p1', 'p2', 'p3', 'p4', 'p5'), // PIERCING
+            esteve_area_malaria: evaluate('m1', 'm2', 'm3', 'm4', 'm5'), // ESTADOS_COM_MALARIA
+            teve_hepatite: evaluate('d1', 'd2'), // IMPEDIMENTOS_DEFINITIVOS (Hepatites)
+            usou_drogas_injetaveis: evaluate('d4', 'r4'), // IMPEDIMENTOS/SITUAÇÃO DE RISCO (Drogas injetáveis)
+            teve_malaria: evaluate('d3', 'm4'), // IMPEDIMENTOS/MALARIA
         };
 
         const payloadLimpo = Object.fromEntries(
@@ -105,6 +146,9 @@ export default function QuizScreen() {
         try {
             // Usa a nossa nova função!
             await submitAnswersToAPI(finalAnswers);
+            
+            // Grava a aprovação localmente no AsyncStorage
+            await saveModuleResult(module.id, 'approved');
             
             Alert.alert(module.successTitle, module.successMessage, [
                 { text: 'OK', onPress: () => navigation.goBack() },
@@ -130,6 +174,9 @@ export default function QuizScreen() {
     const openBlock = (message: string) => {
         setBlockVisible(true);
         setBlockMessage(message || module.blockMessage);
+        
+        // Grava o bloqueio localmente no AsyncStorage
+        saveModuleResult(module.id, 'blocked').catch(e => console.error(e));
     };
 
     const validateQuestion = (answer: boolean | string | number | null) => {
@@ -155,7 +202,18 @@ export default function QuizScreen() {
                     return { blocked: true, message: 'Selecione uma opção para continuar.' };
                 }
 
-                return rule.blockValues.includes(answer)
+                // Validação customizada para triagem de meses de doação anterior (h3 e w3)
+                if (currentQuestion.id === 'h3' || currentQuestion.id === 'w3') {
+                    const limit = currentQuestion.id === 'h3' ? 60 : 90;
+                    if (isMonthWithinDays(answer, limit)) {
+                        return { 
+                            blocked: true, 
+                            message: `A sua última doação foi há menos de ${limit} dias. É necessário aguardar o intervalo mínimo.` 
+                        };
+                    }
+                }
+
+                return rule && rule.blockValues.includes(answer)
                     ? { blocked: true, message: getBlockMessage(currentQuestion, module.blockMessage) }
                     : { blocked: false, message: '' };
             }
