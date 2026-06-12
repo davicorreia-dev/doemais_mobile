@@ -6,13 +6,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const saveModuleResult = async (moduleId: string, status: 'approved' | 'blocked') => {
     try {
-        const historyRaw = await AsyncStorage.getItem('@doemais:quiz_history');
+        const userRaw = await AsyncStorage.getItem('@doemais:user');
+        if (!userRaw) return;
+        const user = JSON.parse(userRaw);
+        const userId = user.id;
+        
+        const key = `@doemais:quiz_history:${userId}`;
+        const historyRaw = await AsyncStorage.getItem(key);
         const history = historyRaw ? JSON.parse(historyRaw) : {};
         history[moduleId] = {
             status,
             date: Date.now(),
         };
-        await AsyncStorage.setItem('@doemais:quiz_history', JSON.stringify(history));
+        await AsyncStorage.setItem(key, JSON.stringify(history));
     } catch (e) {
         console.error("Erro ao salvar histórico do quiz no AsyncStorage:", e);
     }
@@ -252,6 +258,13 @@ export default function QuizScreen() {
             submitAnswersToAPI(newAnswers).catch(e => console.error("Erro ao registrar bloqueio:", e));
             // E exibimos a tela de bloqueio
             openBlock(result.message);
+            return;
+        }
+
+        // Se responder 'Não' (false) na primeira pergunta de triagem (h1 ou w1),
+        // significa que não doou nos últimos 60/90 dias. Portanto, está aprovado e não precisa detalhar o mês!
+        if ((currentQuestion.id === 'h1' || currentQuestion.id === 'w1') && answer === false) {
+            finishFlow(newAnswers);
             return;
         }
 

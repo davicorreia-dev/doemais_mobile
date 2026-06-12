@@ -134,20 +134,29 @@ export default function EligibilityFormsScreen() {
         useCallback(() => {
             async function loadData() {
                 try {
-                    // 1. Carrega histórico local
-                    const historyRaw = await AsyncStorage.getItem('@doemais:quiz_history');
-                    if (historyRaw) {
-                        setLocalHistory(JSON.parse(historyRaw));
-                    }
-
-                    // 2. Carrega gênero do cache local
+                    // 1. Carrega gênero do cache local e pega o ID do usuário
                     const userData = await AsyncStorage.getItem('@doemais:user');
+                    let userId = '';
                     if (userData) {
                         const parsedUser = JSON.parse(userData);
+                        userId = parsedUser.id;
                         if (parsedUser.genero) {
                             setGender(normalizeGender(parsedUser.genero));
                             setLoading(false);
                         }
+                    }
+
+                    // 2. Carrega histórico local escopado pelo ID do usuário
+                    if (userId) {
+                        const key = `@doemais:quiz_history:${userId}`;
+                        const historyRaw = await AsyncStorage.getItem(key);
+                        if (historyRaw) {
+                            setLocalHistory(JSON.parse(historyRaw));
+                        } else {
+                            setLocalHistory({});
+                        }
+                    } else {
+                        setLocalHistory({});
                     }
 
                     // 3. Carrega perfil e formulário mais recente em paralelo
