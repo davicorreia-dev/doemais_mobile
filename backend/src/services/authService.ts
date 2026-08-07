@@ -44,6 +44,7 @@ export const registerDoador = async (
       cpf: true,
       telefone: true,
       cidade: true,
+      cep: true,
       tipo_sanguineo: true,
       criado_em: true,
       genero: true // Mantido do nosso código
@@ -139,6 +140,7 @@ export const loginDoador = async (
     cpf: doador.cpf,
     telefone: doador.telefone,
     cidade: doador.cidade,
+    cep: doador.cep,
     tipo_sanguineo: doador.tipo_sanguineo,
     criado_em: doador.criado_em,
     genero: doador.genero, // Adicionado para a nossa triagem funcionar

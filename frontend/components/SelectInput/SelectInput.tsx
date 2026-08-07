@@ -67,7 +67,8 @@ export default function SelectInput({ label, options, value, onChange }: SelectI
 const styles = StyleSheet.create({
     input: {
         height: 45,
-        margin: 12,
+        marginHorizontal: 12,
+        marginVertical: 8,
         borderWidth: 0.1,
         backgroundColor: '#FDFCFC',
         width: 306,
@@ -77,6 +78,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        alignSelf: 'center',
     },
     icon: {
         fontSize: 18,
@@ -105,5 +107,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Lexend_600SemiBold',
         marginLeft: 12,
         marginBottom: 2,
+        color: '#353535',
+        alignSelf: 'flex-start',
     }
 });

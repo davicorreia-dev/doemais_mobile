@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 interface EnvironmentConfig {
   DATABASE_URL: string;
   ACCESS_TOKEN_SECRET: string;
@@ -28,7 +31,7 @@ function validateEnvironment(): EnvironmentConfig {
     DATABASE_URL: process.env.DATABASE_URL!,
     ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET!,
     ACCESS_TOKEN_EXPIRATION_SECONDS:
-      process.env.ACCESS_TOKEN_EXPIRATION_SECONDS || '300',
+      process.env.ACCESS_TOKEN_EXPIRATION_SECONDS || '7d',
     REFRESH_TOKEN_EXPIRATION_DAYS:
       process.env.REFRESH_TOKEN_EXPIRATION_DAYS || '7',
     PORT: process.env.PORT || '3000',

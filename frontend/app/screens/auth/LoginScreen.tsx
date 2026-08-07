@@ -15,6 +15,7 @@ import { StatusBar } from "expo-status-bar";
 import z from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useKeyboardBehavior } from "../../hooks/useKeyboardBehavior";
 
 const loginSchema = z.object({
     email: z.string().min(1, "O e-mail é obrigatório.").email("E-mail inválido"),
@@ -36,6 +37,7 @@ const loginResponseSchema = z.object({
 
 export default function LoginScreen() {
     const navigation = useNavigation<any>();
+    const keyboardBehavior = useKeyboardBehavior();
 
     const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema),
@@ -120,12 +122,13 @@ export default function LoginScreen() {
                 containerStyle={{ backgroundColor: '#E0323C' }}
             />
 
-            <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <KeyboardAvoidingView style={{ flex: 1 }} behavior={keyboardBehavior}>
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                     <View>
-                        <Text style={Styles.TitleContainer}>
-                            Seja bem-vindo(a)! Sua solidariedade pode salvar vidas.
-                        </Text>
+                        <View style={{ paddingHorizontal: 30, marginTop: 35 }}>
+                            <Text style={Styles.HeaderTitle}>Seja bem-vindo(a)</Text>
+                            <Text style={Styles.HeaderSubtitle}>Sua solidariedade pode salvar vidas.</Text>
+                        </View>
 
                         <View style={Styles.inputcontainer}>
                             <Controller
@@ -157,30 +160,42 @@ export default function LoginScreen() {
                                 )}
                             />
 
-                            <Text style={Styles.ForgetPassword}
-                                onPress={() => navigation.navigate("ForgetPasswordChoiceScreen")}> Esqueceu sua senha? </Text>
+                            <View style={{ width: 330, alignSelf: 'center', alignItems: 'flex-end', marginTop: 10 }}>
+                                <Text style={Styles.ForgetPassword}
+                                    onPress={() => navigation.navigate("ForgetPasswordChoiceScreen")}>
+                                    Esqueceu sua senha?
+                                </Text>
+                            </View>
                         </View>
 
-                        <View style={Styles.SocialbuttonsContainer}>
+                        <View style={{ alignItems: 'center', marginTop: 25 }}>
+                            <Button
+                                title={loading ? "Entrando..." : "Entrar"}
+                                textColor="white"
+                                borderRadius={10}
+                                width={330}
+                                onPress={handleSubmit(onSubmit)}
+                                disabled={loading}
+                            />
+                        </View>
+
+                        {/* Divisor Moderno */}
+                        <View style={{ flexDirection: 'row', alignItems: 'center', width: 330, alignSelf: 'center', marginVertical: 25 }}>
+                            <View style={{ flex: 1, height: 1, backgroundColor: '#EFEFEF' }} />
+                            <Text style={{ marginHorizontal: 15, fontSize: 12, color: '#999', fontFamily: 'Lexend_400Regular' }}>ou conecte-se com</Text>
+                            <View style={{ flex: 1, height: 1, backgroundColor: '#EFEFEF' }} />
+                        </View>
+
+                        {/* Botões Sociais Circulares */}
+                        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 20, marginBottom: 10 }}>
                             <SocialButton
-                                title="Entrar com o Google"
                                 iconSource={require("../../../assets/images/googleicon.png")}
                                 onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
                             />
 
                             <SocialButton
-                                title="Entrar com o Facebook"
                                 iconSource={require("../../../assets/images/facebook 1.png")}
                                 onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
-                            />
-
-                            <Button
-                                title={loading ? "Entrando..." : "Entrar"}
-                                textColor="white"
-                                borderRadius={10}
-                                width={270}
-                                onPress={handleSubmit(onSubmit)}
-                                disabled={loading}
                             />
                         </View>
 

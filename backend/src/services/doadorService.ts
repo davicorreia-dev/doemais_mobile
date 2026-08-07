@@ -19,6 +19,7 @@ export const getDoadorProfile = async (id: number): Promise<DoadorResponse> => {
       cpf: true,
       telefone: true,
       cidade: true,
+      cep: true,
       tipo_sanguineo: true,
       genero: true,
       data_nascimento: true,
@@ -71,6 +72,7 @@ export const updateDoadorProfile = async (
   if (updateData.email !== undefined) updatePayload.email = updateData.email;
   if (updateData.telefone !== undefined) updatePayload.telefone = updateData.telefone;
   if (updateData.cidade !== undefined) updatePayload.cidade = updateData.cidade;
+  if (updateData.cep !== undefined) updatePayload.cep = updateData.cep;
   if (updateData.data_nascimento !== undefined)
     updatePayload.data_nascimento = updateData.data_nascimento;
   if (updateData.peso_kg !== undefined) updatePayload.peso_kg = updateData.peso_kg;
@@ -89,6 +91,7 @@ export const updateDoadorProfile = async (
       cpf: true,
       telefone: true,
       cidade: true,
+      cep: true,
       tipo_sanguineo: true,
       genero: true,
       data_nascimento: true,

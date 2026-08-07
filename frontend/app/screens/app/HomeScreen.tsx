@@ -1,10 +1,121 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { View, Text, ScrollView, TextInput, Image, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons'; // Usando ícones padrão por enquanto
 import Styles from './StylesHome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { api } from '../../services/api';
+
+interface NewsItem {
+    id: string;
+    title: string;
+    description: string;
+    location: string;
+    bloodTypeNeeded?: string;
+    date: string;
+    category: 'Pedido' | 'Notícia';
+    source?: string;
+}
+
+const NEWS_DATABASE: NewsItem[] = [
+    {
+        id: '1',
+        title: 'Urgente: Pedido para cirurgia cardíaca',
+        description: 'Paciente internado no IMIP necessita de doadores de qualquer tipo sanguíneo, preferencialmente O- e O+.',
+        location: 'IMIP - Recife, PE',
+        bloodTypeNeeded: 'O-',
+        date: 'Hoje',
+        category: 'Pedido',
+        source: 'Família do Paciente'
+    },
+    {
+        id: '2',
+        title: 'Estoque do HEMOPE em estado crítico',
+        description: 'O hemocentro de Pernambuco convoca doadores de todos os tipos sanguíneos para repor estoques antes do feriado.',
+        location: 'HEMOPE - Recife, PE',
+        bloodTypeNeeded: 'Todos',
+        date: 'Ontem',
+        category: 'Pedido',
+        source: 'HEMOPE'
+    },
+    {
+        id: '3',
+        title: 'Campanha de Doação para o Instituto do Câncer',
+        description: 'Estamos recebendo doações de plaquetas e sangue total para pacientes em tratamento oncológico.',
+        location: 'ICESP - São Paulo, SP',
+        bloodTypeNeeded: 'A+ / B-',
+        date: 'Hoje',
+        category: 'Pedido',
+        source: 'Instituto do Câncer'
+    },
+    {
+        id: '4',
+        title: 'Pedido de sangue A- para recém-nascido',
+        description: 'Necessitamos de doadores de sangue tipo A Negativo para transfusão em bebê na UTI Neonatal do Pro Matre.',
+        location: 'Maternidade Pro Matre - São Paulo, SP',
+        bloodTypeNeeded: 'A-',
+        date: 'Ontem',
+        category: 'Pedido',
+        source: 'Maternidade Pro Matre'
+    },
+    {
+        id: '5',
+        title: 'Hemorio realiza coleta externa na Cinelândia',
+        description: 'Unidade móvel do Hemorio estará na praça recolhendo doações para a campanha de inverno.',
+        location: 'Hemorio - Rio de Janeiro, RJ',
+        bloodTypeNeeded: 'Todos',
+        date: 'Hoje',
+        category: 'Pedido',
+        source: 'Hemorio'
+    },
+    {
+        id: '6',
+        title: 'Campanha de Doação para o Hospital Copa D’Or',
+        description: 'Paciente necessita urgentemente de doações de sangue tipo AB+ para cirurgia de grande porte.',
+        location: 'Hospital Copa D’Or - Rio de Janeiro, RJ',
+        bloodTypeNeeded: 'AB+',
+        date: '2 dias atrás',
+        category: 'Pedido',
+        source: 'Família do Paciente'
+    },
+    {
+        id: '7',
+        title: 'Estoque de sangue no Hemominas atinge nível de alerta',
+        description: 'O Hemocentro de Minas Gerais solicita a presença de doadores de tipo O- para atendimento emergencial.',
+        location: 'Hemominas - Belo Horizonte, MG',
+        bloodTypeNeeded: 'O-',
+        date: 'Hoje',
+        category: 'Pedido',
+        source: 'Hemominas'
+    },
+    {
+        id: '100',
+        title: 'Como se preparar para a sua primeira doação de sangue',
+        description: 'Dicas de alimentação, sono e hidratação para garantir que sua experiência de doação seja tranquila e segura.',
+        location: 'Nacional',
+        date: '3 dias atrás',
+        category: 'Notícia',
+        source: 'Ministério da Saúde'
+    },
+    {
+        id: '101',
+        title: 'Benefícios de doar sangue para a saúde do doador',
+        description: 'Estudos indicam que doar sangue ajuda na renovação das células sanguíneas e reduz riscos de doenças cardíacas.',
+        location: 'Nacional',
+        date: '4 dias atrás',
+        category: 'Notícia',
+        source: 'OMS'
+    },
+    {
+        id: '102',
+        title: 'Importância da doação regular: por que doar mais de uma vez?',
+        description: 'O sangue doado tem prazo de validade curto. Para plaquetas, dura apenas 5 dias. Por isso, a regularidade salva vidas.',
+        location: 'Nacional',
+        date: '5 dias atrás',
+        category: 'Notícia',
+        source: 'Campanha Nacional'
+    }
+];
 
 
 export default function HomeScreen() {
@@ -13,6 +124,63 @@ export default function HomeScreen() {
 
     const [userName, setUserName] = useState<string>('Carregando...');
     const [bloodType, setBloodType] = useState<string>('-');
+    const [userCity, setUserCity] = useState<string>('');
+    const [externalNews, setExternalNews] = useState<NewsItem[]>([]);
+
+    useEffect(() => {
+        async function fetchExternalNews() {
+            try {
+                const res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://g1.globo.com/rss/g1/ciencia-e-saude/');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.status === 'ok' && Array.isArray(data.items)) {
+                        const parsedItems: NewsItem[] = data.items.slice(0, 5).map((item: any, idx: number) => {
+                            const cleanDesc = item.description 
+                                ? item.description.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim() 
+                                : 'Acesse a notícia completa para saber mais.';
+                            return {
+                                id: `g1-${idx}`,
+                                title: item.title,
+                                description: cleanDesc,
+                                location: 'G1 Saúde',
+                                date: 'Recente',
+                                category: 'Notícia',
+                                source: 'G1'
+                            };
+                        });
+                        setExternalNews(parsedItems);
+                    }
+                }
+            } catch (err) {
+                console.log("Erro ao buscar notícias externas do G1:", err);
+            }
+        }
+        fetchExternalNews();
+    }, []);
+
+    const filteredNews = useMemo(() => {
+        const allRequests = NEWS_DATABASE.filter(item => item.category === 'Pedido');
+        const globalNews = externalNews.length > 0 ? externalNews : NEWS_DATABASE.filter(item => item.category === 'Notícia');
+
+        if (!userCity) {
+            return [...allRequests, ...globalNews];
+        }
+
+        const cityPrefix = userCity.split(' - ')[0].toLowerCase().trim();
+        const localRequests = allRequests.filter(item => 
+            item.location.toLowerCase().includes(cityPrefix)
+        );
+
+        const otherRequests = allRequests.filter(item => 
+            !item.location.toLowerCase().includes(cityPrefix)
+        );
+
+        if (localRequests.length > 0) {
+            return [...localRequests, ...globalNews, ...otherRequests];
+        } else {
+            return [...otherRequests, ...globalNews];
+        }
+    }, [userCity, externalNews]);
 
 
     useFocusEffect(
@@ -40,6 +208,10 @@ export default function HomeScreen() {
 
                         if (userData.tipo_sanguineo) {
                             setBloodType(userData.tipo_sanguineo);
+                        }
+
+                        if (userData.cidade) {
+                            setUserCity(userData.cidade);
                         }
                     }
                 } catch (error) {
@@ -151,18 +323,54 @@ export default function HomeScreen() {
                         ))}
                     </View>
 
-                    {/* Seção Visto Recentemente */}
-                    <Text style={Styles.sectionTitle}>Visto Recentemente</Text>
-                    <View style={Styles.recentCard}>
-                        <View style={Styles.recentBadge}>
-                            <Text style={Styles.recentBadgeText}>A+</Text>
-                        </View>
-                        <View>
-                            <Text style={Styles.hospitalName}>Emergência A+ Sangue Urgente</Text>
-                            <Text style={Styles.hospitalLocation}>🏥 Hospital Nome</Text>
-                            <Text style={Styles.timeText}>🕒 10 Set 2025</Text>
-                        </View>
-                    </View>
+                    {/* Seção de Notícias e Pedidos de Sangue */}
+                    <Text style={Styles.sectionTitle}>Notícias e Pedidos de Sangue</Text>
+                    {userCity ? (
+                        <Text style={{ fontSize: 12, color: '#666', marginTop: -10, marginBottom: 12 }}>
+                            Pedidos em: <Text style={{ fontWeight: 'bold', color: '#E0323C' }}>{userCity}</Text>
+                        </Text>
+                    ) : (
+                        <Text style={{ fontSize: 12, color: '#999', marginTop: -10, marginBottom: 12 }}>
+                            Defina seu CEP no Perfil para ver pedidos da sua região.
+                        </Text>
+                    )}
+
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{ paddingBottom: 10, gap: 15 }}
+                    >
+                        {filteredNews.map((item) => (
+                            <View key={item.id} style={Styles.newsCard}>
+                                <View style={Styles.newsHeader}>
+                                    <View style={[
+                                        Styles.categoryBadge,
+                                        { backgroundColor: item.category === 'Pedido' ? '#FFF0F0' : '#E8F5E9' }
+                                    ]}>
+                                        <Text style={[
+                                            Styles.categoryText,
+                                            { color: item.category === 'Pedido' ? '#E0323C' : '#2E7D32' }
+                                        ]}>
+                                            {item.category}
+                                        </Text>
+                                    </View>
+                                    {item.bloodTypeNeeded && (
+                                        <View style={Styles.bloodBadge}>
+                                            <Text style={Styles.bloodBadgeText}>{item.bloodTypeNeeded}</Text>
+                                        </View>
+                                    )}
+                                </View>
+
+                                <Text style={Styles.newsTitle} numberOfLines={2}>{item.title}</Text>
+                                <Text style={Styles.newsDescription} numberOfLines={3}>{item.description}</Text>
+                                
+                                <View style={Styles.newsFooter}>
+                                    <Text style={Styles.newsLocation}>📍 {item.location}</Text>
+                                    <Text style={Styles.newsDate}>🕒 {item.date}</Text>
+                                </View>
+                            </View>
+                        ))}
+                    </ScrollView>
 
                     {/* Seção Nossa Contribuição */}
                     <Text style={Styles.sectionTitle}>Nossa Contribuição</Text>

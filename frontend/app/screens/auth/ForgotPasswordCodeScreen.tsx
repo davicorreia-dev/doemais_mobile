@@ -10,11 +10,16 @@ import {
   Alert,
   NativeSyntheticEvent,
   TextInputKeyPressEventData,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useKeyboardBehavior } from '../../hooks/useKeyboardBehavior';
 
 const ForgotPasswordCodeScreen: React.FC = () => {
   const navigation = useNavigation();
+  const keyboardBehavior = useKeyboardBehavior();
 
   const [otp, setOtp] = useState<string[]>(['', '', '', '']);
   const [timer, setTimer] = useState<number>(120);
@@ -78,59 +83,66 @@ const ForgotPasswordCodeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>  
-        {/* Logo */}
-        <Image
-          source={require('../../../assets/images/logoDoe.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-
-        <Text style={styles.instructionText}>
-          Enviamos um código de redefinição ao seu e-mail. Insira o código de{' '}
-          <Text style={styles.boldText}>4 dígitos</Text> recebido.
-        </Text>
-
-        {/* Inputs do Código OTP */}
-        <View style={styles.otpContainer}>
-          {otp.map((digit, index) => (
-            <TextInput
-              key={index}
-              ref={(ref) => {
-                if (ref) inputRefs.current[index] = ref;
-              }}
-              style={styles.otpInput}
-              keyboardType="number-pad"
-              maxLength={1}
-              onChangeText={(text) => handleInputChange(text, index)}
-              onKeyPress={(event) => handleBackspace(event, index)}
-              value={digit}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={keyboardBehavior}
+      >
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          <View style={styles.content}>  
+            {/* Logo */}
+            <Image
+              source={require('../../../assets/images/logoDoe.png')}
+              style={styles.logo}
+              resizeMode="contain"
             />
-          ))}
-        </View>
 
-        <Text style={styles.resendText}>
-          Caso não tenha recebido o código,{' '}
-            <Text style={[styles.resendLink, timer > 0 && styles.disabledLink]}
-              onPress={handleResendCode}
-              disabled={timer > 0}
-              >
-              toque aqui para reenviá-lo.
+            <Text style={styles.instructionText}>
+              Enviamos um código de redefinição ao seu e-mail. Insira o código de{' '}
+              <Text style={styles.boldText}>4 dígitos</Text> recebido.
             </Text>
-        </Text>
 
-        {timer > 0 && (
-          <Text style={styles.timerText}>
-            Validado por 4 minutos ({formatTime()})
-          </Text>
-        )}
-      </View>
+            {/* Inputs do Código OTP */}
+            <View style={styles.otpContainer}>
+              {otp.map((digit, index) => (
+                <TextInput
+                  key={index}
+                  ref={(ref) => {
+                    if (ref) inputRefs.current[index] = ref;
+                  }}
+                  style={styles.otpInput}
+                  keyboardType="number-pad"
+                  maxLength={1}
+                  onChangeText={(text) => handleInputChange(text, index)}
+                  onKeyPress={(event) => handleBackspace(event, index)}
+                  value={digit}
+                />
+              ))}
+            </View>
 
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmCode}>
-          <Text style={styles.confirmButtonText}>Confirmar código</Text>
-        </TouchableOpacity>
-      </View>
+            <Text style={styles.resendText}>
+              Caso não tenha recebido o código,{' '}
+                <Text style={[styles.resendLink, timer > 0 && styles.disabledLink]}
+                  onPress={handleResendCode}
+                  disabled={timer > 0}
+                  >
+                  toque aqui para reenviá-lo.
+                </Text>
+            </Text>
+
+            {timer > 0 && (
+              <Text style={styles.timerText}>
+                Validado por 4 minutos ({formatTime()})
+              </Text>
+            )}
+          </View>
+
+          <View style={styles.footer}>
+            <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmCode}>
+              <Text style={styles.confirmButtonText}>Confirmar código</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

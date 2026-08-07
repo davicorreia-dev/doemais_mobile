@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { CustomError } from '../utils/errors';
-import { ValidationError } from 'class-validator';
 
 const errorMiddleware = (
   err: Error,
@@ -26,24 +25,7 @@ const errorMiddleware = (
     });
   }
 
-  // Erro de validação do class-validator
-  if (Array.isArray(err) && err[0] instanceof ValidationError) {
-    const validationErrors: Record<string, string[]> = {};
-    
-    err.forEach((error: ValidationError) => {
-      if (error.constraints) {
-        validationErrors[error.property] = Object.values(error.constraints);
-      }
-    });
 
-    return res.status(400).json({
-      success: false,
-      message: 'Erro de validação.',
-      statusCode: 400,
-      error: 'ValidationError',
-      details: validationErrors,
-    });
-  }
 
   // Erro padrão do JavaScript ou desconhecido
   res.status(500).json({

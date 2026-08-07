@@ -202,6 +202,79 @@ const Styles = StyleSheet.create({
         color: '#fff',
         fontSize: 10,
         marginTop: 5,
+    },
+    // Estilos do Carrossel de Notícias e Pedidos de Sangue
+    newsCard: {
+        width: 290,
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        padding: 16,
+        borderWidth: 1,
+        borderColor: '#EFEFEF',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
+        elevation: 3,
+        marginVertical: 5,
+    },
+    newsHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    categoryBadge: {
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 6,
+    },
+    categoryText: {
+        fontSize: 10,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+    },
+    bloodBadge: {
+        backgroundColor: '#E0323C',
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 4,
+    },
+    bloodBadgeText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 12,
+    },
+    newsTitle: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 6,
+        lineHeight: 18,
+    },
+    newsDescription: {
+        fontSize: 12,
+        color: '#666',
+        lineHeight: 16,
+        marginBottom: 12,
+    },
+    newsFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderTopWidth: 1,
+        borderTopColor: '#F5F5F5',
+        paddingTop: 10,
+        marginTop: 'auto',
+    },
+    newsLocation: {
+        fontSize: 10,
+        color: '#888',
+        fontWeight: '600',
+    },
+    newsDate: {
+        fontSize: 10,
+        color: '#999',
     }
 });
 

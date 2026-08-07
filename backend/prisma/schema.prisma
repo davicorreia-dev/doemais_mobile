@@ -19,6 +19,7 @@ model Doador {
   senha                   String
   telefone                String?
   cidade                  String?
+  cep                     String?
   criado_em               DateTime               @default(now()) @map("criadoEm")
 
   // Relacionamentos com outras tabelas

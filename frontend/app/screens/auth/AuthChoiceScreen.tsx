@@ -45,16 +45,13 @@ export default function AuthChoiceScreen({ navigation }: any) {
                 onPress={() => navigation.navigate("Register")}
             />
 
-            <View style={StylesButton.containerSocialButtons}>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 20, marginTop: 25 }}>
                 <SocialButton
-                    title="Entrar com o Google"
                     iconSource={require("../../../assets/images/googleicon.png")}
                 />
 
-                <SocialButton //props dos botões sociais
-                    title="Entrar com o Facebook"
+                <SocialButton
                     iconSource={require("../../../assets/images/facebook 1.png")}
-
                 />
             </View>
 

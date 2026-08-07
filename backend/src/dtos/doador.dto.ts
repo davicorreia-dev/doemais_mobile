@@ -81,6 +81,11 @@ export class RegisterDoadorDto {
   @MaxLength(50, { message: 'O nome da cidade deve ter no máximo 50 caracteres.' })
   cidade?: string;
 
+  @IsString({ message: 'O CEP deve ser uma string.' })
+  @IsOptional()
+  @Matches(/^\d{5}-?\d{3}$/, { message: 'O CEP informado não é válido.' })
+  cep?: string;
+
   @IsOptional()
   @Type(() => Date)
   @IsDate({ message: 'A data de nascimento deve ser uma data válida.' })
@@ -156,6 +161,11 @@ export class UpdateDoadorDto {
   @MinLength(2, { message: 'O nome da cidade deve ter no mínimo 2 caracteres.' })
   @MaxLength(50, { message: 'O nome da cidade deve ter no máximo 50 caracteres.' })
   cidade?: string;
+
+  @IsString({ message: 'O CEP deve ser uma string.' })
+  @IsOptional()
+  @Matches(/^\d{5}-?\d{3}$/, { message: 'O CEP informado não é válido.' })
+  cep?: string;
 
   @IsOptional()
   @Type(() => Date)

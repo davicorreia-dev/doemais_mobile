@@ -6,9 +6,11 @@ import Header from '../../../components/Header';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import Styles from './StylesNewPassword';
+import { useKeyboardBehavior } from '../../hooks/useKeyboardBehavior';
 
 export default function NewPasswordScreen() {
     const navigation = useNavigation<any>();
+    const keyboardBehavior = useKeyboardBehavior();
 
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -39,7 +41,7 @@ export default function NewPasswordScreen() {
 
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                behavior={keyboardBehavior}
             >
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
 

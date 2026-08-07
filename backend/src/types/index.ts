@@ -11,6 +11,7 @@ export interface DoadorResponse {
   cpf: string;
   telefone?: string | null;
   cidade?: string | null;
+  cep?: string | null;
   tipo_sanguineo?: string | null;
   criado_em: Date;
 }

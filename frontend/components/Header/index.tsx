@@ -14,7 +14,7 @@ type HeaderProps = {
     subtitleColor?: string;
     titleSize?: number;
     subtitleSize?: number;
-    icon?: string;
+    icon?: keyof typeof Ionicons.glyphMap;
     iconColor?: string;
     minHeight?: number;
     containerStyle?: any;
@@ -50,7 +50,7 @@ export default function Header({ title, onBack, subtitle, titleColor, subtitleCo
             >
 
                 <Ionicons
-                    name={icon}
+                    name={icon || "arrow-back"}
                     size={24}
                     color={iconColor || "#E0323C"}
                 />

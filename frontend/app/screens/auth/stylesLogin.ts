@@ -4,61 +4,51 @@ const Styles = StyleSheet.create({
     inputcontainer: {
         width: '100%',
         alignItems: 'center',
-        marginTop: 20,
+        marginTop: 15,
     },
 
-    // Imagelogo: {
-    //     marginTop: 40,
-    //     marginBottom: 40,
-    //     alignSelf: 'center',
-    //     width: 225.11,
-    //     height: 60,
-    //     resizeMode: 'contain'
-    // },
-
-    TitleContainer: {
-        fontSize: 16,
-        fontWeight: 'bold',
+    HeaderTitle: {
+        fontSize: 26,
         fontFamily: 'Lexend_700Bold',
-        width: "83%",
-        alignSelf: "center",
-        textAlign: "center",
-        color: "#E0323C",
-        marginTop: 30,
+        color: '#1F2937',
+        textAlign: 'center',
+        marginBottom: 8,
+    },
+
+    HeaderSubtitle: {
+        fontSize: 14,
+        fontFamily: 'Lexend_400Regular',
+        color: '#666666',
+        textAlign: 'center',
+        lineHeight: 20,
+        paddingHorizontal: 20,
     },
 
     ForgetPassword: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        fontFamily: 'Lexend_700Bold',
-        width: "77%",
-        alignSelf: "center",
-        textAlign: "left",
-        color: "#E0323C"
+        fontSize: 13,
+        fontFamily: 'Lexend_500Medium',
+        color: "#E0323C",
     },
     SocialbuttonsContainer: {
-        gap: 30,
-        marginTop: 30,
+        gap: 20,
+        marginTop: 25,
         alignItems: "center",
     },
 
     containerRegister: {
-        flexDirection: 'column',
-        fontWeight: 'bold',
-        fontFamily: 'Lexend_700Bold',
-        alignContent: 'center',
+        marginTop: 35,
+        marginBottom: 20,
         alignSelf: 'center'
     },
 
     RegisterUnderline: {
         color: "#E0323C",
-        textDecorationLine: "underline",
-        fontFamily: 'Lexend_700Bold',
+        fontFamily: 'Lexend_600SemiBold',
     },
 
     registerText: {
-        color: '#E0323C',
-        fontFamily: 'Lexend_700Bold',
+        color: '#666666',
+        fontFamily: 'Lexend_400Regular',
         fontSize: 14,
         textAlign: 'center',
     },

@@ -10,12 +10,14 @@ import Button from '../../../components/Button';
 import Styles from './StylesCompleteProfile';
 import { api } from '../../services/api';
 import { isValidAge, isValidWeight } from '../../utils/validators';
+import { useKeyboardBehavior } from '../../hooks/useKeyboardBehavior';
 
 const BLOOD_TYPES = ['A+', 'O+', 'B+', 'AB+', 'A-', 'O-', 'B-', 'AB-'];
 
 export default function CompleteProfileScreen() {
     const navigation = useNavigation<any>();
     const route = useRoute();
+    const keyboardBehavior = useKeyboardBehavior();
 
     //Recebe os dados da RegisterScreen 
     const { basicData } = (route.params as any) || {};
@@ -165,7 +167,7 @@ export default function CompleteProfileScreen() {
 
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                behavior={keyboardBehavior}
             >
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
 

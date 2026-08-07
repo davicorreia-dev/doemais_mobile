@@ -11,6 +11,7 @@ import CheckboxInput from '../../../components/CheckboxInput';
 import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useKeyboardBehavior } from '../../hooks/useKeyboardBehavior';
 
 const registerSchema = z.object({
     name: z.string().min(1, "O nome é obrigatório.").refine(isValidName, "Por favor, digite seu nome completo, sem números."),
@@ -31,6 +32,7 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 export default function RegisterScreen() {
 
     const navigation = useNavigation<any>();
+    const keyboardBehavior = useKeyboardBehavior();
 
     const { control, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
         resolver: zodResolver(registerSchema),
@@ -78,13 +80,12 @@ export default function RegisterScreen() {
             />
 
 
-            <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <KeyboardAvoidingView style={{ flex: 1 }} behavior={keyboardBehavior}>
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-
-
-                    <Text style={Styles.TitleContainer}>
-                        Seja bem-vindo(a)! Vamos fazer o bem juntos.
-                    </Text>
+                    <View style={{ paddingHorizontal: 30, marginTop: 35 }}>
+                        <Text style={Styles.HeaderTitle}>Crie sua conta</Text>
+                        <Text style={Styles.HeaderSubtitle}>Vamos fazer o bem juntos.</Text>
+                    </View>
 
                     <View style={Styles.InputContainer}>
                         {/* Campos adicionados para bater com o Backend */}

@@ -5,7 +5,7 @@ const Styles = StyleSheet.create({
 
     containerInput: {
         flexDirection: 'column',
-
+        width: 330, // Largura total constante (306 da caixa + 12 de margem esquerda + 12 de margem direita)
     },
 
     inputContainer: {
@@ -23,6 +23,7 @@ const Styles = StyleSheet.create({
         flex: 1,
         height: '100%',
         paddingHorizontal: 15, // Espaço para o texto não ficar colado
+        color: '#000000', // Garante que o texto digitado seja visível (não fique invisível em dark mode ou com secureTextEntry)
     },
     iconContainer: {
         padding: 10,
@@ -38,6 +39,7 @@ const Styles = StyleSheet.create({
         fontSize: 12,
         fontFamily: 'Lexend_400Regular',
         marginLeft: 12,
+        marginRight: 12, // Evita encostar na borda direita e garante que o texto quebre linha
         marginTop: -8,
         marginBottom: 8,
     }

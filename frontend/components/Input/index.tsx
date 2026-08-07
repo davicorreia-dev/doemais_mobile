@@ -33,7 +33,10 @@ export default function Input({
             <View style={[styles.inputContainer, error ? { borderColor: 'red', borderWidth: 1 } : null]}>
                 <TextInput
                     keyboardType={keyboardType}
-                    style={styles.inputStyle}
+                    style={[
+                        styles.inputStyle,
+                        secureTextEntry && !isPasswordVisible ? { fontFamily: 'System' } : null
+                    ]}
                     value={value}
                     placeholder={placeholder}
                     secureTextEntry={secureTextEntry && !isPasswordVisible}

@@ -1,9 +1,8 @@
 import 'reflect-metadata';
 import app from './app';
 import env from './config/environment';
-import { PrismaClient } from '@prisma/client';
+import prisma from './config/prisma';
 
-const prisma = new PrismaClient();
 const PORT = env.PORT;
 
 async function startServer() {

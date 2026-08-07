@@ -1,8 +1,8 @@
 import { Alert, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Configuração da API do Render
-const API_URL = 'https://doemais-mobile.onrender.com';
+// Configuração da API do Render com suporte para variáveis de ambiente locais
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://doemais-mobile.onrender.com';
 
 /**
  * Serviço centralizado para requisições HTTP
