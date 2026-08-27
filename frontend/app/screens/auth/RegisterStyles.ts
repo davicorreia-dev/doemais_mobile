@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { formColumn } from "../../utils/responsive";
 
 const Styles = StyleSheet.create({
     Container: {
@@ -21,6 +22,12 @@ const Styles = StyleSheet.create({
         marginBottom: 8,
     },
 
+    requiredHint: {
+        fontSize: 12,
+        fontFamily: 'Lexend_400Regular',
+        color: '#666666',
+    },
+
     HeaderSubtitle: {
         fontSize: 14,
         fontFamily: 'Lexend_400Regular',
@@ -38,8 +45,7 @@ const Styles = StyleSheet.create({
     },
 
     checkbox: {
-        width: 306,
-        alignSelf: 'center',
+        ...formColumn,
         marginVertical: 10,
     },
 })

@@ -1,4 +1,5 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
+import { formColumn } from '../../utils/responsive';
 
 const Styles = StyleSheet.create({
     container: {
@@ -71,7 +72,7 @@ const Styles = StyleSheet.create({
     },
 
     buttonContainer: {
-        alignItems: 'center',
+        ...formColumn,
     },
     weightLabel: {
         fontSize: 12,

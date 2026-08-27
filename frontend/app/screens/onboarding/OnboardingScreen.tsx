@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { View, Text, Image, StatusBar } from 'react-native';
+import { View, Text, Image, StatusBar, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 
 import Button from '../../../components/Button';
 import Styles from './Styles';
+import { clamp, topInset } from '../../utils/responsive';
 
 // Configuração dos Slides
 const slides = [
@@ -31,6 +33,11 @@ export default function OnboardingScreen() {
     const navigation = useNavigation<any>();
     const [currentIndex, setCurrentIndex] = useState(0);
 
+    // Faixa vermelha responsiva: respeita o notch e acompanha a altura da tela
+    const { height } = useWindowDimensions();
+    const insets = useSafeAreaInsets();
+    const barSize = clamp(height * 0.03, 18, 34);
+
     const handleNext = () => {
         if (currentIndex < slides.length - 1) {
             setCurrentIndex(currentIndex + 1);
@@ -49,7 +56,7 @@ export default function OnboardingScreen() {
             <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
             {/* Faixa Vermelha Superior igual ao design */}
-            <View style={Styles.topBar} />
+            <View style={[Styles.topBar, { height: barSize, marginTop: topInset(insets.top) }]} />
 
             <View style={Styles.content}>
                 <Text style={Styles.title}>{currentSlide.title}</Text>

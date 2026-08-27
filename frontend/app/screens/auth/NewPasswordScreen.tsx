@@ -43,7 +43,7 @@ export default function NewPasswordScreen() {
                 style={{ flex: 1 }}
                 behavior={keyboardBehavior}
             >
-                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
 
                 <View style={Styles.content}>
                     <Text style={Styles.description}>

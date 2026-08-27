@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import Input from "../../../components/Input";
 import Button from "../../../components/Button";
 import MethodButton from "../../../components/MethodButton";
+import { formColumn } from "../../utils/responsive";
 
 export default function ForgetPasswordChoiceScreen() {
     const navigation = useNavigation<any>();
@@ -30,7 +31,7 @@ export default function ForgetPasswordChoiceScreen() {
             </View>
 
 
-            <View style={{ marginTop: 50, alignItems: 'center' }}>
+            <View style={[formColumn, { marginTop: 50 }]}>
                 <Button title="Avançar"
                     textColor="#fff"
                 />

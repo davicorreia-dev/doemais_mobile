@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Image, Modal, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Modal, ScrollView, StatusBar, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NavigationProp, ParamListBase, useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -54,6 +55,7 @@ import Input from '../../../../components/Input';
 import Styles from './Styles';
 import { QUIZ_MODULES, type QuizQuestion } from './quizData';
 import { api } from '../../../services/api'; // <-- Adicionado o import da API
+import { clamp, topInset } from '../../../utils/responsive';
 
 type RouteParams = {
     moduleId?: string;
@@ -65,6 +67,15 @@ function getBlockMessage(question: QuizQuestion, fallback: string) {
 
 export default function QuizScreen() {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
+
+    // Topo vermelho responsivo: acompanha a tela e respeita o notch
+    const { width: winWidth, height: winHeight } = useWindowDimensions();
+    const insets = useSafeAreaInsets();
+    const safeTop = topInset(insets.top);
+    const headerSize = clamp(winHeight * 0.28, 190, 280);
+    const headerRadius = winWidth * 0.42;
+    const circleSize = clamp(winWidth * 0.32, 96, 140);
+    const navSize = clamp(winWidth * 0.14, 44, 60);
     const route = useRoute();
     const { moduleId } = (route.params as RouteParams | undefined) ?? {};
 
@@ -86,6 +97,9 @@ export default function QuizScreen() {
     // Acumulador de respostas!
     const [answers, setAnswers] = useState<Record<string, any>>({});
     const [isSubmitting, setIsSubmitting] = useState(false); // Para evitar duplo clique no final...
+    // Opção tocada no momento: fica destacada por um instante antes de avançar,
+    // para o usuário enxergar o que escolheu (a tela trocava rápido demais).
+    const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
     useEffect(() => {
         setInputValue('');
@@ -277,6 +291,19 @@ export default function QuizScreen() {
         setQuestionIndex((value) => value + 1);
     };
 
+    // Destaca a opção escolhida e só então avança
+    const chooseAnswer = (optionKey: string, answer: boolean | string | number | null, onSelect?: () => void) => {
+        if (isSubmitting || selectedOption) return;
+
+        setSelectedOption(optionKey);
+        onSelect?.();
+
+        setTimeout(() => {
+            setSelectedOption(null);
+            handleAdvance(answer);
+        }, 280);
+    };
+
     const handlePrevious = () => {
         if (questionIndex > 0) {
             setQuestionIndex((value) => value - 1);
@@ -292,11 +319,21 @@ export default function QuizScreen() {
         if (currentQuestion.answerType === 'boolean') {
             return (
                 <View style={Styles.booleanActions}>
-                    <TouchableOpacity style={Styles.answerButton} onPress={() => handleAdvance(true)} disabled={isSubmitting}>
-                        <Text style={Styles.answerButtonText}>Sim</Text>
+                    <TouchableOpacity
+                        style={[Styles.answerButton, selectedOption === 'sim' && Styles.answerButtonSelected]}
+                        activeOpacity={0.8}
+                        onPress={() => chooseAnswer('sim', true)}
+                        disabled={isSubmitting}
+                    >
+                        <Text style={[Styles.answerButtonText, selectedOption === 'sim' && Styles.answerButtonTextSelected]}>Sim</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={Styles.answerButton} onPress={() => handleAdvance(false)} disabled={isSubmitting}>
-                        <Text style={Styles.answerButtonText}>Não</Text>
+                    <TouchableOpacity
+                        style={[Styles.answerButton, selectedOption === 'nao' && Styles.answerButtonSelected]}
+                        activeOpacity={0.8}
+                        onPress={() => chooseAnswer('nao', false)}
+                        disabled={isSubmitting}
+                    >
+                        <Text style={[Styles.answerButtonText, selectedOption === 'nao' && Styles.answerButtonTextSelected]}>Não</Text>
                     </TouchableOpacity>
                 </View>
             );
@@ -322,11 +359,9 @@ export default function QuizScreen() {
                                 {currentQuestion.options.map((option) => (
                                     <TouchableOpacity
                                         key={option.value}
-                                        style={Styles.choiceSelectItem}
-                                        onPress={() => {
-                                            setSelectedMonthLabel(option.label);
-                                            handleAdvance(option.value);
-                                        }}
+                                        style={[Styles.choiceSelectItem, selectedOption === option.value && Styles.choiceSelectItemSelected]}
+                                        activeOpacity={0.8}
+                                        onPress={() => chooseAnswer(String(option.value), option.value, () => setSelectedMonthLabel(option.label))}
                                     >
                                         <Text style={Styles.choiceSelectItemText}>{option.label}</Text>
                                     </TouchableOpacity>
@@ -346,13 +381,21 @@ export default function QuizScreen() {
                     <View style={Styles.inputArea}>
                         <Text style={Styles.monthConfirmText}>{text}</Text>
                         <View style={Styles.radioList}>
-                            <TouchableOpacity style={Styles.radioRow} onPress={() => handleAdvance('SIM')}>
-                                <View style={Styles.radioCircle} />
+                            <TouchableOpacity
+                                style={[Styles.radioRow, selectedOption === 'SIM' && Styles.radioRowSelected]}
+                                activeOpacity={0.8}
+                                onPress={() => chooseAnswer('SIM', 'SIM')}
+                            >
+                                <View style={[Styles.radioCircle, selectedOption === 'SIM' && Styles.radioCircleActive]} />
                                 <Text style={Styles.radioLabel}>Sim</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={Styles.radioRow} onPress={() => handleAdvance('NAO_TENHO_CERTEZA')}>
-                                <View style={Styles.radioCircle} />
+                            <TouchableOpacity
+                                style={[Styles.radioRow, selectedOption === 'NAO_TENHO_CERTEZA' && Styles.radioRowSelected]}
+                                activeOpacity={0.8}
+                                onPress={() => chooseAnswer('NAO_TENHO_CERTEZA', 'NAO_TENHO_CERTEZA')}
+                            >
+                                <View style={[Styles.radioCircle, selectedOption === 'NAO_TENHO_CERTEZA' && Styles.radioCircleActive]} />
                                 <Text style={Styles.radioLabel}>Não tenho certeza</Text>
                             </TouchableOpacity>
                         </View>
@@ -363,8 +406,14 @@ export default function QuizScreen() {
             return (
                 <View style={Styles.choiceList}>
                     {currentQuestion.options.map((option) => (
-                        <TouchableOpacity key={option.value} style={Styles.choiceButton} onPress={() => handleAdvance(option.value)} disabled={isSubmitting}>
-                            <Text style={Styles.choiceButtonText}>{option.label}</Text>
+                        <TouchableOpacity
+                            key={option.value}
+                            style={[Styles.choiceButton, selectedOption === String(option.value) && Styles.choiceButtonSelected]}
+                            activeOpacity={0.8}
+                            onPress={() => chooseAnswer(String(option.value), option.value)}
+                            disabled={isSubmitting}
+                        >
+                            <Text style={[Styles.choiceButtonText, selectedOption === String(option.value) && Styles.choiceButtonTextSelected]}>{option.label}</Text>
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -409,19 +458,19 @@ export default function QuizScreen() {
 
     return (
         <View style={Styles.container}>
-            <StatusBar backgroundColor="#E0323C" barStyle="light-content" />
+            <StatusBar translucent barStyle="light-content" />
 
-            <View style={Styles.header}>
-                <TouchableOpacity style={[Styles.navButton, Styles.navButtonLeft]} onPress={handlePrevious} disabled={isSubmitting}>
+            <View style={[Styles.header, { height: safeTop + headerSize, paddingTop: safeTop + 18, borderBottomLeftRadius: headerRadius, borderBottomRightRadius: headerRadius }]}>
+                <TouchableOpacity style={[Styles.navButton, Styles.navButtonLeft, { top: safeTop + 20, width: navSize, height: navSize }]} onPress={handlePrevious} disabled={isSubmitting}>
                     <Ionicons name="chevron-back" size={28} color="#FFF" />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[Styles.navButton, Styles.navButtonRight, { opacity: 0.35 }]} disabled>
+                <TouchableOpacity style={[Styles.navButton, Styles.navButtonRight, { opacity: 0.35, top: safeTop + 20, width: navSize, height: navSize }]} disabled>
                     <Ionicons name="chevron-forward" size={28} color="rgba(255,255,255,0.35)" />
                 </TouchableOpacity>
 
-                <View style={Styles.headerIconContainer}>
-                    <Image source={module.image} style={Styles.headerImage} resizeMode="contain" />
+                <View style={[Styles.headerIconContainer, { width: circleSize, height: circleSize, borderRadius: circleSize / 2, marginTop: clamp(winHeight * 0.05, 28, 60) }]}>
+                    <Image source={module.image} style={[Styles.headerImage, { width: circleSize * 0.56, height: circleSize * 0.56 }]} resizeMode="contain" />
                 </View>
             </View>
 

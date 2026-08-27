@@ -99,10 +99,19 @@ const Styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    // Estado de seleção: marca visualmente a opção tocada antes de avançar
+    answerButtonSelected: {
+        backgroundColor: '#E0323C',
+        borderColor: '#E0323C',
+        transform: [{ scale: 0.98 }],
+    },
     answerButtonText: {
         fontSize: 16,
         fontWeight: '700',
         color: '#444',
+    },
+    answerButtonTextSelected: {
+        color: '#FFF',
     },
     choiceList: {
         width: '100%',
@@ -148,6 +157,9 @@ const Styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#F3F3F3',
     },
+    choiceSelectItemSelected: {
+        backgroundColor: '#FDECEC',
+    },
     choiceSelectItemText: {
         fontSize: 15,
         color: '#333',
@@ -164,11 +176,19 @@ const Styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: 16,
     },
+    choiceButtonSelected: {
+        backgroundColor: '#E0323C',
+        borderColor: '#E0323C',
+        transform: [{ scale: 0.98 }],
+    },
     choiceButtonText: {
         fontSize: 15,
         fontWeight: '600',
         color: '#333',
         textAlign: 'center',
+    },
+    choiceButtonTextSelected: {
+        color: '#FFF',
     },
     inputArea: {
         marginTop: 22,
@@ -198,6 +218,9 @@ const Styles = StyleSheet.create({
     },
     radioCircleActive: {
         backgroundColor: '#E0323C',
+    },
+    radioRowSelected: {
+        opacity: 0.75,
     },
     radioLabel: {
         fontSize: 14,

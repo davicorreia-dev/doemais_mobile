@@ -48,13 +48,23 @@ export const api = async (endpoint: string, method: string = 'GET', body?: any, 
 
                         if (refreshResponse.ok) {
                             const refreshData = await refreshResponse.json();
-                            if (refreshData.accessToken) {
+                            // O backend responde { success, message, data: { accessToken, expiresIn } },
+                            // então o token vem dentro de "data" (o fallback cobre respostas planas).
+                            const newAccessToken = refreshData?.data?.accessToken ?? refreshData?.accessToken;
+
+                            if (newAccessToken) {
                                 // Salva o novo token
-                                await AsyncStorage.setItem('@doemais:token', refreshData.accessToken);
+                                await AsyncStorage.setItem('@doemais:token', newAccessToken);
                                 // Refaz a requisição original com a flag isRetry = true
                                 console.log(`[API_LOG] Token renovado! Refazendo a requisição original para ${endpoint}...`);
                                 return await api(endpoint, method, body, true);
                             }
+
+                            // Resposta 200 sem token: sessão inutilizável, melhor derrubar do que insistir
+                            console.warn('[API_LOG] Refresh respondeu sem accessToken. Limpando sessão.');
+                            await AsyncStorage.removeItem('@doemais:token');
+                            await AsyncStorage.removeItem('@doemais:refreshToken');
+                            await AsyncStorage.removeItem('@doemais:user');
                         } else {
                             // Se o refresh falhou (refresh token expirou ou inválido), limpa tudo
                             await AsyncStorage.removeItem('@doemais:token');

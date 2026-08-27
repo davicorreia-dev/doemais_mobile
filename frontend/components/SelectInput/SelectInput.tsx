@@ -8,6 +8,7 @@ import {
     FlatList,
     StyleSheet
 } from 'react-native';
+import { formColumn } from '../../app/utils/responsive';
 
 interface Option {
     label: string;
@@ -25,8 +26,8 @@ export default function SelectInput({ label, options, value, onChange }: SelectI
     const [open, setOpen] = useState(false);
 
     return (
-        <View>
-            <Text style={styles.label} > {label} </Text>
+        <View style={styles.container}>
+            <Text style={styles.label}>{label}</Text>
 
             < TouchableOpacity style={styles.input} onPress={() => setOpen(true)
             }>
@@ -65,13 +66,16 @@ export default function SelectInput({ label, options, value, onChange }: SelectI
 }
 
 const styles = StyleSheet.create({
+    container: {
+        // Mesma coluna do Input e do botão principal
+        ...formColumn,
+    },
     input: {
-        height: 45,
-        marginHorizontal: 12,
+        height: 48,
         marginVertical: 8,
         borderWidth: 0.1,
         backgroundColor: '#FDFCFC',
-        width: 306,
+        width: '100%',
         borderRadius: 10,
         elevation: 5,
         paddingHorizontal: 15,
@@ -105,7 +109,6 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 12,
         fontFamily: 'Lexend_600SemiBold',
-        marginLeft: 12,
         marginBottom: 2,
         color: '#353535',
         alignSelf: 'flex-start',

@@ -1,8 +1,10 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, useWindowDimensions } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import styles from "./styles";
 import { useNavigation } from "@react-navigation/native";
 import { useFonts, Lexend_100Thin, Lexend_200ExtraLight, Lexend_300Light, Lexend_400Regular, Lexend_500Medium, Lexend_600SemiBold, Lexend_700Bold } from "@expo-google-fonts/lexend";
 import { Ionicons } from "@expo/vector-icons";
+import { barHeight, clamp, headerHeight, topInset } from "../../app/utils/responsive";
 
 //props do header
 type HeaderProps = {
@@ -37,8 +39,29 @@ export default function Header({ title, onBack, subtitle, titleColor, subtitleCo
 
     const navigation = useNavigation<any>();
 
+    // Responsividade: a barra acompanha o tamanho da tela e a área do sistema (notch/status bar)
+    const { width, height } = useWindowDimensions();
+    const insets = useSafeAreaInsets();
+    const safeTop = topInset(insets.top);
+
+    // Sem título/subtítulo é a faixa vermelha simples; com texto vira o header alto
+    const isBarOnly = !title && !subtitle;
+    const contentHeight = minHeight ?? (isBarOnly ? barHeight(height) : headerHeight(height));
+    const iconSize = clamp(width * 0.065, 22, 30);
+
     return (
-        <View style={[styles.header, { marginTop, minHeight }, containerStyle]}>
+        <View
+            style={[
+                styles.header,
+                {
+                    // a faixa cresce por trás da status bar em vez de usar margem fixa
+                    paddingTop: safeTop + (marginTop ?? 0),
+                    minHeight: safeTop + contentHeight,
+                    paddingHorizontal: clamp(width * 0.03, 10, 24),
+                },
+                containerStyle,
+            ]}
+        >
             <TouchableOpacity onPress={() => {
                 if (onBack) {
                     onBack();
@@ -47,47 +70,49 @@ export default function Header({ title, onBack, subtitle, titleColor, subtitleCo
                 }
             }}
                 style={styles.iconBack}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
 
                 <Ionicons
                     name={icon || "arrow-back"}
-                    size={24}
+                    size={iconSize}
                     color={iconColor || "#E0323C"}
                 />
             </TouchableOpacity>
 
-            <View style={styles.textContainer}>
-                <Text
+            {!isBarOnly && (
+                <View style={styles.textContainer}>
+                    <Text
 
-                    // Props das cores do titulo 
-                    style={[
-                        styles.title,
-                        {
-                            color: titleColor || styles.title.color,
-                            fontSize: titleSize || styles.title.fontSize,
-                        },
-                    ]}
-                >
-                    {title}
-                </Text>
+                        // Props das cores do titulo 
+                        style={[
+                            styles.title,
+                            {
+                                color: titleColor || styles.title.color,
+                                fontSize: titleSize || clamp(width * 0.055, 18, 26),
+                            },
+                        ]}
+                    >
+                        {title}
+                    </Text>
 
-                {/* Props de cores dos subtitulo */}
-                <Text
-                    style={[
-                        styles.subtitle,
-                        {
-                            color: subtitleColor || styles.subtitle.color,
-                            fontSize: subtitleSize || styles.subtitle.fontSize,
-                        },
-                    ]}
-                >
-                    {subtitle}
-                </Text>
-            </View>
+                    {/* Props de cores dos subtitulo */}
+                    <Text
+                        style={[
+                            styles.subtitle,
+                            {
+                                color: subtitleColor || styles.subtitle.color,
+                                fontSize: subtitleSize || clamp(width * 0.04, 14, 18),
+                            },
+                        ]}
+                    >
+                        {subtitle}
+                    </Text>
+                </View>
+            )}
 
 
         </View>
 
     );
 }
-

@@ -1,19 +1,21 @@
 import { StyleSheet } from "react-native";
+import { formColumn } from "../../app/utils/responsive";
 
 const Styles = StyleSheet.create({
 
 
     containerInput: {
         flexDirection: 'column',
-        width: 330, // Largura total constante (306 da caixa + 12 de margem esquerda + 12 de margem direita)
+        // Coluna do formulário: mesma borda do botão principal e dos links
+        ...formColumn,
     },
 
     inputContainer: {
-        height: 45,
-        margin: 12,
+        height: 48,
+        marginVertical: 12,
         borderWidth: 0.1,
         backgroundColor: '#FDFCFC',
-        width: 306,
+        width: '100%',
         borderRadius: 10,
         elevation: 5,
         flexDirection: 'row',
@@ -31,15 +33,12 @@ const Styles = StyleSheet.create({
     label: {
         fontSize: 12,
         fontFamily: 'Lexend_600SemiBold',
-        marginLeft: 12,
         marginBottom: 2,
     },
     errorText: {
         color: 'red',
         fontSize: 12,
         fontFamily: 'Lexend_400Regular',
-        marginLeft: 12,
-        marginRight: 12, // Evita encostar na borda direita e garante que o texto quebre linha
         marginTop: -8,
         marginBottom: 8,
     }

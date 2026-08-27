@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, ScrollView, KeyboardAvoidingView, Platform, Alert, useWindowDimensions } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import Header from '../../../components/Header';
 import Styles from './Styles';
+import { clamp } from '../../utils/responsive';
 import Input from '../../../components/Input';
 import SelectInput from '../../../components/SelectInput/SelectInput';
 import Button from '../../../components/Button';
@@ -26,6 +28,12 @@ type UpdateProfileData = z.infer<typeof updateprofile>;
 export default function SettingsProfileScreen() {
 
     const navigation = useNavigation<any>();
+
+    // A tela acompanha a largura disponível em vez de larguras fixas
+    const { width } = useWindowDimensions();
+    const gutter = clamp(width * 0.05, 16, 28);
+    const titleSize = clamp(width * 0.062, 20, 28);
+    const subtitleSize = clamp(width * 0.037, 13, 16);
     const [loading, setLoading] = useState(false);
     const [cep, setCep] = useState('');
     const keyboardBehavior = useKeyboardBehavior();
@@ -143,11 +151,10 @@ export default function SettingsProfileScreen() {
     ];
 
     return (
-        <View style={{ flex: 1, alignItems: 'center' }}>
+        <View style={Styles.screen}>
 
+            <StatusBar style="light" />
             <Header
-                marginTop={30}
-                minHeight={50}
                 icon="arrow-back-outline"
                 iconColor="#FFF"
                 containerStyle={{ backgroundColor: '#E0323C' }}
@@ -161,14 +168,14 @@ export default function SettingsProfileScreen() {
             >
                 <View style={{ flex: 1, backgroundColor: '#FDFCFC' }}>
                     <ScrollView
-                        contentContainerStyle={{ padding: 20 }}
+                        contentContainerStyle={[Styles.scrollContent, { paddingHorizontal: gutter }]}
                         showsVerticalScrollIndicator={false}
                         keyboardShouldPersistTaps="handled"
                     >
 
-                        <Text style={Styles.title}>Configuração do perfil</Text>
+                        <Text style={[Styles.title, { fontSize: titleSize }]}>Configuração do perfil</Text>
 
-                        <Text style={Styles.subtitle}>
+                        <Text style={[Styles.subtitle, { fontSize: subtitleSize }]}>
                             Quase pronto para configurar seu perfil, preencha as informações abaixo.
                             Apenas 3 etapas.
                         </Text>
@@ -207,7 +214,7 @@ export default function SettingsProfileScreen() {
                                     control={control}
                                     name="city"
                                     render={({ field: { onChange, value } }) => (
-                                        <View>
+                                        <View style={Styles.fieldGroup}>
                                             <Input
                                                 label="CEP (Para auto-preencher)"
                                                 keyboardType="numeric"
@@ -229,7 +236,7 @@ export default function SettingsProfileScreen() {
                                     control={control}
                                     name="type_sanguine"
                                     render={({ field: { onChange, value } }) => (
-                                        <View>
+                                        <View style={Styles.fieldGroup}>
                                             <SelectInput
                                                 label="Grupo sanguíneo"
                                                 options={BLOOD_TYPES}
@@ -245,12 +252,11 @@ export default function SettingsProfileScreen() {
                             </View>
                         </View>
 
-                        <View style={{ alignItems: 'center', marginTop: 10, marginBottom: 20 }}>
+                        <View style={[Styles.actionRow, { marginTop: 10, marginBottom: 20 }]}>
                             <Button
                                 title={loading ? "Salvando..." : "Salvar"}
                                 textColor="#FFF"
                                 borderRadius={10}
-                                width={270}
                                 onPress={handleSubmit(onSubmit)}
                                 disabled={loading}
                             />

@@ -7,6 +7,7 @@ import { useFonts, Lexend_100Thin, Lexend_200ExtraLight, Lexend_300Light, Lexend
 import Header from "../../../components/Header";
 import Input from "../../../components/Input";
 import Styles from "./stylesLogin";
+import { formColumn } from "../../utils/responsive";
 import SocialButton from "../../../components/SocialButton";
 import Button from "../../../components/Button";
 
@@ -106,10 +107,8 @@ export default function LoginScreen() {
 
     return (
         <View style={{ flex: 1, backgroundColor: '#fff' }}>
-            <StatusBar backgroundColor="#E0323C" style="light" />
+            <StatusBar style="light" />
             <Header
-                marginTop={30}
-                minHeight={50}
                 icon="arrow-back-outline"
                 iconColor="#FFF"
                 onBack={() => {
@@ -123,7 +122,7 @@ export default function LoginScreen() {
             />
 
             <KeyboardAvoidingView style={{ flex: 1 }} behavior={keyboardBehavior}>
-                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
                     <View>
                         <View style={{ paddingHorizontal: 30, marginTop: 35 }}>
                             <Text style={Styles.HeaderTitle}>Seja bem-vindo(a)</Text>
@@ -136,11 +135,12 @@ export default function LoginScreen() {
                                 name="email"
                                 render={({ field: { onChange, value } }) => (
                                     <Input
-                                        label="E-mail:"
+                                        label="E-mail"
                                         keyboardType="email-address"
                                         value={value}
                                         onChangeText={onChange}
                                         autoCapitalize="none"
+                                        autoCorrect={false}
                                         error={errors.email?.message}
                                     />
                                 )}
@@ -151,7 +151,7 @@ export default function LoginScreen() {
                                 name="password"
                                 render={({ field: { onChange, value } }) => (
                                     <Input
-                                        label="Senha:"
+                                        label="Senha"
                                         value={value}
                                         onChangeText={onChange}
                                         secureTextEntry
@@ -160,7 +160,7 @@ export default function LoginScreen() {
                                 )}
                             />
 
-                            <View style={{ width: 330, alignSelf: 'center', alignItems: 'flex-end', marginTop: 10 }}>
+                            <View style={[formColumn, { alignItems: 'flex-end', marginTop: 10 }]}>
                                 <Text style={Styles.ForgetPassword}
                                     onPress={() => navigation.navigate("ForgetPasswordChoiceScreen")}>
                                     Esqueceu sua senha?
@@ -168,19 +168,18 @@ export default function LoginScreen() {
                             </View>
                         </View>
 
-                        <View style={{ alignItems: 'center', marginTop: 25 }}>
+                        <View style={[formColumn, { marginTop: 25 }]}>
                             <Button
                                 title={loading ? "Entrando..." : "Entrar"}
                                 textColor="white"
                                 borderRadius={10}
-                                width={330}
                                 onPress={handleSubmit(onSubmit)}
                                 disabled={loading}
                             />
                         </View>
 
                         {/* Divisor Moderno */}
-                        <View style={{ flexDirection: 'row', alignItems: 'center', width: 330, alignSelf: 'center', marginVertical: 25 }}>
+                        <View style={[formColumn, { flexDirection: 'row', alignItems: 'center', marginVertical: 25 }]}>
                             <View style={{ flex: 1, height: 1, backgroundColor: '#EFEFEF' }} />
                             <Text style={{ marginHorizontal: 15, fontSize: 12, color: '#999', fontFamily: 'Lexend_400Regular' }}>ou conecte-se com</Text>
                             <View style={{ flex: 1, height: 1, backgroundColor: '#EFEFEF' }} />

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, Modal, TextInput } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -10,6 +11,7 @@ import Button from '../../../components/Button';
 import Styles from './StylesCompleteProfile';
 import { api } from '../../services/api';
 import { isValidAge, isValidWeight } from '../../utils/validators';
+import { mapRegisterServerError } from '../../utils/registerErrors';
 import { useKeyboardBehavior } from '../../hooks/useKeyboardBehavior';
 
 const BLOOD_TYPES = ['A+', 'O+', 'B+', 'AB+', 'A-', 'O-', 'B-', 'AB-'];
@@ -107,7 +109,7 @@ export default function CompleteProfileScreen() {
         //Validação se o basicData chegou
         if (!basicData) {
             Alert.alert("Erro", "Dados do cadastro não encontrados. Volte ao início.");
-            navigation.navigate("RegisterScreen");
+            navigation.navigate("Register");
             return;
         }
 
@@ -141,6 +143,23 @@ export default function CompleteProfileScreen() {
 
         } catch (error: any) {
             console.error(error);
+
+            // Erros sobre nome, e-mail, CPF, telefone ou senha são da RegisterScreen:
+            // devolvemos o usuário para lá com os dados preenchidos e o erro no campo.
+            const fieldErrors = mapRegisterServerError(error.message ?? '');
+
+            if (Object.keys(fieldErrors).length > 0) {
+                Alert.alert(
+                    "Revise seus dados",
+                    Object.values(fieldErrors).join('\n'),
+                    [{
+                        text: "Corrigir",
+                        onPress: () => navigation.navigate("Register", { prefill: basicData, fieldErrors })
+                    }]
+                );
+                return;
+            }
+
             Alert.alert("Erro ao criar conta", error.message || "Tente novamente.");
         } finally {
             setLoading(false);
@@ -149,9 +168,8 @@ export default function CompleteProfileScreen() {
 
     return (
         <View style={Styles.container}>
+            <StatusBar style="light" />
             <Header
-                marginTop={30}
-                minHeight={50}
                 icon="arrow-back-outline"
                 iconColor="#FFF"
                 onBack={() => {
@@ -169,7 +187,7 @@ export default function CompleteProfileScreen() {
                 style={{ flex: 1 }}
                 behavior={keyboardBehavior}
             >
-                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
 
                     <View style={Styles.content}>
 

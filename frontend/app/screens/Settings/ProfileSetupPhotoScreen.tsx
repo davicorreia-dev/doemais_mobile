@@ -8,6 +8,7 @@ import {
     Alert,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { StatusBar } from 'expo-status-bar';
 import Styles from './StylesProfileSetupPhoto';
 import Header from '../../../components/Header';
 import { Ionicons } from '@expo/vector-icons';
@@ -98,9 +99,8 @@ export default function ProfileSetupPhotoScreen({ navigation }: any) {
 
     return (
         <View style={Styles.container}>
+            <StatusBar style="light" />
             <Header
-                marginTop={30}
-                minHeight={50}
                 icon="arrow-back-outline"
                 iconColor="#FFF"
                 containerStyle={{ backgroundColor: '#E0323C' }}

@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import Input from "../../../components/Input";
 import Button from "../../../components/Button";
 import { useKeyboardBehavior } from '../../hooks/useKeyboardBehavior';
+import { formColumn } from '../../utils/responsive';
 
 export default function ForgetPasswordScreen() {
     const navigation = useNavigation<any>();
@@ -32,8 +33,10 @@ export default function ForgetPasswordScreen() {
                             label="E-mail"
                         />
 
-                        <Button title="Redefinir senha"
-                            textColor="#ffff" />
+                        <View style={formColumn}>
+                            <Button title="Redefinir senha"
+                                textColor="#ffff" />
+                        </View>
                     </View>
                 </ScrollView>
             </KeyboardAvoidingView>

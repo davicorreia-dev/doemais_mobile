@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // --- IMPORTS DAS TELAS ---
 import AuthChoiceScreen from './app/screens/auth/AuthChoiceScreen';
@@ -33,7 +34,8 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer>
       <StatusBar style="auto" />
 
       {/* AuthChoice tela padrão   */}
@@ -68,7 +70,8 @@ export default function App() {
         <Stack.Screen name="ProfileSetupPhotoScreen" component={ProfileSetupPhotoScreen} />
 
       </Stack.Navigator>
-    </NavigationContainer>
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }
 

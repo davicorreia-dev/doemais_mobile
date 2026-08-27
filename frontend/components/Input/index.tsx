@@ -11,7 +11,8 @@ type InputProps = {
     secureTextEntry?: boolean;
     onChangeText?: (text: string) => void;
     keyboardType?: KeyboardTypeOptions;
-    autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters'; 
+    autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+    autoCorrect?: boolean;
     error?: string;
 };
 
@@ -23,6 +24,7 @@ export default function Input({
     onChangeText, 
     keyboardType,
     autoCapitalize,
+    autoCorrect,
     error
 }: InputProps) {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -42,6 +44,7 @@ export default function Input({
                     secureTextEntry={secureTextEntry && !isPasswordVisible}
                     onChangeText={onChangeText}
                     autoCapitalize={autoCapitalize}
+                    autoCorrect={autoCorrect}
                 />
                 {secureTextEntry && (
                     <TouchableOpacity

@@ -10,7 +10,7 @@ const Styles = StyleSheet.create({
     },
     topBar: {
         width: '100%',
-        height: 25,
+        // altura definida no componente (responsiva)
         backgroundColor: '#E0323C',
     },
     content: {

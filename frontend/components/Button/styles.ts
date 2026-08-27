@@ -1,12 +1,17 @@
 import { StyleSheet } from "react-native";
+import { FORM_MAX_WIDTH } from "../../app/utils/responsive";
 
 const styles = StyleSheet.create({
 
 
     button: {
         backgroundColor: '#E0323C',
-        height: 60.96,
-        width: 309.33,
+        // Mais alto que os inputs (48) para marcar a ação principal
+        height: 56,
+        // Acompanha a largura do container; a coluna do formulário define o limite
+        width: '100%',
+        maxWidth: FORM_MAX_WIDTH,
+        alignSelf: 'center',
         borderColor: '#E0323C',
         borderWidth: 1,
         justifyContent: 'center',

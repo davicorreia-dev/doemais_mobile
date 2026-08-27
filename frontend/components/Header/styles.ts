@@ -2,17 +2,15 @@ import { StyleSheet } from "react-native";
 
 const Styles = StyleSheet.create({
     header: {
-        minHeight: 200,
-        paddingHorizontal: 10,
-        marginTop: 30,
+        // altura, padding e margem do topo são calculados no componente (responsivos)
         justifyContent: 'flex-start',
         width: '100%',
-
     },
 
     iconBack: {
         marginTop: 10,
         marginLeft: 5,
+        alignSelf: 'flex-start',
     },
 
     textContainer: {
