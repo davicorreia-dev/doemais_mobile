@@ -21,6 +21,11 @@ O celular e o PC precisam estar na **mesma rede Wi-Fi**.
   e chame `docker compose --profile local up --build`.
 - Parar tudo: `docker compose --profile local down` (acrescente `-v` para apagar o banco local).
 
+> Trocou de modo (`--local` ↔ `--render`) com o app já aberto? **Feche o app no Expo Go por
+> completo e abra de novo** (ou use "Reload"). Sem isso ele continua com o JS antigo e chama a API do modo anterior.
+> A API usada vem de `EXPO_PUBLIC_API_URL_OVERRIDE` (definida pelo compose) e tem prioridade sobre
+> qualquer `frontend/.env.local`; esse arquivo só vale rodando o Expo fora do Docker.
+
 ### Se o celular não conectar
 1. Firewall do PC liberando as portas **8081** (Expo) e **3000** (API). Ex. Linux: `sudo ufw allow 8081/tcp && sudo ufw allow 3000/tcp`.
 2. Roteador sem "isolamento de clientes" (AP isolation) e PC/celular na mesma rede.

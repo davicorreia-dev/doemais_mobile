@@ -2,7 +2,8 @@ import { Alert, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Configuração da API do Render com suporte para variáveis de ambiente locais
-const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://doemais-mobile.onrender.com';
+// EXPO_PUBLIC_API_URL_OVERRIDE é definida pelo docker-compose (./run.sh --local | --render) e tem prioridade
+const API_URL = process.env.EXPO_PUBLIC_API_URL_OVERRIDE || process.env.EXPO_PUBLIC_API_URL || 'https://doemais-mobile.onrender.com';
 
 /**
  * Serviço centralizado para requisições HTTP

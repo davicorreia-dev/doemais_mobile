@@ -40,8 +40,9 @@ services:
       # IP do PC na rede: o celular usa esse endereço para falar com o Metro e com a API
       HOST_IP: ${HOST_IP:-}
       REACT_NATIVE_PACKAGER_HOSTNAME: ${HOST_IP:-}
-      # definido pelo run.sh (--local ou --render)
-      EXPO_PUBLIC_API_URL: ${API_URL:-http://localhost:3000}
+      # Definido pelo run.sh (--local ou --render). Nome próprio de propósito: o Expo 58 empacota
+      # arquivos .env* (ex.: frontend/.env.local) e eles sobrescreveriam EXPO_PUBLIC_API_URL.
+      EXPO_PUBLIC_API_URL_OVERRIDE: ${API_URL:-http://localhost:3000}
       EXPO_NO_TELEMETRY: "1"
       # sem login/rede do Expo: evita o prompt "Log in / Proceed anonymously" que trava o Expo Go
       EXPO_OFFLINE: "1"

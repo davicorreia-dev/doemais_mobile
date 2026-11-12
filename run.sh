@@ -45,4 +45,5 @@ fi
 
 echo "Modo: $MODE | API: $API_URL | Expo: exp://$HOST_IP:8081"
 echo "(QR code nos logs do serviço 'frontend')"
+echo "Se o app já estava aberto no celular (ou trocou de modo): feche-o por completo e reabra, senão ele segue com o JS/API antigos."
 docker compose "${PROFILE[@]}" up --build -V "$@"
