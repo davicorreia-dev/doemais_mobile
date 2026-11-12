@@ -51,6 +51,7 @@ const styles = StyleSheet.create({
     card: {
         backgroundColor: '#FFF',
         borderRadius: 22,
+        position: 'relative',
         paddingVertical: 16,
         paddingHorizontal: 14,
         flexDirection: 'row',
@@ -85,6 +86,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 14,
     },
+    cardMainActionWithReview: {
+        paddingRight: 88,
+    },
     cardTitle: {
         fontSize: 16,
         fontWeight: '800',
@@ -97,7 +101,9 @@ const styles = StyleSheet.create({
         color: '#666',
     },
     reviewButton: {
-        alignSelf: 'flex-end',
+        position: 'absolute',
+        top: 10,
+        right: 10,
         minHeight: 36,
         paddingHorizontal: 8,
         borderWidth: 1,
