@@ -331,7 +331,7 @@ export default function EligibilityFormsScreen() {
                                         </Text>
                                     </View>
 
-                                    {rightIcon}
+                                    {stateInfo.status === 'neutral' && rightIcon}
                                 </TouchableOpacity>
 
                                 {stateInfo.status !== 'neutral' && (
