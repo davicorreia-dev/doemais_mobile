@@ -19,6 +19,7 @@ import LgpdScreen from './app/screens/onboarding/LgpdScreen';
 import RegisterSuccessScreen from './app/screens/auth/RegisterSuccessScreen';
 import CompleteProfileScreen from './app/screens/onboarding/CompleteProfileScreen';
 import OnboardingScreen from './app/screens/onboarding/OnboardingScreen';
+import PostRegisterOnboardingScreen from './app/screens/onboarding/PostRegisterOnboardingScreen';
 import QuizScreen from './app/screens/app/QuizFlow/QuizScreen';
 
 // IMPORTANTE: Este é o seu MENU NOVO (Vermelho)
@@ -72,6 +73,7 @@ export default function App() {
         {/* Telas sem Header */}
         <Stack.Screen name="RegisterSuccessScreen" component={RegisterSuccessScreen} />
         <Stack.Screen name="OnboardingScreen" component={OnboardingScreen} />
+        <Stack.Screen name="PostRegisterOnboarding" component={PostRegisterOnboardingScreen} />
         <Stack.Screen name="QuizScreen" component={QuizScreen} />
 
         {/* --- O GRANDE MOMENTO --- */}

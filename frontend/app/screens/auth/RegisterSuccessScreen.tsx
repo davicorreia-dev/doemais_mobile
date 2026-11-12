@@ -9,13 +9,9 @@ export default function RegisterSuccessScreen() {
     const navigation = useNavigation<any>();
 
     const handleStart = () => {
-        // Redireciona para o Login por enquanto
         navigation.reset({
-            index: 1,
-            routes: [
-                { name: 'AuthChoice' },
-                { name: 'Login' },
-            ],
+            index: 0,
+            routes: [{ name: 'PostRegisterOnboarding' }],
         });
     };
 
@@ -29,11 +25,11 @@ export default function RegisterSuccessScreen() {
 
             <Text style={Styles.subtitle}>
                 Obrigado por se cadastrar no Doe+. Sua atitude já é o primeiro passo para salvar vidas.{'\n\n'}
-                Entenda um pouco da missão da Doe+ antes de começar.
+                Antes de entrar, conheça os próximos passos para preencher sua triagem e acessar sua carteirinha.
             </Text>
 
             <Button
-                title="Começar"
+                title="Ver como funciona"
                 textColor="#FFFFFF"
                 onPress={handleStart}
             />
