@@ -181,6 +181,10 @@ const Styles = StyleSheet.create({
         borderColor: '#E0323C',
         transform: [{ scale: 0.98 }],
     },
+    correctionReasonButton: {
+        flexDirection: 'row',
+        gap: 8,
+    },
     choiceButtonText: {
         fontSize: 15,
         fontWeight: '600',

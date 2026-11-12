@@ -573,9 +573,25 @@ export default function QuizScreen() {
                         <Ionicons name="create-outline" size={52} color="#E0323C" />
                         <Text style={Styles.modalTitle}>Corrigir respostas</Text>
                         <Text style={Styles.modalMessage}>Informe o motivo antes de refazer. O hemocentro poderá comparar as respostas.</Text>
-                        <TouchableOpacity style={Styles.choiceButton} onPress={() => setCorrectionReason('Resposta marcada incorretamente')}><Text style={Styles.choiceButtonText}>Marquei uma resposta incorreta</Text></TouchableOpacity>
-                        <TouchableOpacity style={Styles.choiceButton} onPress={() => setCorrectionReason('Informação mudou')}><Text style={Styles.choiceButtonText}>Minha informação mudou</Text></TouchableOpacity>
-                        <Input label="Comentário (opcional)" value={correctionComment} onChangeText={setCorrectionComment} placeholder="Explique brevemente" />
+                        <TouchableOpacity
+                            style={[Styles.choiceButton, Styles.correctionReasonButton, correctionReason === 'Resposta marcada incorretamente' && Styles.choiceButtonSelected]}
+                            onPress={() => setCorrectionReason('Resposta marcada incorretamente')}
+                            accessibilityRole="radio"
+                            accessibilityState={{ selected: correctionReason === 'Resposta marcada incorretamente' }}
+                        >
+                            <Text style={[Styles.choiceButtonText, correctionReason === 'Resposta marcada incorretamente' && Styles.choiceButtonTextSelected]}>Marquei uma resposta incorreta</Text>
+                            {correctionReason === 'Resposta marcada incorretamente' && <Ionicons name="checkmark-circle" size={20} color="#FFF" />}
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[Styles.choiceButton, Styles.correctionReasonButton, correctionReason === 'Informação mudou' && Styles.choiceButtonSelected]}
+                            onPress={() => setCorrectionReason('Informação mudou')}
+                            accessibilityRole="radio"
+                            accessibilityState={{ selected: correctionReason === 'Informação mudou' }}
+                        >
+                            <Text style={[Styles.choiceButtonText, correctionReason === 'Informação mudou' && Styles.choiceButtonTextSelected]}>Minha informação mudou</Text>
+                            {correctionReason === 'Informação mudou' && <Ionicons name="checkmark-circle" size={20} color="#FFF" />}
+                        </TouchableOpacity>
+                        <Input label="Comentário (opcional)" value={correctionComment} onChangeText={setCorrectionComment} placeholder="Explique brevemente o que precisa ser corrigido" />
                         <Button title="Refazer formulário" textColor="#FFF" width="100%" onPress={beginCorrection} />
                     </View>
                 </View>
