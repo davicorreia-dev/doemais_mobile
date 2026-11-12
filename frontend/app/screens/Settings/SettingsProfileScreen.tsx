@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, ScrollView, KeyboardAvoidingView, Platform, Alert, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, KeyboardAvoidingView, Platform, Alert, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Header from '../../../components/Header';
 import Styles from './Styles';
@@ -180,6 +180,16 @@ export default function SettingsProfileScreen() {
                             Apenas 3 etapas.
                         </Text>
                         
+                        <TouchableOpacity
+                            style={Styles.photoShortcut}
+                            onPress={() => navigation.navigate('ProfileSetupPhotoScreen')}
+                            accessibilityRole="button"
+                            accessibilityLabel="Alterar foto do perfil"
+                        >
+                            <Text style={Styles.photoShortcutText}>Alterar foto do perfil</Text>
+                            <Text style={Styles.photoShortcutArrow}>›</Text>
+                        </TouchableOpacity>
+
                         <View style={Styles.profileCard}>
                             <View style={Styles.containerInputs}>
 
