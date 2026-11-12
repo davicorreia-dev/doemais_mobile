@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, ScrollView, StatusBar, Text, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StatusBar, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -153,10 +153,13 @@ export default function VirtualCardScreen() {
 
                 <View style={Styles.card}>
                     <View style={Styles.brandRow}>
-                        <View style={Styles.brandIcon}>
-                            <Ionicons name="water" size={23} color="#E0323C" />
+                            <View style={Styles.brandLogoWrap}>
+                                <Image
+                                    source={require('../../../assets/images/Doe+_Logo_1-removebg-preview.png')}
+                                    style={Styles.brandLogo}
+                                    resizeMode="contain"
+                                />
                         </View>
-                        <Text style={Styles.brand}>DOE+MAIS</Text>
                         <Ionicons name="shield-checkmark" size={24} color="#FFF" />
                     </View>
 
