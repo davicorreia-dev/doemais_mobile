@@ -51,11 +51,12 @@ const styles = StyleSheet.create({
     card: {
         backgroundColor: '#FFF',
         borderRadius: 22,
+        position: 'relative',
         paddingVertical: 16,
         paddingHorizontal: 14,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 14,
+        gap: 10,
         shadowColor: '#000',
         shadowOpacity: 0.06,
         shadowRadius: 12,
@@ -78,6 +79,16 @@ const styles = StyleSheet.create({
     cardBody: {
         flex: 1,
     },
+    cardMainAction: {
+        width: '100%',
+        minHeight: 56,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 14,
+    },
+    cardMainActionWithReview: {
+        paddingRight: 92,
+    },
     cardTitle: {
         fontSize: 16,
         fontWeight: '800',
@@ -88,6 +99,24 @@ const styles = StyleSheet.create({
         fontSize: 13,
         lineHeight: 18,
         color: '#666',
+    },
+    reviewButton: {
+        position: 'absolute',
+        top: 12,
+        right: 12,
+        height: 32,
+        paddingHorizontal: 10,
+        borderRadius: 16,
+        backgroundColor: '#E0323C',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        gap: 5,
+    },
+    reviewButtonText: {
+        color: '#FFF',
+        fontSize: 11,
+        fontWeight: '800',
     },
 });
 

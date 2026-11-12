@@ -280,10 +280,6 @@ export default function EligibilityFormsScreen() {
                         }
 
                         const handlePress = () => {
-                            const requestCorrection = () => navigation.navigate('QuizScreen', {
-                                moduleId: module.id,
-                                correction: { originalAnswers: localHistory?.[module.id]?.answers || {} },
-                            });
                             if (stateInfo.status === 'blocked') {
                                 Alert.alert(
                                     "Aguarde o prazo",
@@ -306,26 +302,51 @@ export default function EligibilityFormsScreen() {
                             navigation.navigate('QuizScreen', { moduleId: module.id });
                         };
 
+                        const requestCorrection = () => navigation.navigate('QuizScreen', {
+                            moduleId: module.id,
+                            correction: { originalAnswers: localHistory?.[module.id]?.answers || {} },
+                        });
+
                         return (
-                            <TouchableOpacity 
-                                key={module.id} 
-                                style={[styles.card, { backgroundColor: cardBg, borderColor: cardBorderColor, borderWidth: cardBorderColor !== 'transparent' ? 1 : 0 }]} 
-                                activeOpacity={0.85} 
-                                onPress={handlePress}
+                            <View
+                                key={module.id}
+                                style={[styles.card, { backgroundColor: cardBg, borderColor: cardBorderColor, borderWidth: cardBorderColor !== 'transparent' ? 1 : 0 }]}
                             >
-                                <View style={[styles.cardIconWrap, { backgroundColor: iconBg }]}>
-                                    <Image source={module.image} style={[styles.cardIcon, { tintColor: tintColor }]} resizeMode="contain" />
-                                </View>
+                                <TouchableOpacity
+                                    style={[
+                                        styles.cardMainAction,
+                                        stateInfo.status !== 'neutral' && styles.cardMainActionWithReview,
+                                    ]}
+                                    activeOpacity={0.85}
+                                    onPress={handlePress}
+                                >
+                                    <View style={[styles.cardIconWrap, { backgroundColor: iconBg }]}>
+                                        <Image source={module.image} style={[styles.cardIcon, { tintColor: tintColor }]} resizeMode="contain" />
+                                    </View>
 
-                                <View style={styles.cardBody}>
-                                    <Text style={[styles.cardTitle, { color: textColor }]}>{module.title}</Text>
-                                    <Text style={[styles.cardDescription, { color: descColor }]}>
-                                        {stateInfo.status === 'blocked' ? stateInfo.message : module.description}
-                                    </Text>
-                                </View>
+                                    <View style={styles.cardBody}>
+                                        <Text style={[styles.cardTitle, { color: textColor }]}>{module.title}</Text>
+                                        <Text style={[styles.cardDescription, { color: descColor }]}>
+                                            {stateInfo.status === 'blocked' ? stateInfo.message : module.description}
+                                        </Text>
+                                    </View>
 
-                                {rightIcon}
-                            </TouchableOpacity>
+                                    {stateInfo.status === 'neutral' && rightIcon}
+                                </TouchableOpacity>
+
+                                {stateInfo.status !== 'neutral' && (
+                                    <TouchableOpacity
+                                        style={styles.reviewButton}
+                                        activeOpacity={0.8}
+                                        onPress={requestCorrection}
+                                        accessibilityRole="button"
+                                        accessibilityLabel={`Solicitar revisão do formulário ${module.title}`}
+                                    >
+                                        <Ionicons name="create-outline" size={14} color="#FFF" />
+                                        <Text style={styles.reviewButtonText}>Revisar</Text>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
                         );
                     })}
                 </View>
