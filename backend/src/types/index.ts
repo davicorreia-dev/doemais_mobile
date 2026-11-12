@@ -8,8 +8,6 @@ export interface DoadorResponse {
   id: number;
   nome: string;
   email: string;
-  cpf: string;
-  telefone?: string | null;
   cidade?: string | null;
   cep?: string | null;
   tipo_sanguineo?: string | null;
@@ -18,7 +16,7 @@ export interface DoadorResponse {
 
 export interface AuthResponse {
   accessToken: string;
-  refreshToken: string;
+  refreshToken?: string;
   expiresIn: string;
   doador: DoadorResponse;
 }

@@ -3,6 +3,8 @@ import { Image, ScrollView, StatusBar, Text, TouchableOpacity, View, Alert } fro
 import { NavigationProp, ParamListBase, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
+import { getUser, setUser } from '../../services/session';
 import { QUIZ_MODULES, type FormGender, type QuizModule } from '../app/QuizFlow/quizData';
 import styles from './StylesEligibily';
 import { api } from '../../services/api';
@@ -135,7 +137,7 @@ export default function EligibilityFormsScreen() {
             async function loadData() {
                 try {
                     // 1. Carrega gênero do cache local e pega o ID do usuário
-                    const userData = await AsyncStorage.getItem('@doemais:user');
+                    const userData = await getUser();
                     let userId = '';
                     if (userData) {
                         const parsedUser = JSON.parse(userData);
@@ -147,7 +149,7 @@ export default function EligibilityFormsScreen() {
                     }
 
                     // 2. Carrega histórico local escopado pelo ID do usuário
-                    if (userId) {
+                    if (userId && Platform.OS !== 'web') {
                         const key = `@doemais:quiz_history:${userId}`;
                         const historyRaw = await AsyncStorage.getItem(key);
                         if (historyRaw) {
@@ -174,9 +176,9 @@ export default function EligibilityFormsScreen() {
                             if (userData) {
                                 const parsedUser = JSON.parse(userData);
                                 parsedUser.genero = userDataApi.genero;
-                                await AsyncStorage.setItem('@doemais:user', JSON.stringify(parsedUser));
+                                await setUser(parsedUser);
                             } else {
-                                await AsyncStorage.setItem('@doemais:user', JSON.stringify(userDataApi));
+                                await setUser(userDataApi);
                             }
                         }
                     }
