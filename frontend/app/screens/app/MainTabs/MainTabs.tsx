@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import HomeScreen from '../HomeScreen';
 import EligibilityFormsScreen from '../../onboarding/EligibilityFormsScreen';
 import VirtualCardScreen from '../VirtualCardScreen';
+import ProfileMenuScreen from '../ProfileMenuScreen';
 import { QUIZ_MODULES, type FormGender } from '../QuizFlow/quizData';
 import { api } from '../../../services/api';
 import styles from './Styles';
@@ -48,6 +49,7 @@ function TabIcon({ routeName, focused, color, size, cardUnlocked }: TabIconProps
     if (routeName === 'Início') iconName = focused ? 'home' : 'home-outline';
     if (routeName === 'Elegibilidade') iconName = focused ? 'clipboard' : 'clipboard-outline';
     if (routeName === 'Carteirinha') iconName = isLockedCard ? 'lock-closed-outline' : focused ? 'card' : 'card-outline';
+    if (routeName === 'Mais') iconName = focused ? 'person' : 'person-outline';
 
     const iconColor = isLockedCard ? '#A8A29A' : focused ? '#FFF' : color;
     const animatedStyle = {
@@ -144,6 +146,7 @@ export default function MainTabs() {
             <Tab.Screen name="Início" component={HomeScreen} />
             <Tab.Screen name="Elegibilidade" component={EligibilityFormsScreen} />
             <Tab.Screen name="Carteirinha" component={VirtualCardScreen} />
+            <Tab.Screen name="Mais" component={ProfileMenuScreen} />
         </Tab.Navigator>
     );
 }
