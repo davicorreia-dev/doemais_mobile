@@ -308,9 +308,12 @@ export default function EligibilityFormsScreen() {
                         });
 
                         return (
-                            <View key={module.id} style={styles.formItem}>
+                            <View
+                                key={module.id}
+                                style={[styles.card, { backgroundColor: cardBg, borderColor: cardBorderColor, borderWidth: cardBorderColor !== 'transparent' ? 1 : 0 }]}
+                            >
                                 <TouchableOpacity
-                                    style={[styles.card, { backgroundColor: cardBg, borderColor: cardBorderColor, borderWidth: cardBorderColor !== 'transparent' ? 1 : 0 }]}
+                                    style={styles.cardMainAction}
                                     activeOpacity={0.85}
                                     onPress={handlePress}
                                 >
