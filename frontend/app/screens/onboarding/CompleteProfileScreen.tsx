@@ -62,7 +62,6 @@ export default function CompleteProfileScreen() {
 
     const handleFinish = async () => {
         const date = parseBirthDate(birthDate);
-        console.log("Botão clicado. Estado atual:", { birthDate, gender, weight });
 
         //Campos Vazios
         if (!birthDate || !gender || !weight) {
@@ -126,16 +125,12 @@ export default function CompleteProfileScreen() {
                 tipo_sanguineo: unknownBlood ? 'NDA' : selectedBlood
             };
 
-            console.log("Enviando dados:", payload);
-
             await api('/api/auth/register', 'POST', payload);
 
             Alert.alert("Sucesso", "Conta criada com sucesso!");
             navigation.navigate("RegisterSuccessScreen");
 
         } catch (error: any) {
-            console.error(error);
-
             const errorMessage = error.message ?? '';
             if (/data de nascimento|doador deve ter/i.test(errorMessage)) {
                 setBirthDateError(errorMessage);

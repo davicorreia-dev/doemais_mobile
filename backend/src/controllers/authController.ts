@@ -9,6 +9,24 @@ import {
   confirmPasswordReset,
 } from '../services/authService';
 import ApiResponseHandler from '../utils/response';
+import env from '../config/environment';
+
+const REFRESH_COOKIE = 'doemais_refresh';
+const refreshCookieOptions = {
+  httpOnly: true,
+  secure: env.NODE_ENV === 'production',
+  sameSite: 'lax' as const,
+  path: '/api/auth',
+  maxAge: Number(env.REFRESH_TOKEN_EXPIRATION_DAYS) * 24 * 60 * 60 * 1000,
+};
+const isWebClient = (req: Request) => req.get('x-client-platform') === 'web';
+
+function formatAuthResult(req: Request, res: Response, result: Awaited<ReturnType<typeof loginDoador>>) {
+  if (!isWebClient(req)) return result;
+  if (result.refreshToken) res.cookie(REFRESH_COOKIE, result.refreshToken, refreshCookieOptions);
+  const { refreshToken: _refreshToken, ...webResult } = result;
+  return webResult;
+}
 
 /**
  * Registra um novo doador
@@ -27,7 +45,7 @@ export const register = async (
     ApiResponseHandler.success(
       res,
       'Doador registrado com sucesso.',
-      result,
+      formatAuthResult(req, res, result),
       201
     );
   } catch (error) {
@@ -52,7 +70,7 @@ export const login = async (
     ApiResponseHandler.success(
       res,
       'Login realizado com sucesso.',
-      result,
+      formatAuthResult(req, res, result),
       200
     );
   } catch (error) {
@@ -71,8 +89,8 @@ export const refresh = async (
   next: NextFunction
 ) => {
   try {
-    const tokenData: RefreshTokenDto = req.body;
-    const result = await refreshAccessToken(tokenData);
+    const refreshToken = req.body?.refreshToken || req.cookies?.[REFRESH_COOKIE];
+    const result = await refreshAccessToken({ refreshToken });
 
     ApiResponseHandler.success(
       res,
@@ -96,8 +114,9 @@ export const logoutUser = async (
   next: NextFunction
 ) => {
   try {
-    const tokenData: RefreshTokenDto = req.body;
-    const result = await logout(tokenData);
+    const refreshToken = req.body?.refreshToken || req.cookies?.[REFRESH_COOKIE];
+    const result = await logout({ refreshToken });
+    if (isWebClient(req)) res.clearCookie(REFRESH_COOKIE, refreshCookieOptions);
 
     ApiResponseHandler.success(
       res,

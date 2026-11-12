@@ -1,7 +1,6 @@
 import { Image, Platform, ScrollView, Text, View, Alert, KeyboardAvoidingView } from "react-native";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFonts, Lexend_100Thin, Lexend_200ExtraLight, Lexend_300Light, Lexend_400Regular, Lexend_500Medium, Lexend_600SemiBold, Lexend_700Bold } from "@expo-google-fonts/lexend";
 
 import Header from "../../../components/Header";
@@ -17,6 +16,7 @@ import z from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useKeyboardBehavior } from "../../hooks/useKeyboardBehavior";
+import { setSession } from '../../services/session';
 
 const loginSchema = z.object({
     email: z.string().min(1, "O e-mail é obrigatório.").email("E-mail inválido"),
@@ -69,18 +69,12 @@ export default function LoginScreen() {
         setLoading(true);
 
         try {
-            console.log("Tentando logar com:", payload);
-
             const response = await api('/api/auth/login', 'POST', payload);
             const responseData = response.data || response;
             const parsedResponse = loginResponseSchema.parse(responseData);
 
             if (parsedResponse.accessToken) {
-                await AsyncStorage.setItem('@doemais:token', parsedResponse.accessToken);
-                await AsyncStorage.setItem('@doemais:user', JSON.stringify(parsedResponse.doador));
-                if (parsedResponse.refreshToken) {
-                    await AsyncStorage.setItem('@doemais:refreshToken', parsedResponse.refreshToken);
-                }
+                await setSession(parsedResponse.accessToken, parsedResponse.doador, parsedResponse.refreshToken);
 
                 navigation.reset({
                     index: 0,
@@ -91,7 +85,6 @@ export default function LoginScreen() {
             }
 
         } catch (error: any) {
-            console.error("Erro Login:", error);
             const msg = error.message.includes('401') || error.message.includes('404')
                 ? 'E-mail ou senha incorretos.'
                 : error.message;

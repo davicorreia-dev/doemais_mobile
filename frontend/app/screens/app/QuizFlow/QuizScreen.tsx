@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, Image, Modal, ScrollView, StatusBar, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
+import { Alert, Image, Modal, Platform, ScrollView, StatusBar, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NavigationProp, ParamListBase, useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUser } from '../../../services/session';
 
 const saveModuleResult = async (moduleId: string, status: 'approved' | 'blocked') => {
+    // Triagem é dado sensível: não mantemos histórico local no navegador.
+    if (Platform.OS === 'web') return;
     try {
-        const userRaw = await AsyncStorage.getItem('@doemais:user');
+        const userRaw = await getUser();
         if (!userRaw) return;
         const user = JSON.parse(userRaw);
         const userId = user.id;
@@ -21,7 +24,7 @@ const saveModuleResult = async (moduleId: string, status: 'approved' | 'blocked'
         };
         await AsyncStorage.setItem(key, JSON.stringify(history));
     } catch (e) {
-        console.error("Erro ao salvar histórico do quiz no AsyncStorage:", e);
+        // O histórico é opcional e nenhuma resposta sensível é registrada em log.
     }
 };
 
@@ -124,8 +127,6 @@ export default function QuizScreen() {
 
    // Nova função auxiliar: Apenas traduz e envia
     const submitAnswersToAPI = async (finalAnswers: Record<string, any>) => {
-        console.log("🛠️ RESPOSTAS BRUTAS COM OS IDs REAIS:", finalAnswers);
-
         // O nosso Avaliador Inteligente:
         const evaluate = (...keys: string[]) => {
             const values = keys.map(k => finalAnswers[k]).filter(v => v !== undefined);
@@ -152,11 +153,10 @@ export default function QuizScreen() {
         );
 
         if (Object.keys(payloadLimpo).length > 0) {
-            console.log("Enviando JSON para o banco:", payloadLimpo);
             try {
                 await api('/api/doadores/elegibilidade', 'POST', payloadLimpo);
             } catch (err) {
-                 console.error("Erro na API de elegibilidade:", err);
+                 throw err;
             }
         }
     };
@@ -174,7 +174,6 @@ export default function QuizScreen() {
                 { text: 'OK', onPress: () => navigation.goBack() },
             ]);
         } catch (error) {
-            console.error("Erro ao salvar triagem:", error);
             Alert.alert("Erro", "Ocorreu um erro ao salvar o questionário. Tente novamente.");
         } finally {
             setIsSubmitting(false);
@@ -196,7 +195,7 @@ export default function QuizScreen() {
         setBlockMessage(message || module.blockMessage);
         
         // Grava o bloqueio localmente no AsyncStorage
-        saveModuleResult(module.id, 'blocked').catch(e => console.error(e));
+        saveModuleResult(module.id, 'blocked').catch(() => undefined);
     };
 
     const validateQuestion = (answer: boolean | string | number | null) => {
@@ -269,7 +268,7 @@ export default function QuizScreen() {
         // Se a resposta for ELIMINATÓRIA:
         if (result.blocked) {
             // Mandamos para o banco em "background" para registrar a falha
-            submitAnswersToAPI(newAnswers).catch(e => console.error("Erro ao registrar bloqueio:", e));
+            submitAnswersToAPI(newAnswers).catch(() => undefined);
             // E exibimos a tela de bloqueio
             openBlock(result.message);
             return;

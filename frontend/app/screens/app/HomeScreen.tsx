@@ -5,6 +5,7 @@ import Styles from './StylesHome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { api } from '../../services/api';
+import { clearSession, getRefreshToken } from '../../services/session';
 
 interface NewsItem {
     id: string;
@@ -236,18 +237,14 @@ export default function HomeScreen() {
 
     const handleLogout = async () => {
         try {
-            const refreshToken = await AsyncStorage.getItem('@doemais:refreshToken');
-            if (refreshToken) {
-                // Invalida o token no backend
-                await api('/api/auth/logout', 'POST', { refreshToken });
-            }
+            const refreshToken = await getRefreshToken();
+            // No navegador, o refresh token segue no cookie HttpOnly; no app, vai no corpo.
+            await api('/api/auth/logout', 'POST', refreshToken ? { refreshToken } : undefined);
         } catch (error) {
-            console.error("Erro ao fazer logout no servidor:", error);
+            // A limpeza local continua mesmo se o logout remoto não responder.
         } finally {
             // Limpa tudo localmente independentemente do sucesso da API
-            await AsyncStorage.removeItem('@doemais:token');
-            await AsyncStorage.removeItem('@doemais:refreshToken');
-            await AsyncStorage.removeItem('@doemais:user');
+            await clearSession();
 
             navigation.reset({
                 index: 0,

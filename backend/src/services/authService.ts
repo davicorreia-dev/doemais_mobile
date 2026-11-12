@@ -27,12 +27,7 @@ export const registerDoador = async (
   });
 
   if (existingDoador) {
-    if (existingDoador.email === email) {
-      throw new ConflictError('Este e-mail já está registrado.');
-    }
-    if (existingDoador.cpf === cpf) {
-      throw new ConflictError('Este CPF já está registrado.');
-    }
+    throw new ConflictError('Não foi possível concluir o cadastro com estes dados.');
   }
 
   const hashedPassword = await hashPassword(senha);
@@ -48,8 +43,6 @@ export const registerDoador = async (
       id: true,
       nome: true,
       email: true,
-      cpf: true,
-      telefone: true,
       cidade: true,
       cep: true,
       tipo_sanguineo: true,
@@ -144,8 +137,6 @@ export const loginDoador = async (
     id: doador.id,
     nome: doador.nome,
     email: doador.email,
-    cpf: doador.cpf,
-    telefone: doador.telefone,
     cidade: doador.cidade,
     cep: doador.cep,
     tipo_sanguineo: doador.tipo_sanguineo,
