@@ -1,4 +1,5 @@
 import prisma from '../config/prisma';
+import { Prisma } from '@prisma/client';
 import { BadRequestError, UnauthorizedError } from '../utils/errors';
 
 const changes = (before: Record<string, unknown>, after: Record<string, unknown>) =>
@@ -12,7 +13,7 @@ export const create = async (doadorId: number, data: any) => {
 export const finish = async (doadorId: number, id: number, answers: Record<string, unknown>) => {
   const request = await prisma.solicitacao_Correcao.findFirst({ where: { id, doador_id: doadorId, status: 'PENDING_REVIEW' } });
   if (!request) throw new UnauthorizedError('Solicitação de correção não encontrada.');
-  return prisma.solicitacao_Correcao.update({ where: { id }, data: { respostas_corrigidas: answers, perguntas_alteradas: changes(request.respostas_originais as Record<string, unknown>, answers) } });
+  return prisma.solicitacao_Correcao.update({ where: { id }, data: { respostas_corrigidas: answers as Prisma.InputJsonObject, perguntas_alteradas: changes(request.respostas_originais as Record<string, unknown>, answers) } });
 };
 export const latestForDoador = (doadorId: number) => prisma.solicitacao_Correcao.findMany({ where: { doador_id: doadorId }, orderBy: { criado_em: 'desc' } });
 export const pendingForIntegration = async () => {
