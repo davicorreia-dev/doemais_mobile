@@ -30,6 +30,8 @@ export const CONSTANTS = {
     '/api/auth/login',
     '/api/auth/refresh',
     '/api/auth/logout',
+    '/api/auth/password-reset/request',
+    '/api/auth/password-reset/confirm',
     '/health',
     '/api/docs',
   ],

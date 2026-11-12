@@ -102,9 +102,10 @@ export default function RegisterScreen() {
 
 
     const onSubmit = (data: RegisterFormData) => {
+        const email = data.email.trim().toLowerCase();
         const payload = {
             nome: data.name.trim(),
-            email: data.email.trim().toLowerCase(),
+            email,
             cpf: data.cpf.replace(/\D/g, ''),
             senha: data.password,
             telefone: data.phone ? data.phone.replace(/\D/g, '') : ''

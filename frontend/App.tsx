@@ -13,6 +13,7 @@ import ForgotPasswordCodeScreen from './app/screens/auth/ForgotPasswordCodeScree
 import ForgetPasswordScreen from './app/screens/auth/ForgetPasswordScreen';
 import ForgetPasswordChoiceScreen from './app/screens/auth/ForgetPasswordChoiceScreen';
 import NewPasswordScreen from './app/screens/auth/NewPasswordScreen';
+import ResetPasswordScreen from './app/screens/auth/ResetPasswordScreen';
 import PasswordResetSuccessScreen from './app/screens/auth/PasswordResetSuccessScreen';
 import LgpdScreen from './app/screens/onboarding/LgpdScreen';
 import RegisterSuccessScreen from './app/screens/auth/RegisterSuccessScreen';
@@ -32,10 +33,22 @@ import ProfileSetupPhotoScreen from './app/screens/Settings/ProfileSetupPhotoScr
 
 const Stack = createNativeStackNavigator();
 
+const linking: any = {
+  prefixes: [],
+  config: {
+    screens: {
+      AuthChoice: '',
+      Login: 'login',
+      ForgetPasswordScreen: 'forgot-password',
+      ResetPasswordScreen: 'password-reset',
+    },
+  },
+};
+
 export default function App() {
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
+      <NavigationContainer linking={linking}>
       <StatusBar style="auto" />
 
       {/* AuthChoice tela padrão   */}
@@ -51,6 +64,7 @@ export default function App() {
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordCodeScreen} />
         <Stack.Screen name="ForgetPasswordChoiceScreen" component={ForgetPasswordChoiceScreen} />
         <Stack.Screen name="NewPasswordScreen" component={NewPasswordScreen} />
+        <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
         <Stack.Screen name="PasswordResetSuccessScreen" component={PasswordResetSuccessScreen} />
         <Stack.Screen name="LgpdScreen" component={LgpdScreen} />
         <Stack.Screen name="CompleteProfileScreen" component={CompleteProfileScreen} />
