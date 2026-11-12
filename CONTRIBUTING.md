@@ -12,6 +12,13 @@ Este documento estabelece as regras formais para contribuições no projeto **Do
 
 ---
 
+## 🛠️ Ambiente de Desenvolvimento
+
+Suba tudo com Docker usando `./run.sh --local` (ou `--render` para a API publicada). Instruções,
+solução de problemas e notas do Expo SDK 58 estão no [README](README.md).
+
+---
+
 ## 🔄 Fluxo Oficial de Contribuição
 
 1. Criar branch a partir da `main`

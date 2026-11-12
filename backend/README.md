@@ -46,8 +46,11 @@ A estrutura do projeto é modular e segue o princípio da separação de respons
 
 ## 3. Guia de Instalação e Execução
 
+> **Atalho:** na raiz do repositório, `./run.sh --local` sobe banco + backend + app com Docker
+> (veja o [README principal](../README.md)). O guia abaixo é para rodar o backend sem Docker.
+
 ### 3.1. Pré-requisitos
-- Node.js (versão 18.x ou superior)  
+- Node.js (versão 22.x ou superior)  
 - npm  
 - PostgreSQL  
 - Git  
@@ -87,6 +90,21 @@ npx prisma migrate deploy
 
 Isso aplicará as migrations existentes no banco de dados. Se ainda não tiver criado o banco, use `npx prisma migrate dev --name init` apenas no ambiente de desenvolvimento local.
 
+**Variáveis de ambiente**
+
+| Variável | Obrigatória | Padrão | Descrição |
+|---|---|---|---|
+| `DATABASE_URL` | sim | – | Conexão PostgreSQL |
+| `ACCESS_TOKEN_SECRET` | sim | – | Segredo de assinatura do JWT (longo e aleatório, ex.: `openssl rand -hex 32`). Nunca commitar |
+| `ACCESS_TOKEN_EXPIRATION_SECONDS` | não | `7d` | Validade do access token (segundos ou formato `15m`, `1h`, `7d`) |
+| `REFRESH_TOKEN_EXPIRATION_DAYS` | não | `7` | Validade do refresh token |
+| `PORT` | não | `3000` | Porta da API |
+| `NODE_ENV` | não | `development` | Em `production`, o link de reset de senha **não** é logado |
+| `CORS_ORIGIN` | não | `http://localhost:3001` | Origem(ns) extra(s) permitida(s) no CORS; várias separadas por vírgula |
+| `FRONTEND_URL` | não | `http://localhost:8081` | Base do link de redefinição de senha |
+
+Origens `localhost` em 3000, 3001, 8080, 8081 e 8082 (e `127.0.0.1` em 8081/8082) já são liberadas.
+
 ### 3.3. Execução da Aplicação
 
 Para iniciar o servidor em modo de desenvolvimento com recarregamento automático:
@@ -106,11 +124,19 @@ O servidor estará disponível em: `http://localhost:3000`
 
 O projeto adota a filosofia **"Secure by Default"** para garantir que nenhuma rota sensível seja exposta por esquecimento.
 
+### 4.0. Tokens (resumo)
+- **Access token:** JWT assinado com `ACCESS_TOKEN_SECRET` (HS256), payload `{ doadorId }`, validade em `ACCESS_TOKEN_EXPIRATION_SECONDS`.
+- **Refresh token:** string aleatória de 64 bytes, salva na tabela `RefreshToken`; `/refresh` emite novo access token;
+  logout e troca de senha apagam os refresh tokens.
+- O logout não invalida um access token já emitido (JWT é stateless): ele vale até expirar.
+  Por isso prefira validades curtas (15 min a 1 h) em produção.
+- Tokens de ambientes diferentes (local x Render) não se misturam porque os segredos são diferentes.
+
 ### 4.1. Middleware de Autenticação
 Diferente da abordagem tradicional de aplicar middlewares em cada rota, o `authMiddleware` é injetado globalmente no `app.ts`. 
 
 - **Rotas Protegidas:** Por padrão, todas as rotas da API exigem um header `Authorization: Bearer <token>`.
-- **Rotas Públicas:** Apenas os endpoints de `/api/auth` (login, register, refresh, logout) são adicionados à lista de exceções no `app.ts`.
+- **Rotas Públicas:** Apenas os endpoints de `/api/auth` (login, register, refresh, logout, password-reset) são adicionados à lista de exceções no `app.ts`.
 - **Injeção de Contexto:** Tokens válidos decodificam o `doadorId` e o injetam diretamente no objeto `req`. Isso permite que qualquer controlador acesse o ID do usuário logado via `req.doadorId`.
 
 ---
@@ -122,6 +148,10 @@ Diferente da abordagem tradicional de aplicar middlewares em cada rota, o `authM
 - `POST /api/auth/login`: Autentica e gera os tokens de acesso.
 - `POST /api/auth/refresh`: Renova o `accessToken` expirado.
 - `POST /api/auth/logout`: Encerra a sessão e revoga o `refreshToken`.
+- `POST /api/auth/password-reset/request`: Pede a redefinição de senha. Resposta idêntica para e-mails existentes e inexistentes (não revela quem tem conta).
+- `POST /api/auth/password-reset/confirm`: Troca a senha com o token recebido (token de uso único, validade de 1 h, guardado só como hash SHA-256). Revoga todos os refresh tokens do usuário.
+
+> Sem integração de e-mail ainda: fora de `production`, o link de reset é impresso no log do backend.
 
 ### **Protegidos (Usuário)**
 - `GET /api/doadores/me`: Retorna o perfil completo do doador autenticado (excluindo dados sensíveis como senha).
