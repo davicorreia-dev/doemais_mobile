@@ -44,7 +44,7 @@ export default function ProfileSetupPhotoScreen({ navigation }: any) {
     async function handleNext() {
         try {
             if (image) await AsyncStorage.setItem('@profile_image', image);
-            navigation.navigate('MainTabs', { image });
+            navigation.goBack();
         } catch {
             Alert.alert('Erro', 'Não foi possível salvar a imagem neste navegador.');
         }
