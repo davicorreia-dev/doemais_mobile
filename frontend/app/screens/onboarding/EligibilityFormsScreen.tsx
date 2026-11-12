@@ -164,7 +164,7 @@ export default function EligibilityFormsScreen() {
                     const [profileResponse, formResponse, triageResponse] = await Promise.all([
                         api('/api/doadores/me', 'GET').catch(() => null),
                         api('/api/doadores/elegibilidade', 'GET').catch(() => null),
-                        api('/api/doadores/triagens/atual', 'GET').catch(() => null)
+                        api('/api/doadores/triagens/atual', 'GET', undefined, false, true).catch(() => null)
                     ]);
 
                     if (profileResponse) {
@@ -196,6 +196,7 @@ export default function EligibilityFormsScreen() {
                             Object.entries(latestTriages).map(([moduleId, result]: [string, any]) => [moduleId, {
                                 status: result.status,
                                 date: new Date(result.data_preenchimento).getTime(),
+                                answers: result.respostas || {},
                             }])
                         );
                         setLocalHistory((current: any) => ({ ...current, ...persistedHistory }));
@@ -279,10 +280,15 @@ export default function EligibilityFormsScreen() {
                         }
 
                         const handlePress = () => {
+                            const requestCorrection = () => navigation.navigate('QuizScreen', {
+                                moduleId: module.id,
+                                correction: { originalAnswers: localHistory?.[module.id]?.answers || {} },
+                            });
                             if (stateInfo.status === 'blocked') {
                                 Alert.alert(
                                     "Aguarde o prazo",
-                                    `Você foi classificado como inapto nesta triagem.\n\nMotivo: ${stateInfo.message || 'Período de segurança ativo.'}`
+                                    `Você foi classificado como inapto nesta triagem.\n\nMotivo: ${stateInfo.message || 'Período de segurança ativo.'}`,
+                                    [{ text: 'Voltar', style: 'cancel' }, { text: 'Corrigir respostas', onPress: requestCorrection }]
                                 );
                                 return;
                             }
@@ -292,7 +298,7 @@ export default function EligibilityFormsScreen() {
                                     "Você já foi aprovado nesta triagem recente. Deseja refazer as respostas?",
                                     [
                                         { text: "Voltar", style: "cancel" },
-                                        { text: "Refazer", onPress: () => navigation.navigate('QuizScreen', { moduleId: module.id }) }
+                                        { text: "Corrigir respostas", onPress: requestCorrection }
                                     ]
                                 );
                                 return;

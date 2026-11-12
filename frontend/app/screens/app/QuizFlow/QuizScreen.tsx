@@ -22,6 +22,7 @@ const saveModuleResult = async (
         history[moduleId] = {
             status,
             date: Date.now(),
+            answers,
         };
         await AsyncStorage.setItem(key, JSON.stringify(history));
 
@@ -74,6 +75,7 @@ import { clamp, topInset } from '../../../utils/responsive';
 
 type RouteParams = {
     moduleId?: string;
+    correction?: { originalAnswers: Record<string, unknown> };
 };
 
 function getBlockMessage(question: QuizQuestion, fallback: string) {
@@ -92,7 +94,7 @@ export default function QuizScreen() {
     const circleSize = clamp(winWidth * 0.32, 96, 140);
     const navSize = clamp(winWidth * 0.14, 44, 60);
     const route = useRoute();
-    const { moduleId } = (route.params as RouteParams | undefined) ?? {};
+    const { moduleId, correction } = (route.params as RouteParams | undefined) ?? {};
 
     const module = useMemo(() => {
         if (!moduleId) {
@@ -106,6 +108,11 @@ export default function QuizScreen() {
     const [inputValue, setInputValue] = useState('');
     const [blockVisible, setBlockVisible] = useState(false);
     const [blockMessage, setBlockMessage] = useState('');
+    const [successVisible, setSuccessVisible] = useState(false);
+    const [correctionVisible, setCorrectionVisible] = useState(Boolean(correction));
+    const [correctionReason, setCorrectionReason] = useState('');
+    const [correctionComment, setCorrectionComment] = useState('');
+    const [correctionId, setCorrectionId] = useState<number | null>(null);
     const [selectExpanded, setSelectExpanded] = useState(false);
     const [selectedMonthLabel, setSelectedMonthLabel] = useState('');
     
@@ -184,6 +191,9 @@ export default function QuizScreen() {
             
             // Grava a aprovação localmente no AsyncStorage
             await saveModuleResult(module.id, 'approved', finalAnswers);
+            if (correctionId) {
+                await api(`/api/doadores/correcoes/${correctionId}/finalizar`, 'PATCH', { respostas_corrigidas: finalAnswers });
+            }
             
             const isFinalTriage = module.id === 'TRIAGEM_HOMEM' || module.id === 'TRIAGEM_MULHER';
             // No web, Alert pode não executar o callback do botão como no app nativo.
@@ -193,12 +203,7 @@ export default function QuizScreen() {
                 return;
             }
 
-            Alert.alert(module.successTitle, module.successMessage, [
-                {
-                    text: 'OK',
-                    onPress: () => navigation.goBack(),
-                },
-            ]);
+            setSuccessVisible(true);
         } catch (error) {
             console.error("Erro ao salvar triagem:", error);
             Alert.alert("Erro", "Ocorreu um erro ao salvar o questionário. Tente novamente.");
@@ -210,11 +215,37 @@ export default function QuizScreen() {
     const exitToMenu = () => {
         setBlockVisible(false);
         setBlockMessage('');
+        setSuccessVisible(false);
         setQuestionIndex(0);
         setInputValue('');
         setSelectedMonthLabel('');
         setAnswers({}); // Limpa as respostas ao sair
         navigation.goBack();
+    };
+
+    const exitAfterSuccess = () => {
+        setSuccessVisible(false);
+        navigation.goBack();
+    };
+
+    const beginCorrection = async () => {
+        if (!correctionReason) {
+            Alert.alert('Informe o motivo', 'Selecione o motivo da correção antes de continuar.');
+            return;
+        }
+        try {
+            const response = await api('/api/doadores/correcoes', 'POST', {
+                modulo: module.id,
+                motivo: correctionReason,
+                comentario: correctionComment.trim() || undefined,
+                respostas_originais: correction?.originalAnswers || {},
+            });
+            const request = response.data || response;
+            setCorrectionId(request.id);
+            setCorrectionVisible(false);
+        } catch (error: any) {
+            Alert.alert('Erro', error.message || 'Não foi possível iniciar a correção.');
+        }
     };
 
     const openBlock = (message: string, finalAnswers: Record<string, unknown>) => {
@@ -223,6 +254,10 @@ export default function QuizScreen() {
         
         // Grava o bloqueio localmente no AsyncStorage
         saveModuleResult(module.id, 'blocked', finalAnswers).catch(e => console.error(e));
+        if (correctionId) {
+            api(`/api/doadores/correcoes/${correctionId}/finalizar`, 'PATCH', { respostas_corrigidas: finalAnswers })
+                .catch((error) => console.error('Erro ao finalizar correção:', error));
+        }
     };
 
     const validateQuestion = (answer: boolean | string | number | null) => {
@@ -517,6 +552,31 @@ export default function QuizScreen() {
                         <Text style={Styles.modalTitle}>{module.blockTitle}</Text>
                         <Text style={Styles.modalMessage}>{blockMessage || module.blockMessage}</Text>
                         <Button title="Voltar ao menu" textColor="#FFF" width="100%" onPress={exitToMenu} />
+                    </View>
+                </View>
+            </Modal>
+
+            <Modal visible={successVisible} transparent animationType="fade" onRequestClose={exitAfterSuccess}>
+                <View style={Styles.modalBackdrop}>
+                    <View style={Styles.modalCard}>
+                        <Ionicons name="checkmark-circle-outline" size={60} color="#2E7D32" />
+                        <Text style={Styles.modalTitle}>{module.successTitle}</Text>
+                        <Text style={Styles.modalMessage}>{module.successMessage}</Text>
+                        <Button title="Voltar aos formulários" textColor="#FFF" width="100%" onPress={exitAfterSuccess} />
+                    </View>
+                </View>
+            </Modal>
+
+            <Modal visible={correctionVisible} transparent animationType="fade" onRequestClose={() => navigation.goBack()}>
+                <View style={Styles.modalBackdrop}>
+                    <View style={Styles.modalCard}>
+                        <Ionicons name="create-outline" size={52} color="#E0323C" />
+                        <Text style={Styles.modalTitle}>Corrigir respostas</Text>
+                        <Text style={Styles.modalMessage}>Informe o motivo antes de refazer. O hemocentro poderá comparar as respostas.</Text>
+                        <TouchableOpacity style={Styles.choiceButton} onPress={() => setCorrectionReason('Resposta marcada incorretamente')}><Text style={Styles.choiceButtonText}>Marquei uma resposta incorreta</Text></TouchableOpacity>
+                        <TouchableOpacity style={Styles.choiceButton} onPress={() => setCorrectionReason('Informação mudou')}><Text style={Styles.choiceButtonText}>Minha informação mudou</Text></TouchableOpacity>
+                        <Input label="Comentário (opcional)" value={correctionComment} onChangeText={setCorrectionComment} placeholder="Explique brevemente" />
+                        <Button title="Refazer formulário" textColor="#FFF" width="100%" onPress={beginCorrection} />
                     </View>
                 </View>
             </Modal>

@@ -310,3 +310,28 @@ export class CreateTriagemResultadoDto {
   @IsObject({ message: 'As respostas da triagem são inválidas.' })
   respostas!: Record<string, unknown>;
 }
+
+export class CreateSolicitacaoCorrecaoDto {
+  @IsString() @IsNotEmpty() @MaxLength(80)
+  modulo!: string;
+  @IsString() @IsNotEmpty() @MaxLength(100)
+  motivo!: string;
+  @IsOptional() @IsString() @MaxLength(500)
+  comentario?: string;
+  @IsObject()
+  respostas_originais!: Record<string, unknown>;
+}
+
+export class FinalizarSolicitacaoCorrecaoDto {
+  @IsObject()
+  respostas_corrigidas!: Record<string, unknown>;
+}
+
+export class ResolverSolicitacaoCorrecaoDto {
+  @IsIn(['APPROVED', 'REJECTED'])
+  status!: 'APPROVED' | 'REJECTED';
+  @IsString() @IsNotEmpty() @MaxLength(100)
+  responsavel!: string;
+  @IsOptional() @IsString() @MaxLength(500)
+  observacao?: string;
+}
