@@ -133,6 +133,29 @@ export class RefreshTokenDto {
   refreshToken!: string;
 }
 
+export class PasswordResetRequestDto {
+  @IsEmail({}, { message: 'O e-mail informado não é válido.' })
+  @IsNotEmpty({ message: 'O e-mail é obrigatório.' })
+  @Transform(({ value }) => value?.toLowerCase().trim())
+  email!: string;
+}
+
+export class PasswordResetConfirmDto {
+  @IsString({ message: 'O link de redefinição é inválido.' })
+  @IsNotEmpty({ message: 'O link de redefinição é obrigatório.' })
+  @MinLength(32, { message: 'O link de redefinição é inválido.' })
+  token!: string;
+
+  @IsString({ message: 'A senha deve ser uma string.' })
+  @IsNotEmpty({ message: 'A senha é obrigatória.' })
+  @MinLength(8, { message: 'A senha deve ter no mínimo 8 caracteres.' })
+  @MaxLength(128, { message: 'A senha deve ter no máximo 128 caracteres.' })
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/, {
+    message: 'A senha deve conter letra maiúscula, minúscula, número e caractere especial.',
+  })
+  senha!: string;
+}
+
 /**
  * DTO para atualização de perfil de doador
  * Todos os campos são opcionais pois é para atualização parcial

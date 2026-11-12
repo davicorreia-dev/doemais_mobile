@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, Modal, TextInput } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, KeyboardAvoidingView, Modal, TextInput } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
-import DateTimePicker from '@react-native-community/datetimepicker';
 
 import Header from '../../../components/Header';
 import Input from '../../../components/Input';
@@ -13,6 +12,7 @@ import { api } from '../../services/api';
 import { isValidAge, isValidWeight } from '../../utils/validators';
 import { mapRegisterServerError } from '../../utils/registerErrors';
 import { useKeyboardBehavior } from '../../hooks/useKeyboardBehavior';
+import DateOfBirthInput from '../../../components/DateOfBirthInput/DateOfBirthInput';
 
 const BLOOD_TYPES = ['A+', 'O+', 'B+', 'AB+', 'A-', 'O-', 'B-', 'AB-'];
 
@@ -24,9 +24,8 @@ export default function CompleteProfileScreen() {
     //Recebe os dados da RegisterScreen 
     const { basicData } = (route.params as any) || {};
 
-    const [date, setDate] = useState(new Date());
-    const [dobLabel, setDobLabel] = useState('');
-    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [birthDate, setBirthDate] = useState('');
+    const [birthDateError, setBirthDateError] = useState('');
 
     const [weight, setWeight] = useState('');
     const [selectedBlood, setSelectedBlood] = useState<string | null>(null);
@@ -38,17 +37,11 @@ export default function CompleteProfileScreen() {
     //Estado para controlar o carregamento da requisição
     const [loading, setLoading] = useState(false);
 
-    const onChangeDate = (event: any, selectedDate?: Date) => {
-        setShowDatePicker(false);
-        if (event.type === 'dismissed' || !selectedDate) {
-            return;
-        }
-        if (selectedDate) {
-            setDate(selectedDate);
-            const formattedDate = selectedDate.toLocaleDateString('pt-BR');
-            setDobLabel(formattedDate);
-            console.log("Data Mobile selecionada:", formattedDate);
-        }
+    const parseBirthDate = (value: string): Date | null => {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+        const [year, month, day] = value.split('-').map(Number);
+        const parsed = new Date(year, month - 1, day);
+        return parsed.getFullYear() === year && parsed.getMonth() === month - 1 && parsed.getDate() === day ? parsed : null;
     };
 
     const handleSelectBlood = (type: string) => {
@@ -68,10 +61,12 @@ export default function CompleteProfileScreen() {
 
 
     const handleFinish = async () => {
-        console.log("Botão clicado. Estado atual:", { dobLabel, date, gender, weight });
+        const date = parseBirthDate(birthDate);
+        console.log("Botão clicado. Estado atual:", { birthDate, gender, weight });
 
         //Campos Vazios
-        if (!dobLabel || !gender || !weight) {
+        if (!birthDate || !gender || !weight) {
+            if (!birthDate) setBirthDateError('Informe sua data de nascimento.');
             Alert.alert("Atenção", "Preencha os campos obrigatórios (Data, Gênero, Peso).");
             return;
         }
@@ -120,10 +115,7 @@ export default function CompleteProfileScreen() {
 
             // Ajuste de Fuso Horário (Timezone):
             // Extraímos o ano, mês e dia locais exatos que o usuário escolheu e montamos a string ISO.
-            const localYear = date.getFullYear();
-            const localMonth = String(date.getMonth() + 1).padStart(2, '0');
-            const localDay = String(date.getDate()).padStart(2, '0');
-            const isoDateWithoutTimezoneShift = `${localYear}-${localMonth}-${localDay}T00:00:00.000Z`;
+            const isoDateWithoutTimezoneShift = `${birthDate}T00:00:00.000Z`;
 
             // Objeto Final Payload para o Backend
             const payload = {
@@ -144,9 +136,16 @@ export default function CompleteProfileScreen() {
         } catch (error: any) {
             console.error(error);
 
+            const errorMessage = error.message ?? '';
+            if (/data de nascimento|doador deve ter/i.test(errorMessage)) {
+                setBirthDateError(errorMessage);
+                Alert.alert('Revise seus dados', errorMessage);
+                return;
+            }
+
             // Erros sobre nome, e-mail, CPF, telefone ou senha são da RegisterScreen:
             // devolvemos o usuário para lá com os dados preenchidos e o erro no campo.
-            const fieldErrors = mapRegisterServerError(error.message ?? '');
+            const fieldErrors = mapRegisterServerError(errorMessage);
 
             if (Object.keys(fieldErrors).length > 0) {
                 Alert.alert(
@@ -160,7 +159,7 @@ export default function CompleteProfileScreen() {
                 return;
             }
 
-            Alert.alert("Erro ao criar conta", error.message || "Tente novamente.");
+            Alert.alert("Erro ao criar conta", errorMessage || "Tente novamente.");
         } finally {
             setLoading(false);
         }
@@ -191,26 +190,11 @@ export default function CompleteProfileScreen() {
 
                     <View style={Styles.content}>
 
-                        {/* Data */}
-                        <TouchableOpacity onPress={() => setShowDatePicker(true)} activeOpacity={0.8}>
-                            <View pointerEvents="none">
-                                <Input
-                                    label="Data de Nascimento*"
-                                    placeholder="DD/MM/AAAA"
-                                    value={dobLabel}
-                                />
-                            </View>
-                        </TouchableOpacity>
-
-                        {showDatePicker && (
-                            <DateTimePicker
-                                value={date || new Date()}
-                                mode="date"
-                                display="default"
-                                onChange={onChangeDate}
-                                maximumDate={new Date()}
-                            />
-                        )}
+                        <DateOfBirthInput
+                            value={birthDate}
+                            onChange={(value) => { setBirthDate(value); setBirthDateError(''); }}
+                            error={birthDateError}
+                        />
 
                         {/* Gênero */}
                         <TouchableOpacity onPress={() => setModalVisible(true)} activeOpacity={0.8}>

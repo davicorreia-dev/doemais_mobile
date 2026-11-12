@@ -27,6 +27,7 @@ model Doador {
   formulariosElegibilidade Formulario_Elegibilidade[]
   historicosClinicos      Historico_Clinico[]
   refreshTokens           RefreshToken[]
+  passwordResetTokens     PasswordResetToken[]
 }
 
 model Hemocentro {
@@ -127,4 +128,17 @@ model RefreshToken {
   doadorId  Int
   
   createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  doador    Doador   @relation(fields: [doadorId], references: [id], onDelete: Cascade)
+  doadorId  Int
+
+  @@index([doadorId, expiresAt])
 }

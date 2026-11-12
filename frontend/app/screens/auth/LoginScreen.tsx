@@ -162,7 +162,7 @@ export default function LoginScreen() {
 
                             <View style={[formColumn, { alignItems: 'flex-end', marginTop: 10 }]}>
                                 <Text style={Styles.ForgetPassword}
-                                    onPress={() => navigation.navigate("ForgetPasswordChoiceScreen")}>
+                                    onPress={() => navigation.navigate("ForgetPasswordScreen")}>
                                     Esqueceu sua senha?
                                 </Text>
                             </View>
