@@ -25,8 +25,8 @@ const styles = StyleSheet.create({
         marginBottom: 28,
     },
     bulletRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: 'column',
+        alignItems: 'stretch',
         gap: 12,
         marginBottom: 18,
     },
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     cardMainAction: {
-        flex: 1,
+        width: '100%',
         minHeight: 56,
         flexDirection: 'row',
         alignItems: 'center',
@@ -97,6 +97,7 @@ const styles = StyleSheet.create({
         color: '#666',
     },
     reviewButton: {
+        alignSelf: 'flex-end',
         minHeight: 36,
         paddingHorizontal: 8,
         borderWidth: 1,
