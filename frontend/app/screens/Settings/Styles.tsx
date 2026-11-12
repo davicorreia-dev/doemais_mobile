@@ -86,29 +86,6 @@ const Styles = StyleSheet.create({
         marginBottom: 40,
         lineHeight: 22,
     },
-    photoShortcut: {
-        width: '100%',
-        maxWidth: 480,
-        minHeight: 48,
-        alignSelf: 'center',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 16,
-        borderRadius: 14,
-        backgroundColor: '#FFF1F2',
-        marginBottom: 4,
-    },
-    photoShortcutText: {
-        color: '#C52D36',
-        fontSize: 14,
-        fontFamily: 'Lexend_600SemiBold',
-    },
-    photoShortcutArrow: {
-        color: '#C52D36',
-        fontSize: 28,
-        lineHeight: 28,
-    },
 });
 
 export default Styles;
