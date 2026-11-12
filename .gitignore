@@ -1,0 +1,2 @@
+# Segredos e configs locais do Docker (gerados pelo run.sh)
+.env

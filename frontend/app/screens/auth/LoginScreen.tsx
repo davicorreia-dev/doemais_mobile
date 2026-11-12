@@ -69,7 +69,7 @@ export default function LoginScreen() {
         setLoading(true);
 
         try {
-            console.log("Tentando logar com:", payload);
+            console.log("Tentando logar com:", payload.email);
 
             const response = await api('/api/auth/login', 'POST', payload);
             const responseData = response.data || response;

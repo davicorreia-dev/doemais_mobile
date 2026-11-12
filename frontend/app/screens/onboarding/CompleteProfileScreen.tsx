@@ -134,7 +134,7 @@ export default function CompleteProfileScreen() {
                 tipo_sanguineo: unknownBlood ? 'NDA' : selectedBlood
             };
 
-            console.log("Enviando dados:", payload);
+            console.log("Enviando cadastro para:", payload.email);
 
             await api('/api/auth/register', 'POST', payload);
 

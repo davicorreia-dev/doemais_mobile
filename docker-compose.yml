@@ -25,7 +25,8 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://doemais:doemais@db:5432/doemais?schema=public
-      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET:-dev-only-secret-troque-em-producao}
+      # gerado por máquina pelo run.sh (arquivo .env, fora do git); vazio => o backend não sobe
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET:-}
       NODE_ENV: development
       PORT: "3000"
       # origens permitidas (separadas por vírgula): o app web do Expo roda na 8081
