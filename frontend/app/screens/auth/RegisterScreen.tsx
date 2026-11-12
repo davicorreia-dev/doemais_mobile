@@ -13,7 +13,6 @@ import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useKeyboardBehavior } from '../../hooks/useKeyboardBehavior';
-import { api } from '../../services/api';
 
 // Regras espelhadas do RegisterDoadorDto do backend, para que nenhuma validação
 // de servidor sobre estes campos só apareça no fim do fluxo de cadastro.
@@ -102,20 +101,8 @@ export default function RegisterScreen() {
     }, [fieldErrors, prefill, reset, setError, navigation]);
 
 
-    const onSubmit = async (data: RegisterFormData) => {
+    const onSubmit = (data: RegisterFormData) => {
         const email = data.email.trim().toLowerCase();
-        try {
-            const response = await api('/api/auth/email-availability', 'POST', { email });
-            const available = (response.data ?? response)?.available;
-            if (!available) {
-                setError('email', { type: 'server', message: 'Este e-mail já está registrado. Use outro e-mail ou entre na sua conta.' });
-                return;
-            }
-        } catch {
-            setError('email', { type: 'server', message: 'Não foi possível verificar este e-mail. Tente novamente.' });
-            return;
-        }
-
         const payload = {
             nome: data.name.trim(),
             email,

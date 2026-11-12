@@ -7,7 +7,6 @@ import {
   logout,
   requestPasswordReset,
   confirmPasswordReset,
-  isEmailAvailable,
 } from '../services/authService';
 import ApiResponseHandler from '../utils/response';
 
@@ -129,12 +128,3 @@ export const confirmPasswordResetController = async (req: Request, res: Response
   }
 };
 
-export const checkEmailAvailability = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { email } = req.body as PasswordResetRequestDto;
-    const available = await isEmailAvailable(email);
-    ApiResponseHandler.success(res, 'Disponibilidade de e-mail consultada.', { available }, 200);
-  } catch (error) {
-    next(error);
-  }
-};

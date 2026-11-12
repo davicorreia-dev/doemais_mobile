@@ -247,11 +247,6 @@ export const requestPasswordReset = async (
   }
 };
 
-export const isEmailAvailable = async (email: string): Promise<boolean> => {
-  const doador = await prisma.doador.findUnique({ where: { email } });
-  return !doador;
-};
-
 export const confirmPasswordReset = async (
   resetData: PasswordResetConfirmDto
 ): Promise<void> => {
