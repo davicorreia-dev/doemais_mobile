@@ -8,7 +8,7 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL_OVERRIDE || process.env.EXPO_PUB
 /**
  * Serviço centralizado para requisições HTTP
  */
-export const api = async (endpoint: string, method: string = 'GET', body?: any, isRetry: boolean = false): Promise<any> => {
+export const api = async (endpoint: string, method: string = 'GET', body?: any, isRetry: boolean = false, silent: boolean = false): Promise<any> => {
     const url = `${API_URL}${endpoint}`;
 
     // Recuperar o JWT salvo no dispositivo
@@ -96,7 +96,9 @@ export const api = async (endpoint: string, method: string = 'GET', body?: any, 
         return responseText ? JSON.parse(responseText) : {};
 
     } catch (error: any) {
-        console.error(`Erro na API (${endpoint}):`, error.message);
+        if (!silent) {
+            console.error(`Erro na API (${endpoint}):`, error.message);
+        }
         throw error;
     }
 };

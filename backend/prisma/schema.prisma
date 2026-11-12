@@ -25,9 +25,45 @@ model Doador {
   // Relacionamentos com outras tabelas
   agendamentos            Agendamento[]
   formulariosElegibilidade Formulario_Elegibilidade[]
+  resultadosTriagem       Triagem_Resultado[]
+  solicitacoesCorrecao    Solicitacao_Correcao[]
   historicosClinicos      Historico_Clinico[]
   refreshTokens           RefreshToken[]
   passwordResetTokens     PasswordResetToken[]
+}
+
+model Triagem_Resultado {
+  id                 Int      @id @default(autoincrement())
+  doador_id          Int      @map("doadorId")
+  modulo             String
+  respostas          Json
+  status             String
+  data_preenchimento DateTime @default(now()) @map("dataPreenchimento")
+
+  doador             Doador   @relation(fields: [doador_id], references: [id], onDelete: Cascade)
+
+  @@index([doador_id, modulo, data_preenchimento])
+}
+
+model Solicitacao_Correcao {
+  id                    Int      @id @default(autoincrement())
+  doador_id             Int      @map("doadorId")
+  modulo                String
+  motivo                String
+  comentario            String?  @db.VarChar(500)
+  respostas_originais   Json     @map("respostasOriginais")
+  respostas_corrigidas  Json?    @map("respostasCorrigidas")
+  perguntas_alteradas   Json?    @map("perguntasAlteradas")
+  status                String   @default("PENDING_REVIEW")
+  criado_em             DateTime @default(now()) @map("criadoEm")
+  resolvido_em          DateTime? @map("resolvidoEm")
+  responsavel           String?  @map("responsavel")
+  observacao_resolucao  String?  @map("observacaoResolucao") @db.VarChar(500)
+
+  doador                Doador   @relation(fields: [doador_id], references: [id], onDelete: Cascade)
+
+  @@index([doador_id, modulo, status])
+  @@index([status, criado_em])
 }
 
 model Hemocentro {

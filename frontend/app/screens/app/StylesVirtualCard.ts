@@ -1,0 +1,47 @@
+import { StyleSheet } from 'react-native';
+
+const Styles = StyleSheet.create({
+    screen: { flex: 1, backgroundColor: '#F7F7F7' },
+    hero: {
+        height: 35,
+        backgroundColor: '#E0323C',
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+    },
+    centered: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F7F7F7' },
+    content: { paddingHorizontal: 22, paddingTop: 24, paddingBottom: 36 },
+    title: { color: '#333', fontSize: 24, fontWeight: '800', textAlign: 'center' },
+    subtitle: { color: '#666', fontSize: 14, textAlign: 'center', marginTop: 6, marginBottom: 28 },
+    card: {
+        minHeight: 258,
+        borderRadius: 22,
+        backgroundColor: '#E0323C',
+        padding: 22,
+        shadowColor: '#000',
+        shadowOpacity: 0.14,
+        shadowOffset: { width: 0, height: 8 },
+        shadowRadius: 14,
+        elevation: 5,
+    },
+    brandRow: { flexDirection: 'row', alignItems: 'center', gap: 9 },
+    brandIcon: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' },
+    brand: { flex: 1, color: '#FFF', fontSize: 15, letterSpacing: 1, fontWeight: '800' },
+    cardMain: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 32, gap: 12 },
+    fieldLabel: { color: 'rgba(255,255,255,0.80)', fontSize: 10, letterSpacing: 0.7, fontWeight: '700' },
+    name: { maxWidth: 210, color: '#FFF', fontSize: 22, lineHeight: 28, fontWeight: '800', marginTop: 7 },
+    bloodBadge: { minWidth: 73, minHeight: 73, borderRadius: 20, backgroundColor: '#FFF', alignItems: 'center', justifyContent: 'center' },
+    bloodType: { color: '#E0323C', fontSize: 25, fontWeight: '800', marginTop: 1 },
+    divider: { height: 1, backgroundColor: 'rgba(255,255,255,0.32)', marginVertical: 20 },
+    cardFooter: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 8 },
+    date: { color: '#FFF', fontSize: 13, fontWeight: '600', marginTop: 6, textTransform: 'capitalize' },
+    approvedSeal: { flexDirection: 'row', alignItems: 'center', gap: 5, borderRadius: 14, paddingHorizontal: 10, paddingVertical: 7, backgroundColor: '#E8F5E9' },
+    approvedText: { color: '#2E7D32', fontSize: 10, letterSpacing: 0.5, fontWeight: '800' },
+    notice: { flexDirection: 'row', gap: 10, padding: 16, marginTop: 22, borderRadius: 16, backgroundColor: '#FFF2F3' },
+    noticeText: { flex: 1, color: '#7A3439', fontSize: 12, lineHeight: 18 },
+    emptyScreen: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F7F7F7', padding: 34 },
+    emptyIcon: { width: 86, height: 86, borderRadius: 43, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF2F3', marginBottom: 20 },
+    emptyTitle: { color: '#333', fontSize: 21, textAlign: 'center', fontWeight: '800' },
+    emptyText: { color: '#666', fontSize: 14, lineHeight: 21, textAlign: 'center', marginTop: 9 },
+});
+
+export default Styles;

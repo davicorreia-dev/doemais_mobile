@@ -5,7 +5,11 @@ import { NavigationProp, ParamListBase, useNavigation, useRoute } from '@react-n
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const saveModuleResult = async (moduleId: string, status: 'approved' | 'blocked') => {
+const saveModuleResult = async (
+    moduleId: string,
+    status: 'approved' | 'blocked',
+    answers: Record<string, unknown>
+) => {
     try {
         const userRaw = await AsyncStorage.getItem('@doemais:user');
         if (!userRaw) return;
@@ -18,8 +22,20 @@ const saveModuleResult = async (moduleId: string, status: 'approved' | 'blocked'
         history[moduleId] = {
             status,
             date: Date.now(),
+            answers,
         };
         await AsyncStorage.setItem(key, JSON.stringify(history));
+
+        try {
+            await api('/api/doadores/triagens', 'POST', {
+                modulo: moduleId,
+                status,
+                respostas: answers,
+            });
+        } catch (error) {
+            // O cache local mantém a experiência utilizável quando não houver conexão.
+            console.error('Erro ao persistir resultado da triagem:', error);
+        }
     } catch (e) {
         console.error("Erro ao salvar histórico do quiz no AsyncStorage:", e);
     }
@@ -59,6 +75,7 @@ import { clamp, topInset } from '../../../utils/responsive';
 
 type RouteParams = {
     moduleId?: string;
+    correction?: { originalAnswers: Record<string, unknown> };
 };
 
 function getBlockMessage(question: QuizQuestion, fallback: string) {
@@ -77,7 +94,7 @@ export default function QuizScreen() {
     const circleSize = clamp(winWidth * 0.32, 96, 140);
     const navSize = clamp(winWidth * 0.14, 44, 60);
     const route = useRoute();
-    const { moduleId } = (route.params as RouteParams | undefined) ?? {};
+    const { moduleId, correction } = (route.params as RouteParams | undefined) ?? {};
 
     const module = useMemo(() => {
         if (!moduleId) {
@@ -91,6 +108,11 @@ export default function QuizScreen() {
     const [inputValue, setInputValue] = useState('');
     const [blockVisible, setBlockVisible] = useState(false);
     const [blockMessage, setBlockMessage] = useState('');
+    const [successVisible, setSuccessVisible] = useState(false);
+    const [correctionVisible, setCorrectionVisible] = useState(Boolean(correction));
+    const [correctionReason, setCorrectionReason] = useState('');
+    const [correctionComment, setCorrectionComment] = useState('');
+    const [correctionId, setCorrectionId] = useState<number | null>(null);
     const [selectExpanded, setSelectExpanded] = useState(false);
     const [selectedMonthLabel, setSelectedMonthLabel] = useState('');
     
@@ -168,11 +190,20 @@ export default function QuizScreen() {
             await submitAnswersToAPI(finalAnswers);
             
             // Grava a aprovação localmente no AsyncStorage
-            await saveModuleResult(module.id, 'approved');
+            await saveModuleResult(module.id, 'approved', finalAnswers);
+            if (correctionId) {
+                await api(`/api/doadores/correcoes/${correctionId}/finalizar`, 'PATCH', { respostas_corrigidas: finalAnswers });
+            }
             
-            Alert.alert(module.successTitle, module.successMessage, [
-                { text: 'OK', onPress: () => navigation.goBack() },
-            ]);
+            const isFinalTriage = module.id === 'TRIAGEM_HOMEM' || module.id === 'TRIAGEM_MULHER';
+            // No web, Alert pode não executar o callback do botão como no app nativo.
+            // A triagem final precisa abrir a carteirinha imediatamente após a aprovação.
+            if (isFinalTriage) {
+                navigation.navigate('MainTabs', { screen: 'Carteirinha' });
+                return;
+            }
+
+            setSuccessVisible(true);
         } catch (error) {
             console.error("Erro ao salvar triagem:", error);
             Alert.alert("Erro", "Ocorreu um erro ao salvar o questionário. Tente novamente.");
@@ -184,6 +215,7 @@ export default function QuizScreen() {
     const exitToMenu = () => {
         setBlockVisible(false);
         setBlockMessage('');
+        setSuccessVisible(false);
         setQuestionIndex(0);
         setInputValue('');
         setSelectedMonthLabel('');
@@ -191,12 +223,41 @@ export default function QuizScreen() {
         navigation.goBack();
     };
 
-    const openBlock = (message: string) => {
+    const exitAfterSuccess = () => {
+        setSuccessVisible(false);
+        navigation.goBack();
+    };
+
+    const beginCorrection = async () => {
+        if (!correctionReason) {
+            Alert.alert('Informe o motivo', 'Selecione o motivo da correção antes de continuar.');
+            return;
+        }
+        try {
+            const response = await api('/api/doadores/correcoes', 'POST', {
+                modulo: module.id,
+                motivo: correctionReason,
+                comentario: correctionComment.trim() || undefined,
+                respostas_originais: correction?.originalAnswers || {},
+            });
+            const request = response.data || response;
+            setCorrectionId(request.id);
+            setCorrectionVisible(false);
+        } catch (error: any) {
+            Alert.alert('Erro', error.message || 'Não foi possível iniciar a correção.');
+        }
+    };
+
+    const openBlock = (message: string, finalAnswers: Record<string, unknown>) => {
         setBlockVisible(true);
         setBlockMessage(message || module.blockMessage);
         
         // Grava o bloqueio localmente no AsyncStorage
-        saveModuleResult(module.id, 'blocked').catch(e => console.error(e));
+        saveModuleResult(module.id, 'blocked', finalAnswers).catch(e => console.error(e));
+        if (correctionId) {
+            api(`/api/doadores/correcoes/${correctionId}/finalizar`, 'PATCH', { respostas_corrigidas: finalAnswers })
+                .catch((error) => console.error('Erro ao finalizar correção:', error));
+        }
     };
 
     const validateQuestion = (answer: boolean | string | number | null) => {
@@ -271,7 +332,7 @@ export default function QuizScreen() {
             // Mandamos para o banco em "background" para registrar a falha
             submitAnswersToAPI(newAnswers).catch(e => console.error("Erro ao registrar bloqueio:", e));
             // E exibimos a tela de bloqueio
-            openBlock(result.message);
+            openBlock(result.message, newAnswers);
             return;
         }
 
@@ -491,6 +552,31 @@ export default function QuizScreen() {
                         <Text style={Styles.modalTitle}>{module.blockTitle}</Text>
                         <Text style={Styles.modalMessage}>{blockMessage || module.blockMessage}</Text>
                         <Button title="Voltar ao menu" textColor="#FFF" width="100%" onPress={exitToMenu} />
+                    </View>
+                </View>
+            </Modal>
+
+            <Modal visible={successVisible} transparent animationType="fade" onRequestClose={exitAfterSuccess}>
+                <View style={Styles.modalBackdrop}>
+                    <View style={Styles.modalCard}>
+                        <Ionicons name="checkmark-circle-outline" size={60} color="#2E7D32" />
+                        <Text style={Styles.modalTitle}>{module.successTitle}</Text>
+                        <Text style={Styles.modalMessage}>{module.successMessage}</Text>
+                        <Button title="Voltar aos formulários" textColor="#FFF" width="100%" onPress={exitAfterSuccess} />
+                    </View>
+                </View>
+            </Modal>
+
+            <Modal visible={correctionVisible} transparent animationType="fade" onRequestClose={() => navigation.goBack()}>
+                <View style={Styles.modalBackdrop}>
+                    <View style={Styles.modalCard}>
+                        <Ionicons name="create-outline" size={52} color="#E0323C" />
+                        <Text style={Styles.modalTitle}>Corrigir respostas</Text>
+                        <Text style={Styles.modalMessage}>Informe o motivo antes de refazer. O hemocentro poderá comparar as respostas.</Text>
+                        <TouchableOpacity style={Styles.choiceButton} onPress={() => setCorrectionReason('Resposta marcada incorretamente')}><Text style={Styles.choiceButtonText}>Marquei uma resposta incorreta</Text></TouchableOpacity>
+                        <TouchableOpacity style={Styles.choiceButton} onPress={() => setCorrectionReason('Informação mudou')}><Text style={Styles.choiceButtonText}>Minha informação mudou</Text></TouchableOpacity>
+                        <Input label="Comentário (opcional)" value={correctionComment} onChangeText={setCorrectionComment} placeholder="Explique brevemente" />
+                        <Button title="Refazer formulário" textColor="#FFF" width="100%" onPress={beginCorrection} />
                     </View>
                 </View>
             </Modal>

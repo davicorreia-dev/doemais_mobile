@@ -22,6 +22,8 @@ import {
   Min,
   Max,
   IsEnum,
+  IsIn,
+  IsObject,
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 import {
@@ -295,3 +297,41 @@ export class CreateFormularioElegibilidadeDto {
  * DTO para atualização de formulário de elegibilidade
  */
 export class UpdateFormularioElegibilidadeDto extends CreateFormularioElegibilidadeDto {}
+
+export class CreateTriagemResultadoDto {
+  @IsString({ message: 'O módulo da triagem é obrigatório.' })
+  @IsNotEmpty({ message: 'O módulo da triagem é obrigatório.' })
+  @MaxLength(80, { message: 'O módulo da triagem é inválido.' })
+  modulo!: string;
+
+  @IsIn(['approved', 'blocked'], { message: 'O status da triagem é inválido.' })
+  status!: 'approved' | 'blocked';
+
+  @IsObject({ message: 'As respostas da triagem são inválidas.' })
+  respostas!: Record<string, unknown>;
+}
+
+export class CreateSolicitacaoCorrecaoDto {
+  @IsString() @IsNotEmpty() @MaxLength(80)
+  modulo!: string;
+  @IsString() @IsNotEmpty() @MaxLength(100)
+  motivo!: string;
+  @IsOptional() @IsString() @MaxLength(500)
+  comentario?: string;
+  @IsObject()
+  respostas_originais!: Record<string, unknown>;
+}
+
+export class FinalizarSolicitacaoCorrecaoDto {
+  @IsObject()
+  respostas_corrigidas!: Record<string, unknown>;
+}
+
+export class ResolverSolicitacaoCorrecaoDto {
+  @IsIn(['APPROVED', 'REJECTED'])
+  status!: 'APPROVED' | 'REJECTED';
+  @IsString() @IsNotEmpty() @MaxLength(100)
+  responsavel!: string;
+  @IsOptional() @IsString() @MaxLength(500)
+  observacao?: string;
+}

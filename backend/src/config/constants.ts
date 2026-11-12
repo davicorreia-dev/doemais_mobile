@@ -32,6 +32,7 @@ export const CONSTANTS = {
     '/api/auth/logout',
     '/api/auth/password-reset/request',
     '/api/auth/password-reset/confirm',
+    '/api/doadores/integracoes/hemocentros',
     '/health',
     '/api/docs',
   ],
