@@ -342,7 +342,7 @@ export default function EligibilityFormsScreen() {
                                         accessibilityRole="button"
                                         accessibilityLabel={`Solicitar revisão do formulário ${module.title}`}
                                     >
-                                        <Ionicons name="create-outline" size={16} color="#E0323C" />
+                                        <Ionicons name="create-outline" size={14} color="#FFF" />
                                         <Text style={styles.reviewButtonText}>Revisar</Text>
                                     </TouchableOpacity>
                                 )}
