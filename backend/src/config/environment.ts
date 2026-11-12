@@ -9,6 +9,7 @@ interface EnvironmentConfig {
   PORT: string;
   NODE_ENV: string;
   CORS_ORIGIN: string;
+  FRONTEND_URL: string;
 }
 
 function validateEnvironment(): EnvironmentConfig {
@@ -37,6 +38,7 @@ function validateEnvironment(): EnvironmentConfig {
     PORT: process.env.PORT || '3000',
     NODE_ENV: process.env.NODE_ENV || 'development',
     CORS_ORIGIN: process.env.CORS_ORIGIN || 'http://localhost:3001',
+    FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:8081',
   };
 }
 

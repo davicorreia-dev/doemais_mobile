@@ -1,10 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import { RegisterDoadorDto, LoginDoadorDto, RefreshTokenDto } from '../dtos/doador.dto';
+import { RegisterDoadorDto, LoginDoadorDto, RefreshTokenDto, PasswordResetRequestDto, PasswordResetConfirmDto } from '../dtos/doador.dto';
 import {
   registerDoador,
   loginDoador,
   refreshAccessToken,
   logout,
+  requestPasswordReset,
+  confirmPasswordReset,
+  isEmailAvailable,
 } from '../services/authService';
 import ApiResponseHandler from '../utils/response';
 
@@ -103,6 +106,34 @@ export const logoutUser = async (
       null,
       200
     );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const requestPasswordResetController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await requestPasswordReset(req.body as PasswordResetRequestDto);
+    ApiResponseHandler.success(res, 'Se houver uma conta com este e-mail, enviaremos as instruções de redefinição.', null, 200);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const confirmPasswordResetController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await confirmPasswordReset(req.body as PasswordResetConfirmDto);
+    ApiResponseHandler.success(res, 'Senha redefinida com sucesso.', null, 200);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const checkEmailAvailability = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email } = req.body as PasswordResetRequestDto;
+    const available = await isEmailAvailable(email);
+    ApiResponseHandler.success(res, 'Disponibilidade de e-mail consultada.', { available }, 200);
   } catch (error) {
     next(error);
   }

@@ -1,5 +1,5 @@
 import { hashPassword, comparePassword } from '../utils/password';
-import { RegisterDoadorDto, LoginDoadorDto, RefreshTokenDto } from '../dtos/doador.dto';
+import { RegisterDoadorDto, LoginDoadorDto, RefreshTokenDto, PasswordResetRequestDto, PasswordResetConfirmDto } from '../dtos/doador.dto';
 import { ConflictError, UnauthorizedError, BadRequestError } from '../utils/errors';
 import prisma from '../config/prisma';
 import env from '../config/environment';
@@ -7,6 +7,13 @@ import CONSTANTS from '../config/constants';
 import { AuthResponse, DoadorResponse } from '../types/index';
 import jwt from 'jsonwebtoken';
 import { randomBytes } from 'crypto';
+import { createHash } from 'crypto';
+import Logger from '../utils/logger';
+
+const PASSWORD_RESET_TTL_MS = 60 * 60 * 1000;
+
+const hashResetToken = (token: string): string =>
+  createHash('sha256').update(token).digest('hex');
 
 export const registerDoador = async (
   doadorData: RegisterDoadorDto
@@ -210,4 +217,63 @@ export const logout = async (
   }
 
   return { message: 'Logout realizado com sucesso.' };
+};
+
+export const requestPasswordReset = async (
+  resetData: PasswordResetRequestDto
+): Promise<void> => {
+  const doador = await prisma.doador.findUnique({ where: { email: resetData.email } });
+
+  // A resposta do endpoint é a mesma para e-mails existentes e inexistentes.
+  if (!doador) return;
+
+  const token = randomBytes(32).toString('hex');
+  const expiresAt = new Date(Date.now() + PASSWORD_RESET_TTL_MS);
+
+  await prisma.$transaction([
+    prisma.passwordResetToken.updateMany({
+      where: { doadorId: doador.id, usedAt: null },
+      data: { usedAt: new Date() },
+    }),
+    prisma.passwordResetToken.create({
+      data: { doadorId: doador.id, tokenHash: hashResetToken(token), expiresAt },
+    }),
+  ]);
+
+  // A integração de e-mail será adicionada aqui. Nunca registre o token em produção.
+  if (env.NODE_ENV !== 'production') {
+    const resetUrl = `${env.FRONTEND_URL.replace(/\/$/, '')}/password-reset?token=${encodeURIComponent(token)}`;
+    Logger.info('AUTH', 'Link de redefinição de senha (somente desenvolvimento)', { resetUrl });
+  }
+};
+
+export const isEmailAvailable = async (email: string): Promise<boolean> => {
+  const doador = await prisma.doador.findUnique({ where: { email } });
+  return !doador;
+};
+
+export const confirmPasswordReset = async (
+  resetData: PasswordResetConfirmDto
+): Promise<void> => {
+  const tokenHash = hashResetToken(resetData.token);
+
+  await prisma.$transaction(async (tx) => {
+    const resetToken = await tx.passwordResetToken.findFirst({
+      where: { tokenHash, usedAt: null, expiresAt: { gt: new Date() } },
+    });
+
+    if (!resetToken) {
+      throw new BadRequestError('Este link de redefinição é inválido ou expirou.');
+    }
+
+    await tx.doador.update({
+      where: { id: resetToken.doadorId },
+      data: { senha: await hashPassword(resetData.senha) },
+    });
+    await tx.passwordResetToken.update({
+      where: { id: resetToken.id },
+      data: { usedAt: new Date() },
+    });
+    await tx.refreshToken.deleteMany({ where: { doadorId: resetToken.doadorId } });
+  });
 };
