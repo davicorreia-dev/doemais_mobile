@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
@@ -19,6 +19,7 @@ import LgpdScreen from './app/screens/onboarding/LgpdScreen';
 import RegisterSuccessScreen from './app/screens/auth/RegisterSuccessScreen';
 import CompleteProfileScreen from './app/screens/onboarding/CompleteProfileScreen';
 import OnboardingScreen from './app/screens/onboarding/OnboardingScreen';
+import PostRegisterOnboardingScreen from './app/screens/onboarding/PostRegisterOnboardingScreen';
 import QuizScreen from './app/screens/app/QuizFlow/QuizScreen';
 
 // IMPORTANTE: Este é o seu MENU NOVO (Vermelho)
@@ -27,6 +28,7 @@ import MainTabsScreen from './app/screens/app/MainTabs/MainTabs';
 
 import SettingsProfileScreen from './app/screens/Settings/SettingsProfileScreen';
 import ProfileSetupPhotoScreen from './app/screens/Settings/ProfileSetupPhotoScreen';
+import { refreshStoredSession } from './app/services/api';
 // Se você quiser usar a tela de Settings depois, importe ela aqui, 
 // mas ela deve ser adicionada lá dentro do arquivo MainTabs.tsx se quiser que apareça no menu.
 // import SettingsScreen from './app/screens/Settings/SettingsScreen'; 
@@ -46,6 +48,34 @@ const linking: any = {
 };
 
 export default function App() {
+  const [isRestoringSession, setIsRestoringSession] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const restoreSession = async () => {
+      try {
+        setIsAuthenticated(await refreshStoredSession());
+      } catch (error) {
+        console.error('Não foi possível restaurar a sessão:', error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsRestoringSession(false);
+      }
+    };
+
+    restoreSession();
+  }, []);
+
+  if (isRestoringSession) {
+    return (
+      <SafeAreaProvider>
+        <View style={styles.container}>
+          <ActivityIndicator size="large" color="#E0323C" />
+        </View>
+      </SafeAreaProvider>
+    );
+  }
+
   return (
     <SafeAreaProvider>
       <NavigationContainer linking={linking}>
@@ -53,7 +83,7 @@ export default function App() {
 
       {/* AuthChoice tela padrão   */}
       <Stack.Navigator
-        initialRouteName="AuthChoice"
+        initialRouteName={isAuthenticated ? "MainTabs" : "AuthChoice"}
         screenOptions={{ headerShown: false }}
       >
         {/* --- FLUXO DE AUTENTICAÇÃO --- */}
@@ -72,6 +102,7 @@ export default function App() {
         {/* Telas sem Header */}
         <Stack.Screen name="RegisterSuccessScreen" component={RegisterSuccessScreen} />
         <Stack.Screen name="OnboardingScreen" component={OnboardingScreen} />
+        <Stack.Screen name="PostRegisterOnboarding" component={PostRegisterOnboardingScreen} />
         <Stack.Screen name="QuizScreen" component={QuizScreen} />
 
         {/* --- O GRANDE MOMENTO --- */}

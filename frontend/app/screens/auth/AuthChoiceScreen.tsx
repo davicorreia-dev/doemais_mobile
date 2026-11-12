@@ -1,4 +1,4 @@
-import { Image, Text, View } from "react-native";
+import { Alert, Image, Text, View } from "react-native";
 import Button from "../../../components/Button";
 import Styles from "./AuthChoiceStyles"
 import StylesButton from "../../../components/SocialButton/styles";
@@ -48,10 +48,14 @@ export default function AuthChoiceScreen({ navigation }: any) {
             <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 20, marginTop: 25 }}>
                 <SocialButton
                     iconSource={require("../../../assets/images/googleicon.png")}
+                    accessibilityLabel="Continuar com Google"
+                    onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
                 />
 
                 <SocialButton
                     iconSource={require("../../../assets/images/facebook 1.png")}
+                    accessibilityLabel="Continuar com Facebook"
+                    onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
                 />
             </View>
 

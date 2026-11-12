@@ -5,39 +5,28 @@ type SocialButtonProps = {
     title?: string;
     iconSource?: any;
     onPress?: () => void; 
+    accessibilityLabel?: string;
 }
 
 export default function SocialButton({ 
     title,
     iconSource,
-    onPress
+    onPress,
+    accessibilityLabel,
 }: SocialButtonProps) {
 
     if (!title) {
         return (
             <TouchableOpacity 
-                style={[
-                    styles.SocialButton, 
-                    { 
-                        width: 56, 
-                        height: 56, 
-                        borderRadius: 28, 
-                        alignItems: 'center', 
-                        justifyContent: 'center',
-                        backgroundColor: '#FFFFFF',
-                        elevation: 3,
-                        shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: 0.1,
-                        shadowRadius: 3,
-                    }
-                ]} 
+                style={styles.iconButton}
                 onPress={onPress}
+                accessibilityRole="button"
+                accessibilityLabel={accessibilityLabel}
             >
                 {iconSource && (
                     <Image
                         source={iconSource}
-                        style={{ width: 24, height: 24 }}
+                        style={styles.iconImage}
                         resizeMode="contain" 
                     />
                 )}
@@ -46,12 +35,12 @@ export default function SocialButton({
     }
 
     return (
-        <TouchableOpacity style={styles.SocialButton} onPress={onPress}>
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10 }}>
+        <TouchableOpacity style={styles.SocialButton} onPress={onPress} accessibilityRole="button" accessibilityLabel={accessibilityLabel || title}>
+            <View style={styles.content}>
                 {iconSource && (
                     <Image
                         source={iconSource}
-                        style={{ width: 21, height: 21 }}
+                        style={styles.buttonIcon}
                         resizeMode="contain" />
                 )}
                 <Text style={styles.text}>{title}</Text>

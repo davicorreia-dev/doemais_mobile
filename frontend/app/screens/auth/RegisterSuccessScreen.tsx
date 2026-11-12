@@ -9,7 +9,6 @@ export default function RegisterSuccessScreen() {
     const navigation = useNavigation<any>();
 
     const handleStart = () => {
-        // Redireciona para o Login por enquanto
         navigation.reset({
             index: 1,
             routes: [
@@ -29,11 +28,11 @@ export default function RegisterSuccessScreen() {
 
             <Text style={Styles.subtitle}>
                 Obrigado por se cadastrar no Doe+. Sua atitude já é o primeiro passo para salvar vidas.{'\n\n'}
-                Entenda um pouco da missão da Doe+ antes de começar.
+                Faça login para iniciar sua jornada no Doe+.
             </Text>
 
             <Button
-                title="Começar"
+                title="Ir para o login"
                 textColor="#FFFFFF"
                 onPress={handleStart}
             />

@@ -181,6 +181,10 @@ const Styles = StyleSheet.create({
         borderColor: '#E0323C',
         transform: [{ scale: 0.98 }],
     },
+    correctionReasonButton: {
+        flexDirection: 'row',
+        gap: 8,
+    },
     choiceButtonText: {
         fontSize: 15,
         fontWeight: '600',
@@ -250,9 +254,22 @@ const Styles = StyleSheet.create({
         width: '100%',
         backgroundColor: '#FFF',
         borderRadius: 24,
+        position: 'relative',
         padding: 24,
         alignItems: 'center',
         gap: 12,
+    },
+    modalCloseButton: {
+        position: 'absolute',
+        top: 12,
+        right: 12,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#F6F6F6',
+        zIndex: 1,
     },
     modalTitle: {
         fontSize: 18,

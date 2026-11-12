@@ -82,9 +82,14 @@ export default function LoginScreen() {
                     await AsyncStorage.setItem('@doemais:refreshToken', parsedResponse.refreshToken);
                 }
 
+                const onboardingKey = `@doemais:onboarding_completed:${parsedResponse.doador.id}`;
+                const hasCompletedOnboarding = await AsyncStorage.getItem(onboardingKey);
                 navigation.reset({
                     index: 0,
-                    routes: [{ name: 'MainTabs' }],
+                    routes: [{
+                        name: hasCompletedOnboarding ? 'MainTabs' : 'PostRegisterOnboarding',
+                        params: hasCompletedOnboarding ? undefined : { onboardingKey },
+                    }],
                 });
             } else {
                 throw new Error("Token não recebido.");
@@ -189,11 +194,13 @@ export default function LoginScreen() {
                         <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 20, marginBottom: 10 }}>
                             <SocialButton
                                 iconSource={require("../../../assets/images/googleicon.png")}
+                                accessibilityLabel="Continuar com Google"
                                 onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
                             />
 
                             <SocialButton
                                 iconSource={require("../../../assets/images/facebook 1.png")}
+                                accessibilityLabel="Continuar com Facebook"
                                 onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
                             />
                         </View>

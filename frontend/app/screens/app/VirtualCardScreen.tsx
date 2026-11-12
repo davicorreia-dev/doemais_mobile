@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, ScrollView, StatusBar, Text, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StatusBar, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -152,12 +152,16 @@ export default function VirtualCardScreen() {
                 <Text style={Styles.subtitle}>Seu resultado de triagem DoeMais</Text>
 
                 <View style={Styles.card}>
+                    <View style={Styles.cardAccent} />
                     <View style={Styles.brandRow}>
-                        <View style={Styles.brandIcon}>
-                            <Ionicons name="water" size={23} color="#E0323C" />
+                            <View style={Styles.brandLogoWrap}>
+                                <Image
+                                    source={require('../../../assets/images/Doe+_Logo_1-removebg-preview.png')}
+                                    style={Styles.brandLogo}
+                                    resizeMode="contain"
+                                />
                         </View>
-                        <Text style={Styles.brand}>DOE+MAIS</Text>
-                        <Ionicons name="shield-checkmark" size={24} color="#FFF" />
+                        <Text style={Styles.cardType}>CARTEIRINHA DIGITAL</Text>
                     </View>
 
                     <View style={Styles.cardMain}>
@@ -178,9 +182,9 @@ export default function VirtualCardScreen() {
                             <Text style={Styles.fieldLabel}>TRIAGEM CONCLUÍDA EM</Text>
                             <Text style={Styles.date}>{formatApprovalDate(approvalDate)}</Text>
                         </View>
-                        <View style={Styles.approvedSeal}>
-                            <Ionicons name={underReview ? "time" : "checkmark-circle"} size={18} color="#22753A" />
-                            <Text style={Styles.approvedText}>{underReview ? 'EM REVISÃO' : 'APTO(A)'}</Text>
+                        <View style={[Styles.approvedSeal, underReview && Styles.reviewSeal]}>
+                            <Ionicons name={underReview ? "time" : "checkmark-circle"} size={18} color={underReview ? "#8A5A13" : "#22753A"} />
+                            <Text style={[Styles.approvedText, underReview && Styles.reviewText]}>{underReview ? 'EM REVISÃO' : 'APTO(A)'}</Text>
                         </View>
                     </View>
                 </View>

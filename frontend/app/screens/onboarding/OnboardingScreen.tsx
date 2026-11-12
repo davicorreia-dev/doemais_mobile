@@ -43,7 +43,7 @@ export default function OnboardingScreen() {
         if (currentIndex < slides.length - 1) {
             setCurrentIndex(currentIndex + 1);
         } else {
-            navigation.navigate('RegisterScreen');
+            navigation.navigate('Register');
         }
     };
 
