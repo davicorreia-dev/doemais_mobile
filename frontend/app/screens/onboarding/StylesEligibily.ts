@@ -48,9 +48,6 @@ const styles = StyleSheet.create({
     list: {
         gap: 14,
     },
-    formItem: {
-        gap: 8,
-    },
     card: {
         backgroundColor: '#FFF',
         borderRadius: 22,
@@ -91,22 +88,6 @@ const styles = StyleSheet.create({
         fontSize: 13,
         lineHeight: 18,
         color: '#666',
-    },
-    reviewButton: {
-        minHeight: 42,
-        borderWidth: 1,
-        borderColor: '#E0323C',
-        borderRadius: 12,
-        backgroundColor: '#FFF',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'row',
-        gap: 8,
-    },
-    reviewButtonText: {
-        color: '#E0323C',
-        fontSize: 14,
-        fontWeight: '800',
     },
 });
 
