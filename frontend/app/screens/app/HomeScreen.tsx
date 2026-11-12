@@ -1,5 +1,7 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { View, Text, ScrollView, TextInput, Image, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, ScrollView, TextInput, Image, TouchableOpacity, StatusBar } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import StatusBarBackground from '../../../components/StatusBarBackground';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons'; // Usando ícones padrão por enquanto
 import Styles from './StylesHome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -258,7 +260,8 @@ export default function HomeScreen() {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-            <StatusBar barStyle="light-content" backgroundColor="#E0323C" />
+            <StatusBar barStyle="light-content" />
+            <StatusBarBackground color="#E0323C" />
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{}}>
 

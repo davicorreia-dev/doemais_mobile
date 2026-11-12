@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { Image, ScrollView, StatusBar, Text, TouchableOpacity, View, Alert } from 'react-native';
+import StatusBarBackground from '../../../components/StatusBarBackground';
 import { NavigationProp, ParamListBase, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -207,7 +208,8 @@ export default function EligibilityFormsScreen() {
     if (loading) {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FDFCFC' }}>
-                <StatusBar backgroundColor="#E0323C" barStyle="light-content" />
+                <StatusBar barStyle="light-content" />
+            <StatusBarBackground color="#E0323C" />
                 <Text style={{ fontSize: 16, color: '#999' }}>Carregando formulários...</Text>
             </View>
         );
@@ -215,7 +217,8 @@ export default function EligibilityFormsScreen() {
 
     return (
         <View style={styles.container}>
-            <StatusBar backgroundColor="#E0323C" barStyle="light-content" />
+            <StatusBar barStyle="light-content" />
+            <StatusBarBackground color="#E0323C" />
             <View style={styles.hero} />
 
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>

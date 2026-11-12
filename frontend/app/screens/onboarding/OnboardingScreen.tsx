@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View, Text, Image, StatusBar, useWindowDimensions } from 'react-native';
+import StatusBarBackground from '../../../components/StatusBarBackground';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 
@@ -53,7 +54,8 @@ export default function OnboardingScreen() {
 
     return (
         <View style={Styles.container}>
-            <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+            <StatusBar barStyle="dark-content" />
+            <StatusBarBackground color="#fff" />
 
             {/* Faixa Vermelha Superior igual ao design */}
             <View style={[Styles.topBar, { height: barSize, marginTop: topInset(insets.top) }]} />

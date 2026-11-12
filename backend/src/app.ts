@@ -20,7 +20,7 @@ const corsOptions = {
     'http://localhost:3000',
     'http://localhost:3001',
     'http://localhost:8080',
-    env.CORS_ORIGIN,
+    ...env.CORS_ORIGIN.split(',').map((origin) => origin.trim()).filter(Boolean),
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],

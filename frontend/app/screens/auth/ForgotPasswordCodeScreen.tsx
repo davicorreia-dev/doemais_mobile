@@ -8,8 +8,7 @@ import {
   StyleSheet,
   Image,
   Alert,
-  NativeSyntheticEvent,
-  TextInputKeyPressEventData,
+  TextInputKeyPressEvent,
   KeyboardAvoidingView,
   ScrollView,
   Platform,
@@ -24,7 +23,7 @@ const ForgotPasswordCodeScreen: React.FC = () => {
   const [otp, setOtp] = useState<string[]>(['', '', '', '']);
   const [timer, setTimer] = useState<number>(120);
   
-  const inputRefs = useRef<TextInput[]>([]);
+  const inputRefs = useRef<Array<React.ElementRef<typeof TextInput>>>([]);
 
   useEffect(() => {
     if (timer === 0) return;
@@ -54,7 +53,7 @@ const ForgotPasswordCodeScreen: React.FC = () => {
   };
 
   const handleBackspace = (
-    event: NativeSyntheticEvent<TextInputKeyPressEventData>,
+    event: TextInputKeyPressEvent,
     index: number
   ) => {
     if (event.nativeEvent.key === 'Backspace') {

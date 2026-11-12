@@ -458,7 +458,7 @@ export default function QuizScreen() {
 
     return (
         <View style={Styles.container}>
-            <StatusBar translucent barStyle="light-content" />
+            <StatusBar barStyle="light-content" />
 
             <View style={[Styles.header, { height: safeTop + headerSize, paddingTop: safeTop + 18, borderBottomLeftRadius: headerRadius, borderBottomRightRadius: headerRadius }]}>
                 <TouchableOpacity style={[Styles.navButton, Styles.navButtonLeft, { top: safeTop + 20, width: navSize, height: navSize }]} onPress={handlePrevious} disabled={isSubmitting}>

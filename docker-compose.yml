@@ -1,0 +1,55 @@
+# Sobe banco + backend + frontend (Expo) de uma vez:
+#   ./run.sh            (detecta o IP da rede sozinho)
+# ou: HOST_IP=192.168.x.x docker compose up --build
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: doemais
+      POSTGRES_PASSWORD: doemais
+      POSTGRES_DB: doemais
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U doemais"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://doemais:doemais@db:5432/doemais?schema=public
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET:-dev-only-secret-troque-em-producao}
+      NODE_ENV: development
+      PORT: "3000"
+      # origens permitidas (separadas por vírgula): o app web do Expo roda na 8081
+      CORS_ORIGIN: http://localhost:8081,http://${HOST_IP:-localhost}:8081
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    environment:
+      # IP do PC na rede: o celular usa esse endereço para falar com o Metro e com a API
+      HOST_IP: ${HOST_IP:-}
+      REACT_NATIVE_PACKAGER_HOSTNAME: ${HOST_IP:-}
+      EXPO_PUBLIC_API_URL: http://${HOST_IP:-localhost}:3000
+      EXPO_NO_TELEMETRY: "1"
+      # sem login/rede do Expo: evita o prompt "Log in / Proceed anonymously" que trava o Expo Go
+      EXPO_OFFLINE: "1"
+    ports:
+      - "8081:8081"
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  pgdata:
