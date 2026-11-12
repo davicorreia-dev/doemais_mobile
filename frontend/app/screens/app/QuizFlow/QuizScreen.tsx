@@ -248,6 +248,11 @@ export default function QuizScreen() {
         }
     };
 
+    const closeCorrection = () => {
+        setCorrectionVisible(false);
+        navigation.goBack();
+    };
+
     const openBlock = (message: string, finalAnswers: Record<string, unknown>) => {
         setBlockVisible(true);
         setBlockMessage(message || module.blockMessage);
@@ -567,9 +572,17 @@ export default function QuizScreen() {
                 </View>
             </Modal>
 
-            <Modal visible={correctionVisible} transparent animationType="fade" onRequestClose={() => navigation.goBack()}>
+            <Modal visible={correctionVisible} transparent animationType="fade" onRequestClose={closeCorrection}>
                 <View style={Styles.modalBackdrop}>
                     <View style={Styles.modalCard}>
+                        <TouchableOpacity
+                            style={Styles.modalCloseButton}
+                            onPress={closeCorrection}
+                            accessibilityRole="button"
+                            accessibilityLabel="Fechar solicitação de correção"
+                        >
+                            <Ionicons name="close" size={24} color="#666" />
+                        </TouchableOpacity>
                         <Ionicons name="create-outline" size={52} color="#E0323C" />
                         <Text style={Styles.modalTitle}>Corrigir respostas</Text>
                         <Text style={Styles.modalMessage}>Informe o motivo antes de refazer. O hemocentro poderá comparar as respostas.</Text>
