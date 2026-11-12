@@ -25,9 +25,23 @@ model Doador {
   // Relacionamentos com outras tabelas
   agendamentos            Agendamento[]
   formulariosElegibilidade Formulario_Elegibilidade[]
+  resultadosTriagem       Triagem_Resultado[]
   historicosClinicos      Historico_Clinico[]
   refreshTokens           RefreshToken[]
   passwordResetTokens     PasswordResetToken[]
+}
+
+model Triagem_Resultado {
+  id                 Int      @id @default(autoincrement())
+  doador_id          Int      @map("doadorId")
+  modulo             String
+  respostas          Json
+  status             String
+  data_preenchimento DateTime @default(now()) @map("dataPreenchimento")
+
+  doador             Doador   @relation(fields: [doador_id], references: [id], onDelete: Cascade)
+
+  @@index([doador_id, modulo, data_preenchimento])
 }
 
 model Hemocentro {

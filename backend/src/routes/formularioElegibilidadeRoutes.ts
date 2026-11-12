@@ -6,6 +6,8 @@ import {
 } from '../controllers/formularioElegibilidadeController';
 import validationMiddleware from '../middlewares/validation.middleware';
 import { CreateFormularioElegibilidadeDto } from '../dtos/doador.dto';
+import { createTriagem, getLatestTriagens, resetTriagens } from '../controllers/triagemResultadoController';
+import { CreateTriagemResultadoDto } from '../dtos/doador.dto';
 
 const router = Router();
 
@@ -21,5 +23,9 @@ router.get('/elegibilidade', getFormulario);
 
 // Rota GET para recuperar todos os formulários do doador
 router.get('/elegibilidade/historico', getAllFormularios);
+
+router.post('/triagens', validationMiddleware(CreateTriagemResultadoDto), createTriagem);
+router.get('/triagens/atual', getLatestTriagens);
+router.delete('/triagens', resetTriagens);
 
 export default router;

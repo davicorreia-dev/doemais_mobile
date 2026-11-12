@@ -5,7 +5,11 @@ import { NavigationProp, ParamListBase, useNavigation, useRoute } from '@react-n
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const saveModuleResult = async (moduleId: string, status: 'approved' | 'blocked') => {
+const saveModuleResult = async (
+    moduleId: string,
+    status: 'approved' | 'blocked',
+    answers: Record<string, unknown>
+) => {
     try {
         const userRaw = await AsyncStorage.getItem('@doemais:user');
         if (!userRaw) return;
@@ -20,6 +24,17 @@ const saveModuleResult = async (moduleId: string, status: 'approved' | 'blocked'
             date: Date.now(),
         };
         await AsyncStorage.setItem(key, JSON.stringify(history));
+
+        try {
+            await api('/api/doadores/triagens', 'POST', {
+                modulo: moduleId,
+                status,
+                respostas: answers,
+            });
+        } catch (error) {
+            // O cache local mantém a experiência utilizável quando não houver conexão.
+            console.error('Erro ao persistir resultado da triagem:', error);
+        }
     } catch (e) {
         console.error("Erro ao salvar histórico do quiz no AsyncStorage:", e);
     }
@@ -168,10 +183,21 @@ export default function QuizScreen() {
             await submitAnswersToAPI(finalAnswers);
             
             // Grava a aprovação localmente no AsyncStorage
-            await saveModuleResult(module.id, 'approved');
+            await saveModuleResult(module.id, 'approved', finalAnswers);
             
+            const isFinalTriage = module.id === 'TRIAGEM_HOMEM' || module.id === 'TRIAGEM_MULHER';
+            // No web, Alert pode não executar o callback do botão como no app nativo.
+            // A triagem final precisa abrir a carteirinha imediatamente após a aprovação.
+            if (isFinalTriage) {
+                navigation.navigate('MainTabs', { screen: 'Carteirinha' });
+                return;
+            }
+
             Alert.alert(module.successTitle, module.successMessage, [
-                { text: 'OK', onPress: () => navigation.goBack() },
+                {
+                    text: 'OK',
+                    onPress: () => navigation.goBack(),
+                },
             ]);
         } catch (error) {
             console.error("Erro ao salvar triagem:", error);
@@ -191,12 +217,12 @@ export default function QuizScreen() {
         navigation.goBack();
     };
 
-    const openBlock = (message: string) => {
+    const openBlock = (message: string, finalAnswers: Record<string, unknown>) => {
         setBlockVisible(true);
         setBlockMessage(message || module.blockMessage);
         
         // Grava o bloqueio localmente no AsyncStorage
-        saveModuleResult(module.id, 'blocked').catch(e => console.error(e));
+        saveModuleResult(module.id, 'blocked', finalAnswers).catch(e => console.error(e));
     };
 
     const validateQuestion = (answer: boolean | string | number | null) => {
@@ -271,7 +297,7 @@ export default function QuizScreen() {
             // Mandamos para o banco em "background" para registrar a falha
             submitAnswersToAPI(newAnswers).catch(e => console.error("Erro ao registrar bloqueio:", e));
             // E exibimos a tela de bloqueio
-            openBlock(result.message);
+            openBlock(result.message, newAnswers);
             return;
         }
 

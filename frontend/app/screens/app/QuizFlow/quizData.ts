@@ -61,14 +61,14 @@ const monthOptions: QuizOption[] = [
 const createYesNoQuestion = (
     id: string,
     questionText: string,
-    blockWhen: boolean,
+    blockWhen: boolean | undefined,
     blockMessage: string,
 ): QuizQuestion => ({
     id,
     questionText,
     answerType: 'boolean',
     options: yesNoOptions,
-    blockRule: { kind: 'boolean', blockWhen },
+    blockRule: typeof blockWhen === 'boolean' ? { kind: 'boolean', blockWhen } : undefined,
     blockMessage,
 });
 
@@ -290,7 +290,7 @@ export const QUIZ_MODULES: Record<string, QuizModule> = {
         successTitle: 'Modal de Sucesso',
         successMessage: 'Triagem aprovada. Redirecionando para a próxima etapa.',
         questions: [
-            createYesNoQuestion('h1', 'Doou sangue nos últimos 60 dias?', true, 'Você não respeitou o intervalo mínimo de 60 dias.'),
+            createYesNoQuestion('h1', 'Doou sangue nos últimos 60 dias?', undefined, 'Você não respeitou o intervalo mínimo de 60 dias.'),
             createYesNoQuestion('h2', 'Lembra qual foi o mês?', false, 'Selecione uma resposta para continuar.'),
             createChoiceQuestion('h3', 'Selecione o mês em que você realizou a doação.', monthOptions, undefined, undefined, 'select'),
             createChoiceQuestion('h4', '4. Este foi o mês exato da sua doação? ({{month}})', [
@@ -311,7 +311,7 @@ export const QUIZ_MODULES: Record<string, QuizModule> = {
         successTitle: 'Modal de Sucesso',
         successMessage: 'Triagem aprovada. Redirecionando para a próxima etapa.',
         questions: [
-            createYesNoQuestion('w1', 'Doou sangue nos últimos 90 dias?', true, 'Você não respeitou o intervalo mínimo de 90 dias.'),
+            createYesNoQuestion('w1', 'Doou sangue nos últimos 90 dias?', undefined, 'Você não respeitou o intervalo mínimo de 90 dias.'),
             createYesNoQuestion('w2', 'Lembra qual foi o mês?', false, 'Selecione uma resposta para continuar.'),
             createChoiceQuestion('w3', 'Selecione o mês em que você realizou a doação.', monthOptions, undefined, undefined, 'select'),
             createChoiceQuestion('w4', '4. Este foi o mês exato da sua doação? ({{month}})', [

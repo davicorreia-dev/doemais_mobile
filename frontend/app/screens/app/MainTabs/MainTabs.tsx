@@ -5,6 +5,7 @@ import { View, Text } from 'react-native';
 
 import HomeScreen from '../HomeScreen';
 import EligibilityFormsScreen from '../../onboarding/EligibilityFormsScreen';
+import VirtualCardScreen from '../VirtualCardScreen';
 
 const PlaceholderScreen = ({ name }: { name: string }) => (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -49,6 +50,8 @@ export default function MainTabs() {
                         iconName = focused ? 'home' : 'home-outline';
                     } else if (route.name === 'Elegibilidade') {
                         iconName = focused ? 'clipboard' : 'clipboard-outline';
+                    } else if (route.name === 'Carteirinha') {
+                        iconName = focused ? 'card' : 'card-outline';
                     } else if (route.name === 'Mais') {
                         iconName = focused ? 'grid' : 'grid-outline';
                     }
@@ -84,6 +87,8 @@ export default function MainTabs() {
                 name="Elegibilidade"
                 component={EligibilityFormsScreen}
             />
+
+            <Tab.Screen name="Carteirinha" component={VirtualCardScreen} />
 
             <Tab.Screen
                 name="Mais"

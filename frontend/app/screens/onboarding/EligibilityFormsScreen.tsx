@@ -161,9 +161,10 @@ export default function EligibilityFormsScreen() {
                     }
 
                     // 3. Carrega perfil e formulário mais recente em paralelo
-                    const [profileResponse, formResponse] = await Promise.all([
+                    const [profileResponse, formResponse, triageResponse] = await Promise.all([
                         api('/api/doadores/me', 'GET').catch(() => null),
-                        api('/api/doadores/elegibilidade', 'GET').catch(() => null)
+                        api('/api/doadores/elegibilidade', 'GET').catch(() => null),
+                        api('/api/doadores/triagens/atual', 'GET').catch(() => null)
                     ]);
 
                     if (profileResponse) {
@@ -187,6 +188,17 @@ export default function EligibilityFormsScreen() {
                         setLatestForm(formData);
                     } else {
                         setLatestForm(null);
+                    }
+
+                    if (triageResponse) {
+                        const latestTriages = triageResponse.data || triageResponse;
+                        const persistedHistory = Object.fromEntries(
+                            Object.entries(latestTriages).map(([moduleId, result]: [string, any]) => [moduleId, {
+                                status: result.status,
+                                date: new Date(result.data_preenchimento).getTime(),
+                            }])
+                        );
+                        setLocalHistory((current: any) => ({ ...current, ...persistedHistory }));
                     }
                 } catch (error) {
                     console.error("Erro ao carregar dados da triagem:", error);
