@@ -14,7 +14,7 @@ export default function ForgetPasswordChoiceScreen() {
         <View style={{ flex: 1, backgroundColor: '#fff' }}>
             <Header
                 icon="arrow-back-outline"
-                onBack={() => navigation.navigate("LoginScreen")}
+                onBack={() => navigation.navigate("Login")}
                 title="Esqueceu sua senha"
                 subtitle="Escolha como você gostaria de receber o código de redefinição."
             />

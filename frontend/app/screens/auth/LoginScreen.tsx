@@ -194,11 +194,13 @@ export default function LoginScreen() {
                         <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 20, marginBottom: 10 }}>
                             <SocialButton
                                 iconSource={require("../../../assets/images/googleicon.png")}
+                                accessibilityLabel="Continuar com Google"
                                 onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
                             />
 
                             <SocialButton
                                 iconSource={require("../../../assets/images/facebook 1.png")}
+                                accessibilityLabel="Continuar com Facebook"
                                 onPress={() => Alert.alert("Em breve", "Login social ainda não configurado.")}
                             />
                         </View>
