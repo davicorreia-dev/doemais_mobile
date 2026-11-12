@@ -1,9 +1,10 @@
-# Sobe banco + backend + frontend (Expo) de uma vez:
-#   ./run.sh            (detecta o IP da rede sozinho)
-# ou: HOST_IP=192.168.x.x docker compose up --build
+# Use ./run.sh --local  (db + backend + Expo, API local)
+#     ./run.sh --render (só o Expo, API no Render)
+# db e backend ficam no profile "local"; o frontend sempre sobe.
 services:
   db:
     image: postgres:16
+    profiles: [local]
     environment:
       POSTGRES_USER: doemais
       POSTGRES_PASSWORD: doemais
@@ -18,6 +19,7 @@ services:
 
   backend:
     build: ./backend
+    profiles: [local]
     depends_on:
       db:
         condition: service_healthy
@@ -33,13 +35,12 @@ services:
 
   frontend:
     build: ./frontend
-    depends_on:
-      - backend
     environment:
       # IP do PC na rede: o celular usa esse endereço para falar com o Metro e com a API
       HOST_IP: ${HOST_IP:-}
       REACT_NATIVE_PACKAGER_HOSTNAME: ${HOST_IP:-}
-      EXPO_PUBLIC_API_URL: http://${HOST_IP:-localhost}:3000
+      # definido pelo run.sh (--local ou --render)
+      EXPO_PUBLIC_API_URL: ${API_URL:-http://localhost:3000}
       EXPO_NO_TELEMETRY: "1"
       # sem login/rede do Expo: evita o prompt "Log in / Proceed anonymously" que trava o Expo Go
       EXPO_OFFLINE: "1"
