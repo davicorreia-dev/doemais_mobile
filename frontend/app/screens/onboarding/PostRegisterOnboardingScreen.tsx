@@ -89,7 +89,7 @@ export default function PostRegisterOnboardingScreen() {
                     <View style={[styles.progressValue, { width: `${progressPercent}%` }]} />
                 </View>
                 <Button
-                    title={currentIndex === slides.length - 1 ? 'Ir para o login' : 'Próximo'}
+                    title={currentIndex === slides.length - 1 ? 'Ir para o app' : 'Próximo'}
                     textColor="#FFF"
                     borderRadius={25}
                     onPress={handleContinue}
