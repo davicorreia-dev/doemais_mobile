@@ -29,10 +29,9 @@ type TabIconProps = {
     color: string;
     size: number;
     cardUnlocked: boolean;
-    badge?: string | number;
 };
 
-function TabIcon({ routeName, focused, color, size, cardUnlocked, badge }: TabIconProps) {
+function TabIcon({ routeName, focused, color, size, cardUnlocked }: TabIconProps) {
     const progress = useRef(new Animated.Value(focused ? 1 : 0)).current;
     const isEligibility = routeName === 'Elegibilidade';
     const isLockedCard = routeName === 'Carteirinha' && !cardUnlocked;
@@ -70,11 +69,6 @@ function TabIcon({ routeName, focused, color, size, cardUnlocked, badge }: TabIc
             animatedStyle,
         ]}>
             <Ionicons name={iconName} size={isEligibility ? 23 : size} color={iconColor} />
-            {badge !== undefined && (
-                <View style={[styles.iconBadge, badge === '!' && styles.reviewIconBadge]}>
-                    <Text style={styles.iconBadgeText}>{badge}</Text>
-                </View>
-            )}
         </Animated.View>
     );
 }
@@ -138,19 +132,14 @@ export default function MainTabs() {
                 ),
                 tabBarStyle: styles.tabBar,
                 tabBarIcon: ({ focused, color, size }) => (
-                    <TabIcon
-                        routeName={route.name}
-                        focused={focused}
-                        color={color}
-                        size={size}
-                        cardUnlocked={cardUnlocked}
-                        badge={route.name === 'Elegibilidade' && remainingForms > 0
-                            ? remainingForms
-                            : route.name === 'Carteirinha' && hasPendingReview
-                                ? '!'
-                                : undefined}
-                    />
+                    <TabIcon routeName={route.name} focused={focused} color={color} size={size} cardUnlocked={cardUnlocked} />
                 ),
+                tabBarBadge: route.name === 'Elegibilidade' && remainingForms > 0
+                    ? remainingForms
+                    : route.name === 'Carteirinha' && hasPendingReview
+                        ? '!'
+                        : undefined,
+                tabBarBadgeStyle: route.name === 'Carteirinha' && hasPendingReview ? styles.reviewBadge : styles.badge,
                 tabBarItemStyle: route.name === 'Elegibilidade' ? styles.primaryTabItem : undefined,
             })}
         >
