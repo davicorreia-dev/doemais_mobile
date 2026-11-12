@@ -1,4 +1,5 @@
 import prisma from '../config/prisma';
+import { Prisma } from '@prisma/client';
 import { CreateTriagemResultadoDto } from '../dtos/doador.dto';
 import { UnauthorizedError } from '../utils/errors';
 
@@ -14,7 +15,7 @@ export const createTriagemResultado = async (doadorId: number, data: CreateTriag
       doador_id: doadorId,
       modulo: data.modulo,
       status: data.status,
-      respostas: data.respostas,
+      respostas: data.respostas as Prisma.InputJsonObject,
     },
   });
 };
