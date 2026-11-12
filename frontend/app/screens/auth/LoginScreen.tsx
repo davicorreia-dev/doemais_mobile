@@ -82,9 +82,14 @@ export default function LoginScreen() {
                     await AsyncStorage.setItem('@doemais:refreshToken', parsedResponse.refreshToken);
                 }
 
+                const onboardingKey = `@doemais:onboarding_completed:${parsedResponse.doador.id}`;
+                const hasCompletedOnboarding = await AsyncStorage.getItem(onboardingKey);
                 navigation.reset({
                     index: 0,
-                    routes: [{ name: 'MainTabs' }],
+                    routes: [{
+                        name: hasCompletedOnboarding ? 'MainTabs' : 'PostRegisterOnboarding',
+                        params: hasCompletedOnboarding ? undefined : { onboardingKey },
+                    }],
                 });
             } else {
                 throw new Error("Token não recebido.");

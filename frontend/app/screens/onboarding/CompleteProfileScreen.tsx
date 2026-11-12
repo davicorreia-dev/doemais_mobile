@@ -130,10 +130,8 @@ export default function CompleteProfileScreen() {
 
             await api('/api/auth/register', 'POST', payload);
 
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'PostRegisterOnboarding' }],
-            });
+            Alert.alert("Sucesso", "Conta criada com sucesso!");
+            navigation.navigate("RegisterSuccessScreen");
 
         } catch (error: any) {
             console.error(error);

@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { Text, View, useWindowDimensions } from 'react-native';
+import { useRef, useState } from 'react';
+import { Animated, Easing, Text, View, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Button from '../../../components/Button';
 import StatusBarBackground from '../../../components/StatusBarBackground';
@@ -24,22 +25,50 @@ const slides = [
 
 export default function PostRegisterOnboardingScreen() {
     const navigation = useNavigation<any>();
+    const route = useRoute<any>();
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const transition = useRef(new Animated.Value(1)).current;
     const { height } = useWindowDimensions();
     const insets = useSafeAreaInsets();
     const currentSlide = slides[currentIndex];
     const progressPercent = ((currentIndex + 1) / slides.length) * 100;
 
+    const finishOnboarding = async () => {
+        const onboardingKey = route.params?.onboardingKey as string | undefined;
+        if (onboardingKey) {
+            await AsyncStorage.setItem(onboardingKey, 'true');
+        }
+
+        navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
+    };
+
     const handleContinue = () => {
         if (currentIndex < slides.length - 1) {
-            setCurrentIndex((index) => index + 1);
+            setIsTransitioning(true);
+            Animated.timing(transition, {
+                toValue: 0,
+                duration: 160,
+                easing: Easing.out(Easing.quad),
+                useNativeDriver: true,
+            }).start(() => {
+                setCurrentIndex((index) => index + 1);
+                Animated.timing(transition, {
+                    toValue: 1,
+                    duration: 240,
+                    easing: Easing.out(Easing.cubic),
+                    useNativeDriver: true,
+                }).start(() => setIsTransitioning(false));
+            });
             return;
         }
 
-        navigation.reset({
-            index: 1,
-            routes: [{ name: 'AuthChoice' }, { name: 'Login' }],
-        });
+        finishOnboarding();
+    };
+
+    const animatedSlideStyle = {
+        opacity: transition,
+        transform: [{ translateX: transition.interpolate({ inputRange: [0, 1], outputRange: [24, 0] }) }],
     };
 
     return (
@@ -47,13 +76,13 @@ export default function PostRegisterOnboardingScreen() {
             <StatusBarBackground color="#fff" />
             <View style={[styles.topBar, { height: clamp(height * 0.03, 18, 34), marginTop: topInset(insets.top) }]} />
 
-            <View style={styles.content}>
+            <Animated.View style={[styles.content, animatedSlideStyle]}>
                 <Text style={styles.title}>{currentSlide.title}</Text>
                 <View style={styles.iconWrap}>
                     <Ionicons name={currentSlide.icon} size={104} color="#E0323C" />
                 </View>
                 <Text style={styles.description}>{currentSlide.description}</Text>
-            </View>
+            </Animated.View>
 
             <View style={styles.footer}>
                 <View style={styles.progressTrack}>
@@ -64,6 +93,7 @@ export default function PostRegisterOnboardingScreen() {
                     textColor="#FFF"
                     borderRadius={25}
                     onPress={handleContinue}
+                    disabled={isTransitioning}
                 />
             </View>
         </View>
