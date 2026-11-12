@@ -313,7 +313,10 @@ export default function EligibilityFormsScreen() {
                                 style={[styles.card, { backgroundColor: cardBg, borderColor: cardBorderColor, borderWidth: cardBorderColor !== 'transparent' ? 1 : 0 }]}
                             >
                                 <TouchableOpacity
-                                    style={styles.cardMainAction}
+                                    style={[
+                                        styles.cardMainAction,
+                                        stateInfo.status !== 'neutral' && styles.cardMainActionWithReview,
+                                    ]}
                                     activeOpacity={0.85}
                                     onPress={handlePress}
                                 >
@@ -339,8 +342,8 @@ export default function EligibilityFormsScreen() {
                                         accessibilityRole="button"
                                         accessibilityLabel={`Solicitar revisão do formulário ${module.title}`}
                                     >
-                                        <Ionicons name="create-outline" size={18} color="#E0323C" />
-                                        <Text style={styles.reviewButtonText}>Solicitar revisão</Text>
+                                        <Ionicons name="create-outline" size={16} color="#E0323C" />
+                                        <Text style={styles.reviewButtonText}>Revisar</Text>
                                     </TouchableOpacity>
                                 )}
                             </View>
