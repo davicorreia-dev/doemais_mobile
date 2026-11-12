@@ -76,10 +76,10 @@ export default function ProfileSetupPhotoScreen({ navigation }: any) {
 
                     // Salva o caminho permanente no AsyncStorage
                     await AsyncStorage.setItem('@profile_image', destinationUri);
-                    navigation.navigate('MainTabs', { image: destinationUri });
+                    navigation.goBack();
                 } else {
                     // Se já estiver no diretório permanente (foi carregada do AsyncStorage)
-                    navigation.navigate('MainTabs', { image });
+                    navigation.goBack();
                 }
             } catch (error) {
                 console.error("Erro ao salvar a imagem localmente:", error);
@@ -88,7 +88,7 @@ export default function ProfileSetupPhotoScreen({ navigation }: any) {
             }
         } else {
             // Caso o usuário não tenha selecionado uma imagem (opcional)
-            navigation.navigate('MainTabs', { image: null });
+            navigation.goBack();
         }
     }
 

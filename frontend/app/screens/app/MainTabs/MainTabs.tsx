@@ -49,7 +49,7 @@ function TabIcon({ routeName, focused, color, size, cardUnlocked }: TabIconProps
     if (routeName === 'Início') iconName = focused ? 'home' : 'home-outline';
     if (routeName === 'Elegibilidade') iconName = focused ? 'clipboard' : 'clipboard-outline';
     if (routeName === 'Carteirinha') iconName = isLockedCard ? 'lock-closed-outline' : focused ? 'card' : 'card-outline';
-    if (routeName === 'Mais') iconName = focused ? 'person' : 'person-outline';
+    if (routeName === 'Mais') iconName = focused ? 'settings' : 'settings-outline';
 
     const iconColor = isLockedCard ? '#A8A29A' : focused ? '#FFF' : color;
     const animatedStyle = {
