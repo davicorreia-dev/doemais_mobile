@@ -48,6 +48,9 @@ const styles = StyleSheet.create({
     list: {
         gap: 14,
     },
+    formItem: {
+        gap: 8,
+    },
     card: {
         backgroundColor: '#FFF',
         borderRadius: 22,
@@ -55,7 +58,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 14,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 10,
+        gap: 14,
         shadowColor: '#000',
         shadowOpacity: 0.06,
         shadowRadius: 12,
@@ -78,13 +81,6 @@ const styles = StyleSheet.create({
     cardBody: {
         flex: 1,
     },
-    cardMainAction: {
-        flex: 1,
-        minHeight: 56,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 14,
-    },
     cardTitle: {
         fontSize: 16,
         fontWeight: '800',
@@ -97,20 +93,19 @@ const styles = StyleSheet.create({
         color: '#666',
     },
     reviewButton: {
-        minHeight: 36,
-        paddingHorizontal: 8,
+        minHeight: 42,
         borderWidth: 1,
         borderColor: '#E0323C',
-        borderRadius: 10,
-        backgroundColor: '#FFF2F3',
+        borderRadius: 12,
+        backgroundColor: '#FFF',
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'row',
-        gap: 4,
+        gap: 8,
     },
     reviewButtonText: {
         color: '#E0323C',
-        fontSize: 12,
+        fontSize: 14,
         fontWeight: '800',
     },
 });
