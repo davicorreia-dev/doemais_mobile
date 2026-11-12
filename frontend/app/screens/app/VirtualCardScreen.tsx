@@ -156,7 +156,7 @@ export default function VirtualCardScreen() {
                     <View style={Styles.brandRow}>
                             <View style={Styles.brandLogoWrap}>
                                 <Image
-                                    source={require('../../../assets/images/doe-logo.png')}
+                                    source={require('../../../assets/images/Doe+_Logo_1-removebg-preview.png')}
                                     style={Styles.brandLogo}
                                     resizeMode="contain"
                                 />
