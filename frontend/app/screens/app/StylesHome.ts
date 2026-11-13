@@ -1,6 +1,8 @@
 import { StyleSheet, Platform } from "react-native";
 
 const Styles = StyleSheet.create({
+    desktopShell: { flexDirection: 'row', backgroundColor: '#F7F6F4' },
+    desktopMain: { flex: 1 },
     headerContainer: {
         backgroundColor: '#fff',
         paddingTop: Platform.OS === 'android' ? 40 : 20,
@@ -74,6 +76,7 @@ const Styles = StyleSheet.create({
     contentContainer: {
         padding: 20,
     },
+    contentContainerDesktop: { maxWidth: 1080, width: '100%', alignSelf: 'center', paddingHorizontal: 42, paddingTop: 38, paddingBottom: 64 },
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',

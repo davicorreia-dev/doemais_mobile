@@ -39,6 +39,8 @@ export default function VirtualCardScreen() {
     const [profile, setProfile] = useState<Profile>({});
     const [approvalDate, setApprovalDate] = useState<number | null>(null);
     const [underReview, setUnderReview] = useState(false);
+    const [reviewFormName, setReviewFormName] = useState('');
+    const [reviewRequestedAt, setReviewRequestedAt] = useState('');
     const [loading, setLoading] = useState(true);
 
     useFocusEffect(
@@ -98,9 +100,14 @@ export default function VirtualCardScreen() {
                             setApprovalDate(new Date(persistedFinalTriage.data_preenchimento).getTime());
                         }
                         if (active) {
-                            setUnderReview(Array.isArray(corrections) && corrections.some((item: any) =>
+                            const pendingCorrection = Array.isArray(corrections) && corrections.find((item: any) =>
                                 item.status === 'PENDING_REVIEW' && FINAL_TRIAGE_IDS.includes(item.modulo)
-                            ));
+                            );
+                            setUnderReview(Boolean(pendingCorrection));
+                            setReviewFormName(pendingCorrection?.nome_formulario || pendingCorrection?.modulo_nome || pendingCorrection?.modulo?.replaceAll('_', ' ') || '');
+                            setReviewRequestedAt(pendingCorrection?.data_solicitacao
+                                ? new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(pendingCorrection.data_solicitacao))
+                                : '');
                         }
                     } catch (error) {
                         console.error('Erro ao carregar perfil para a carteirinha:', error);
@@ -174,7 +181,7 @@ export default function VirtualCardScreen() {
                             underReview={underReview}
                             desktop={isDesktop}
                         />
-                        <VirtualCardNotice underReview={underReview} desktop={isDesktop} />
+                        <VirtualCardNotice underReview={underReview} desktop={isDesktop} formName={reviewFormName} requestedAt={reviewRequestedAt} />
                     </View>
                 </ScrollView>
             </View>

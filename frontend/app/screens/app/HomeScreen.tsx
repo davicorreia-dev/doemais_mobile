@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { View, Text, ScrollView, TextInput, Image, TouchableOpacity, StatusBar } from 'react-native';
+import { View, Text, ScrollView, TextInput, Image, TouchableOpacity, StatusBar, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import StatusBarBackground from '../../../components/StatusBarBackground';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons'; // Usando ícones padrão por enquanto
@@ -7,6 +7,8 @@ import Styles from './StylesHome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { api } from '../../services/api';
+import DesktopAppSidebar from '../../../components/DesktopAppSidebar';
+import DesktopPageHeader from '../../../components/DesktopPageHeader';
 
 interface NewsItem {
     id: string;
@@ -122,6 +124,8 @@ const NEWS_DATABASE: NewsItem[] = [
 
 export default function HomeScreen() {
     const navigation = useNavigation<any>();
+    const { width } = useWindowDimensions();
+    const isDesktop = width >= 768;
     const [profileImage, setProfileImage] = useState<string | null>(null);
 
     const [userName, setUserName] = useState<string>('Carregando...');
@@ -259,14 +263,17 @@ export default function HomeScreen() {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+        <SafeAreaView style={[{ flex: 1, backgroundColor: '#fff' }, isDesktop && Styles.desktopShell]}>
             <StatusBar barStyle="light-content" />
             <StatusBarBackground color="#E0323C" />
+            {isDesktop && <DesktopAppSidebar name={userName === 'Carregando...' ? 'Doador(a)' : userName} avatarUri={profileImage} activeRoute="Início" onNavigate={(target) => navigation.navigate(target)} onLogout={handleLogout} />}
+            <View style={isDesktop && Styles.desktopMain}>
+            {isDesktop && <DesktopPageHeader title="Início" subtitle="Acompanhe novidades e oportunidades para doar" />}
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{}}>
 
                 {/* --- HEADER VERMELHO --- */}
-                <View style={Styles.headerContainer}>
+                {!isDesktop && <View style={Styles.headerContainer}>
                     <View style={Styles.headerTop}>
                         <View style={Styles.userInfo}>
                             {/* Placeholder para Foto ou Foto Real com navegação */}
@@ -302,10 +309,10 @@ export default function HomeScreen() {
                             style={Styles.searchInput}
                         />
                     </View>
-                </View>
+                </View>}
 
                 {/* --- CONTEÚDO --- */}
-                <View style={Styles.contentContainer}>
+                <View style={[Styles.contentContainer, isDesktop && Styles.contentContainerDesktop]}>
 
                     {/* Seção Atividades */}
                     <Text style={Styles.sectionTitle}>Atividades</Text>
@@ -388,6 +395,7 @@ export default function HomeScreen() {
 
                 </View>
             </ScrollView>
+            </View>
         </SafeAreaView>
     );
 }

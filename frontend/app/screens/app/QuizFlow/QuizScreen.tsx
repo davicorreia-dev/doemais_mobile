@@ -5,6 +5,7 @@ import { NavigationProp, ParamListBase, useNavigation, useRoute } from '@react-n
 import { Ionicons } from '@expo/vector-icons';
 import DesktopAppSidebar from '../../../../components/DesktopAppSidebar';
 import DesktopPageHeader from '../../../../components/DesktopPageHeader';
+import FeedbackModal from '../../../../components/FeedbackModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const saveModuleResult = async (
@@ -124,6 +125,7 @@ export default function QuizScreen() {
     const [correctionId, setCorrectionId] = useState<number | null>(null);
     const [selectExpanded, setSelectExpanded] = useState(false);
     const [selectedMonthLabel, setSelectedMonthLabel] = useState('');
+    const [feedback, setFeedback] = useState<{ title: string; message: string } | null>(null);
     
     // Acumulador de respostas!
     const [answers, setAnswers] = useState<Record<string, any>>({});
@@ -207,7 +209,7 @@ export default function QuizScreen() {
             setSuccessVisible(true);
         } catch (error) {
             console.error("Erro ao salvar triagem:", error);
-            Alert.alert("Erro", "Ocorreu um erro ao salvar o questionário. Tente novamente.");
+            setFeedback({ title: 'Não foi possível salvar', message: 'Ocorreu um erro ao salvar o questionário. Tente novamente.' });
         } finally {
             setIsSubmitting(false);
         }
@@ -235,7 +237,7 @@ export default function QuizScreen() {
 
     const beginCorrection = async () => {
         if (!correctionReason) {
-            Alert.alert('Informe o motivo', 'Selecione o motivo da correção antes de continuar.');
+            setFeedback({ title: 'Informe o motivo', message: 'Selecione o motivo da correção antes de continuar.' });
             return;
         }
         try {
@@ -253,7 +255,7 @@ export default function QuizScreen() {
             setCorrectionId(request.id);
             setCorrectionVisible(false);
         } catch (error: any) {
-            Alert.alert('Erro', error.message || 'Não foi possível iniciar a correção.');
+            setFeedback({ title: 'Não foi possível iniciar o reteste', message: error.message || 'Tente novamente em alguns instantes.' });
         }
     };
 
@@ -621,6 +623,7 @@ export default function QuizScreen() {
                     </View>
                 </View>
             </Modal>
+            <FeedbackModal visible={Boolean(feedback)} title={feedback?.title || ''} message={feedback?.message || ''} onClose={() => setFeedback(null)} />
         </View>
     );
 }

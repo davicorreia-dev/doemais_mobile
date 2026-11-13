@@ -134,10 +134,13 @@ export default function EligibilityFormsScreen() {
     const [loading, setLoading] = useState(true);
     const [latestForm, setLatestForm] = useState<any>(null);
     const [localHistory, setLocalHistory] = useState<any>({});
+    const [errorMessage, setErrorMessage] = useState('');
+    const [loadVersion, setLoadVersion] = useState(0);
 
     useFocusEffect(
         useCallback(() => {
             async function loadData() {
+                setErrorMessage('');
                 try {
                     // 1. Carrega gênero do cache local e pega o ID do usuário
                     const userData = await AsyncStorage.getItem('@doemais:user');
@@ -208,12 +211,13 @@ export default function EligibilityFormsScreen() {
                     }
                 } catch (error) {
                     console.error("Erro ao carregar dados da triagem:", error);
+                    setErrorMessage('Não foi possível atualizar os formulários agora.');
                 } finally {
                     setLoading(false);
                 }
             }
             loadData();
-        }, [])
+        }, [loadVersion])
     );
 
     const visibleForms = useMemo(() => {
@@ -229,6 +233,19 @@ export default function EligibilityFormsScreen() {
                 <StatusBar barStyle="light-content" />
             <StatusBarBackground color="#E0323C" />
                 <Text style={{ fontSize: 16, color: '#999' }}>Carregando formulários...</Text>
+            </View>
+        );
+    }
+
+    if (errorMessage) {
+        return (
+            <View style={styles.stateScreen}>
+                <Ionicons name="cloud-offline-outline" size={42} color="#E0323C" />
+                <Text style={styles.stateTitle}>Não foi possível carregar</Text>
+                <Text style={styles.stateText}>{errorMessage}</Text>
+                <TouchableOpacity style={styles.retryButton} onPress={() => { setLoading(true); setLoadVersion((value) => value + 1); }} accessibilityRole="button">
+                    <Text style={styles.retryButtonText}>Tentar novamente</Text>
+                </TouchableOpacity>
             </View>
         );
     }
