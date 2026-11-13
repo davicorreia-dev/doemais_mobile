@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextInput, Text, View, TouchableOpacity } from "react-native";
+import { TextInput, Text, View, TouchableOpacity, type StyleProp, type ViewStyle } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import type { KeyboardTypeOptions } from "react-native";
 import styles from "./styles";
@@ -14,6 +14,8 @@ type InputProps = {
     autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
     autoCorrect?: boolean;
     error?: string;
+    containerStyle?: StyleProp<ViewStyle>;
+    inputContainerStyle?: StyleProp<ViewStyle>;
 };
 
 export default function Input({ 
@@ -25,14 +27,16 @@ export default function Input({
     keyboardType,
     autoCapitalize,
     autoCorrect,
-    error
+    error,
+    containerStyle,
+    inputContainerStyle,
 }: InputProps) {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     return (
-        <View style={styles.containerInput}>
+        <View style={[styles.containerInput, containerStyle]}>
             {label ? <Text style={styles.label}>{label}</Text> : null}
-            <View style={[styles.inputContainer, error ? { borderColor: 'red', borderWidth: 1 } : null]}>
+            <View style={[styles.inputContainer, inputContainerStyle, error ? { borderColor: 'red', borderWidth: 1 } : null]}>
                 <TextInput
                     keyboardType={keyboardType}
                     style={[

@@ -34,6 +34,7 @@ export default function SettingsProfileScreen() {
     const gutter = clamp(width * 0.05, 16, 28);
     const titleSize = clamp(width * 0.062, 20, 28);
     const subtitleSize = clamp(width * 0.037, 13, 16);
+    const isDesktop = width >= 768;
     const [loading, setLoading] = useState(false);
     const [cep, setCep] = useState('');
     const keyboardBehavior = useKeyboardBehavior();
@@ -173,15 +174,15 @@ export default function SettingsProfileScreen() {
                         keyboardShouldPersistTaps="handled"
                     >
 
-                        <Text style={[Styles.title, { fontSize: titleSize }]}>Configuração do perfil</Text>
+                        <Text style={[Styles.title, isDesktop && Styles.titleDesktop, !isDesktop && { fontSize: titleSize }]}>Configuração do perfil</Text>
 
-                        <Text style={[Styles.subtitle, { fontSize: subtitleSize }]}>
+                        <Text style={[Styles.subtitle, isDesktop && Styles.subtitleDesktop, !isDesktop && { fontSize: subtitleSize }]}>
                             Quase pronto para configurar seu perfil, preencha as informações abaixo.
                             Apenas 3 etapas.
                         </Text>
                         
                         <TouchableOpacity
-                            style={Styles.photoShortcut}
+                            style={[Styles.photoShortcut, isDesktop && Styles.photoShortcutDesktop]}
                             onPress={() => navigation.navigate('ProfileSetupPhotoScreen')}
                             accessibilityRole="button"
                             accessibilityLabel="Alterar foto do perfil"
@@ -190,14 +191,16 @@ export default function SettingsProfileScreen() {
                             <Text style={Styles.photoShortcutArrow}>›</Text>
                         </TouchableOpacity>
 
-                        <View style={Styles.profileCard}>
-                            <View style={Styles.containerInputs}>
+                        <View style={[Styles.profileCard, isDesktop && Styles.profileCardDesktop]}>
+                            <View style={[Styles.containerInputs, isDesktop && Styles.desktopGrid]}>
 
+                                <View style={isDesktop ? Styles.desktopRow : undefined}>
                                 <Controller
                                     control={control}
                                     name="name"
                                     render={({ field: { onChange, value } }) => (
                                         <Input
+                                            containerStyle={isDesktop ? Styles.desktopField : undefined}
                                             label="Nome Completo"
                                             value={value}
                                             onChangeText={onChange}
@@ -211,6 +214,7 @@ export default function SettingsProfileScreen() {
                                     name="phone"
                                     render={({ field: { onChange, value } }) => (
                                         <Input
+                                            containerStyle={isDesktop ? Styles.desktopField : undefined}
                                             label="Numero de celular"
                                             keyboardType="numeric"
                                             value={value}
@@ -219,12 +223,14 @@ export default function SettingsProfileScreen() {
                                         />
                                     )}
                                 />
+                                </View>
 
+                                <View style={isDesktop ? Styles.desktopRow : undefined}>
                                 <Controller
                                     control={control}
                                     name="city"
                                     render={({ field: { onChange, value } }) => (
-                                        <View style={Styles.fieldGroup}>
+                                        <View style={[Styles.fieldGroup, isDesktop && Styles.desktopField]}>
                                             <Input
                                                 label="CEP (Para auto-preencher)"
                                                 keyboardType="numeric"
@@ -232,22 +238,32 @@ export default function SettingsProfileScreen() {
                                                 placeholder="Ex: 50000-000"
                                                 onChangeText={(text) => handleCepChange(text, onChange)}
                                             />
-                                            <Input
-                                                label="Cidade"
-                                                value={value}
-                                                onChangeText={onChange}
-                                                error={errors.city?.message}
-                                            />
                                         </View>
                                     )}
                                 />
+                                <Controller
+                                    control={control}
+                                    name="city"
+                                    render={({ field: { onChange, value } }) => (
+                                        <Input
+                                            containerStyle={isDesktop ? Styles.desktopField : undefined}
+                                            label="Cidade"
+                                            value={value}
+                                            onChangeText={onChange}
+                                            error={errors.city?.message}
+                                        />
+                                    )}
+                                />
+                                </View>
 
+                                <View style={isDesktop ? Styles.desktopRow : undefined}>
                                 <Controller
                                     control={control}
                                     name="type_sanguine"
                                     render={({ field: { onChange, value } }) => (
-                                        <View style={Styles.fieldGroup}>
+                                        <View style={[Styles.fieldGroup, isDesktop && Styles.desktopField]}>
                                             <SelectInput
+                                                containerStyle={isDesktop ? Styles.desktopField : undefined}
                                                 label="Grupo sanguíneo"
                                                 options={BLOOD_TYPES}
                                                 value={value}
@@ -259,17 +275,29 @@ export default function SettingsProfileScreen() {
                                         </View>
                                     )}
                                 />
+                                {isDesktop && <View style={Styles.desktopField} />}
+                                </View>
                             </View>
                         </View>
 
-                        <View style={[Styles.actionRow, { marginTop: 10, marginBottom: 20 }]}>
+                        <View style={[Styles.actionRow, isDesktop && Styles.actionRowDesktop, { marginTop: 10, marginBottom: 20 }]}>
                             <Button
                                 title={loading ? "Salvando..." : "Salvar"}
                                 textColor="#FFF"
-                                borderRadius={10}
+                                borderRadius={28}
                                 onPress={handleSubmit(onSubmit)}
                                 disabled={loading}
+                                style={isDesktop ? Styles.saveButtonDesktop : undefined}
                             />
+                            {isDesktop && (
+                                <Button
+                                    title="Cancelar"
+                                    textColor="#E0323C"
+                                    borderRadius={28}
+                                    onPress={() => navigation.goBack()}
+                                    style={Styles.cancelButton}
+                                />
+                            )}
                         </View>
 
                     </ScrollView>

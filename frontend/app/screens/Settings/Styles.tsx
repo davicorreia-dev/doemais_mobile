@@ -61,12 +61,55 @@ const Styles = StyleSheet.create({
         maxWidth: 480,
         alignSelf: 'center',
     },
+    profileCardDesktop: {
+        width: 860,
+        maxWidth: '100%',
+        borderRadius: 22,
+        paddingHorizontal: 40,
+        paddingVertical: 36,
+    },
+    desktopGrid: {
+        width: '100%',
+        gap: 24,
+    },
+    desktopRow: {
+        width: '100%',
+        flexDirection: 'row',
+        gap: 20,
+    },
+    desktopField: {
+        flex: 1,
+        width: undefined,
+        maxWidth: undefined,
+        alignSelf: 'auto',
+        paddingHorizontal: 0,
+    },
 
     // Botão principal alinhado às bordas do card
     actionRow: {
         width: '100%',
         maxWidth: 480,
         alignSelf: 'center',
+    },
+    actionRowDesktop: {
+        width: 860,
+        maxWidth: '100%',
+        flexDirection: 'row',
+        gap: 20,
+        alignSelf: 'center',
+    },
+    saveButtonDesktop: {
+        width: 240,
+        maxWidth: undefined,
+        marginBottom: 0,
+    },
+    cancelButton: {
+        width: 200,
+        maxWidth: undefined,
+        marginBottom: 0,
+        backgroundColor: '#FFFFFF',
+        borderColor: '#E0323C',
+        borderWidth: 1.5,
     },
 
     title: {
@@ -77,6 +120,12 @@ const Styles = StyleSheet.create({
         maxWidth: 480,
         marginBottom: 20,
     },
+    titleDesktop: {
+        width: 860,
+        maxWidth: '100%',
+        fontSize: 24,
+        marginBottom: 8,
+    },
     subtitle: {
         fontSize: 14,
         fontFamily: 'Lexend_400Regular',
@@ -85,6 +134,13 @@ const Styles = StyleSheet.create({
         maxWidth: 480,
         marginBottom: 40,
         lineHeight: 22,
+    },
+    subtitleDesktop: {
+        width: 860,
+        maxWidth: '100%',
+        fontSize: 12,
+        lineHeight: 16,
+        marginBottom: 22,
     },
     photoShortcut: {
         width: '100%',
@@ -108,6 +164,12 @@ const Styles = StyleSheet.create({
         color: '#C52D36',
         fontSize: 28,
         lineHeight: 28,
+    },
+    photoShortcutDesktop: {
+        width: 860,
+        maxWidth: '100%',
+        minHeight: 42,
+        marginBottom: 0,
     },
 });
 
