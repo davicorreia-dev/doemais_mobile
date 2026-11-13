@@ -3,12 +3,13 @@ import { ActivityIndicator, ScrollView, StatusBar, Text, View, useWindowDimensio
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 import { api } from '../../services/api';
 import StatusBarBackground from '../../../components/StatusBarBackground';
 import VirtualDonorCard from '../../../components/VirtualDonorCard';
 import VirtualCardNotice from '../../../components/VirtualCardNotice';
+import DesktopAppSidebar from '../../../components/DesktopAppSidebar';
 import Styles from './StylesVirtualCard';
 
 type Profile = {
@@ -33,6 +34,7 @@ const formatApprovalDate = (timestamp?: number) => {
 export default function VirtualCardScreen() {
     const { width } = useWindowDimensions();
     const isDesktop = width >= 768;
+    const navigation = useNavigation<any>();
     const [profile, setProfile] = useState<Profile>({});
     const [approvalDate, setApprovalDate] = useState<number | null>(null);
     const [underReview, setUnderReview] = useState(false);
@@ -119,25 +121,29 @@ export default function VirtualCardScreen() {
 
     if (loading) {
         return (
-            <SafeAreaView style={Styles.centered} edges={['top']}>
-                <ActivityIndicator color="#E0323C" size="large" />
+            <SafeAreaView style={[Styles.centered, isDesktop && Styles.desktopScreen]} edges={['top']}>
+                {isDesktop && <DesktopAppSidebar name="Doador(a)" onNavigate={(route) => navigation.navigate(route)} />}
+                <View style={Styles.loadingBody}><ActivityIndicator color="#E0323C" size="large" /></View>
             </SafeAreaView>
         );
     }
 
     if (!approvalDate) {
         return (
-            <SafeAreaView style={Styles.emptyScreen} edges={['top']}>
+            <SafeAreaView style={[Styles.emptyScreen, isDesktop && Styles.desktopScreen]} edges={['top']}>
                 <StatusBar barStyle="light-content" />
                 <StatusBarBackground color="#E0323C" />
-                <View style={Styles.hero} />
-                <View style={Styles.emptyIcon}>
-                    <Ionicons name="card-outline" size={42} color="#E0323C" />
+                {!isDesktop && <View style={Styles.hero} />}
+                {isDesktop && <DesktopAppSidebar name={profile.nome || 'Doador(a)'} onNavigate={(route) => navigation.navigate(route)} />}
+                <View style={[Styles.emptyBody, isDesktop && Styles.emptyBodyDesktop]}>
+                    <View style={Styles.emptyIcon}>
+                        <Ionicons name="card-outline" size={42} color="#E0323C" />
+                    </View>
+                    <Text style={Styles.emptyTitle}>Sua carteirinha estará aqui</Text>
+                    <Text style={Styles.emptyText}>
+                        Conclua a triagem final com sucesso para liberar sua carteirinha virtual.
+                    </Text>
                 </View>
-                <Text style={Styles.emptyTitle}>Sua carteirinha estará aqui</Text>
-                <Text style={Styles.emptyText}>
-                    Conclua a triagem final com sucesso para liberar sua carteirinha virtual.
-                </Text>
             </SafeAreaView>
         );
     }
@@ -147,26 +153,29 @@ export default function VirtualCardScreen() {
         : '—';
 
     return (
-        <SafeAreaView style={Styles.screen} edges={['top']}>
+        <SafeAreaView style={[Styles.screen, isDesktop && Styles.desktopScreen]} edges={['top']}>
             <StatusBar barStyle="light-content" />
             <StatusBarBackground color="#E0323C" />
-            <View style={Styles.hero} />
-            <ScrollView contentContainerStyle={[Styles.content, isDesktop && Styles.contentDesktop]} showsVerticalScrollIndicator={false}>
-                <View style={[Styles.pageHeading, isDesktop && Styles.pageHeadingDesktop]}>
-                    <Text style={[Styles.title, isDesktop && Styles.titleDesktop]}>Carteirinha virtual</Text>
-                    <Text style={[Styles.subtitle, isDesktop && Styles.subtitleDesktop]}>Seu resultado de triagem DoeMais</Text>
-                </View>
-                <View style={Styles.cardColumn}>
-                    <VirtualDonorCard
-                        name={profile.nome || 'Doador(a)'}
-                        bloodType={bloodType}
-                        approvalDate={formatApprovalDate(approvalDate)}
-                        underReview={underReview}
-                        desktop={isDesktop}
-                    />
-                    <VirtualCardNotice underReview={underReview} desktop={isDesktop} />
-                </View>
-            </ScrollView>
+            {!isDesktop && <View style={Styles.hero} />}
+            {isDesktop && <DesktopAppSidebar name={profile.nome || 'Doador(a)'} onNavigate={(route) => navigation.navigate(route)} />}
+            <View style={Styles.mainContent}>
+                <ScrollView contentContainerStyle={[Styles.content, isDesktop && Styles.contentDesktop]} showsVerticalScrollIndicator={false}>
+                    <View style={[Styles.pageHeading, isDesktop && Styles.pageHeadingDesktop]}>
+                        <Text style={[Styles.title, isDesktop && Styles.titleDesktop]}>Carteirinha virtual</Text>
+                        <Text style={[Styles.subtitle, isDesktop && Styles.subtitleDesktop]}>Seu resultado de triagem DoeMais</Text>
+                    </View>
+                    <View style={[Styles.cardColumn, isDesktop && Styles.cardColumnDesktop]}>
+                        <VirtualDonorCard
+                            name={profile.nome || 'Doador(a)'}
+                            bloodType={bloodType}
+                            approvalDate={formatApprovalDate(approvalDate)}
+                            underReview={underReview}
+                            desktop={isDesktop}
+                        />
+                        <VirtualCardNotice underReview={underReview} desktop={isDesktop} />
+                    </View>
+                </ScrollView>
+            </View>
         </SafeAreaView>
     );
 }
