@@ -51,68 +51,6 @@ const styles = StyleSheet.create({
     list: {
         gap: 14,
     },
-    card: {
-        backgroundColor: '#FFF',
-        borderRadius: 22,
-        position: 'relative',
-        paddingVertical: 16,
-        paddingHorizontal: 14,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 10,
-        shadowColor: '#000',
-        shadowOpacity: 0.06,
-        shadowRadius: 12,
-        shadowOffset: { width: 0, height: 6 },
-        elevation: 3,
-    },
-    cardIconWrap: {
-        width: 56,
-        height: 56,
-        borderRadius: 18,
-        backgroundColor: '#FFF2F3',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    cardIcon: {
-        width: 30,
-        height: 30,
-        tintColor: '#E0323C',
-    },
-    cardBody: {
-        flex: 1,
-    },
-    cardMainAction: {
-        width: '100%',
-        minHeight: 56,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 14,
-    },
-    cardMainActionWithReview: {
-        paddingRight: 48,
-    },
-    cardTitle: {
-        fontSize: 16,
-        fontWeight: '800',
-        color: '#333',
-        marginBottom: 4,
-    },
-    cardDescription: {
-        fontSize: 13,
-        lineHeight: 18,
-        color: '#666',
-    },
-    reviewButton: {
-        position: 'absolute',
-        top: 12,
-        right: 12,
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
 });
 
 export default styles;
