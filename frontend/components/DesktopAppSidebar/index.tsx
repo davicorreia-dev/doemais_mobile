@@ -1,11 +1,16 @@
+import { useEffect, useState } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import styles from './styles';
 
 type DesktopAppSidebarProps = {
     name: string;
+    activeRoute?: 'Início' | 'Elegibilidade' | 'Carteirinha' | 'Mais';
     onNavigate: (route: 'Início' | 'Elegibilidade' | 'Carteirinha' | 'Mais') => void;
+    avatarUri?: string | null;
+    onLogout?: () => void;
 };
 
 const items: Array<{ label: 'Início' | 'Elegibilidade' | 'Carteirinha' | 'Mais'; icon: keyof typeof Ionicons.glyphMap }> = [
@@ -15,15 +20,30 @@ const items: Array<{ label: 'Início' | 'Elegibilidade' | 'Carteirinha' | 'Mais'
     { label: 'Mais', icon: 'settings-outline' },
 ];
 
-export default function DesktopAppSidebar({ name, onNavigate }: DesktopAppSidebarProps) {
-    const initials = name.split(' ').filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'D';
+export default function DesktopAppSidebar({ name, activeRoute = 'Carteirinha', onNavigate, avatarUri, onLogout }: DesktopAppSidebarProps) {
+    const [storedName, setStoredName] = useState('');
+    const [storedAvatar, setStoredAvatar] = useState<string | null>(null);
+
+    useEffect(() => {
+        Promise.all([AsyncStorage.getItem('@doemais:user'), AsyncStorage.getItem('@profile_image')])
+            .then(([userRaw, image]) => {
+                const user = userRaw ? JSON.parse(userRaw) : null;
+                setStoredName(user?.nome || '');
+                setStoredAvatar(image);
+            })
+            .catch(() => undefined);
+    }, []);
+
+    const displayName = storedName || name;
+    const displayAvatar = avatarUri || storedAvatar;
+    const initials = displayName.split(' ').filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'D';
     return (
         <View style={styles.sidebar}>
             <View>
                 <Image source={require('../../assets/images/doe-logo.png')} style={styles.logo} resizeMode="contain" />
                 <View style={styles.navigation}>
                     {items.map((item) => {
-                        const active = item.label === 'Carteirinha';
+                        const active = item.label === activeRoute;
                         return <TouchableOpacity key={item.label} style={[styles.item, active && styles.itemActive]} onPress={() => onNavigate(item.label)} accessibilityRole="tab" accessibilityState={{ selected: active }}>
                             <Ionicons name={item.icon} size={18} color={active ? '#FFFFFF' : '#77716A'} />
                             <Text style={[styles.itemText, active && styles.itemTextActive]}>{item.label}</Text>
@@ -32,9 +52,9 @@ export default function DesktopAppSidebar({ name, onNavigate }: DesktopAppSideba
                 </View>
             </View>
             <View style={styles.profile}>
-                <View style={styles.avatar}><Text style={styles.avatarText}>{initials}</Text></View>
-                <View style={styles.profileText}><Text style={styles.profileName} numberOfLines={1}>{name}</Text><Text style={styles.profileRole}>Doador(a)</Text></View>
-                <Ionicons name="log-out-outline" size={17} color="#9A938B" />
+                <View style={styles.avatar}>{displayAvatar ? <Image source={{ uri: displayAvatar }} style={styles.avatarImage} /> : <Text style={styles.avatarText}>{initials}</Text>}</View>
+                <View style={styles.profileText}><Text style={styles.profileName} numberOfLines={1}>{displayName}</Text><Text style={styles.profileRole}>Doador(a)</Text></View>
+                <TouchableOpacity onPress={onLogout} disabled={!onLogout} accessibilityRole="button" accessibilityLabel="Sair da conta"><Ionicons name="log-out-outline" size={17} color="#9A938B" /></TouchableOpacity>
             </View>
         </View>
     );

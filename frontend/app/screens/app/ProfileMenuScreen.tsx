@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Alert, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, Switch, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import StatusBarBackground from '../../../components/StatusBarBackground';
+import DesktopAppSidebar from '../../../components/DesktopAppSidebar';
+import DesktopPageHeader from '../../../components/DesktopPageHeader';
 import styles from './StylesProfileMenu';
 
 type SettingsOptionProps = {
@@ -28,6 +30,8 @@ function SettingsOption({ icon, title, description, onPress }: SettingsOptionPro
 }
 
 export default function ProfileMenuScreen({ navigation }: any) {
+    const { width } = useWindowDimensions();
+    const isDesktop = width >= 768;
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
     useEffect(() => {
@@ -42,12 +46,14 @@ export default function ProfileMenuScreen({ navigation }: any) {
     };
 
     return (
-        <SafeAreaView style={styles.screen} edges={['top']}>
+        <SafeAreaView style={[styles.screen, isDesktop && styles.desktopScreen]} edges={['top']}>
             <StatusBarBackground color="#E0323C" />
-            <View style={styles.hero} />
-            <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-                <Text style={styles.title}>Configurações</Text>
-                <Text style={styles.subtitle}>Gerencie sua conta e preferências</Text>
+            {!isDesktop && <View style={styles.hero} />}
+            {isDesktop && <DesktopAppSidebar name="Doador(a)" activeRoute="Mais" onNavigate={(route) => navigation.navigate(route)} />}
+            <View style={isDesktop && styles.desktopMain}>
+                {isDesktop && <DesktopPageHeader title="Configurações" subtitle="Gerencie seu perfil e suas preferências" />}
+                <ScrollView contentContainerStyle={[styles.content, isDesktop && styles.contentDesktop]} showsVerticalScrollIndicator={false}>
+                    {!isDesktop && <><Text style={styles.title}>Configurações</Text><Text style={styles.subtitle}>Gerencie sua conta e preferências</Text></>}
 
                 <Text style={styles.sectionTitle}>CONTA</Text>
                 <SettingsOption
@@ -86,7 +92,8 @@ export default function ProfileMenuScreen({ navigation }: any) {
                     description="Tire dúvidas sobre doação e o aplicativo"
                     onPress={() => Alert.alert('Ajuda e suporte', 'Em breve você poderá falar diretamente com nossa equipe por aqui.')}
                 />
-            </ScrollView>
+                </ScrollView>
+            </View>
         </SafeAreaView>
     );
 }

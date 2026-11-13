@@ -10,6 +10,7 @@ import StatusBarBackground from '../../../components/StatusBarBackground';
 import VirtualDonorCard from '../../../components/VirtualDonorCard';
 import VirtualCardNotice from '../../../components/VirtualCardNotice';
 import DesktopAppSidebar from '../../../components/DesktopAppSidebar';
+import DesktopPageHeader from '../../../components/DesktopPageHeader';
 import Styles from './StylesVirtualCard';
 
 type Profile = {
@@ -38,6 +39,8 @@ export default function VirtualCardScreen() {
     const [profile, setProfile] = useState<Profile>({});
     const [approvalDate, setApprovalDate] = useState<number | null>(null);
     const [underReview, setUnderReview] = useState(false);
+    const [reviewFormName, setReviewFormName] = useState('');
+    const [reviewRequestedAt, setReviewRequestedAt] = useState('');
     const [loading, setLoading] = useState(true);
 
     useFocusEffect(
@@ -97,9 +100,14 @@ export default function VirtualCardScreen() {
                             setApprovalDate(new Date(persistedFinalTriage.data_preenchimento).getTime());
                         }
                         if (active) {
-                            setUnderReview(Array.isArray(corrections) && corrections.some((item: any) =>
+                            const pendingCorrection = Array.isArray(corrections) && corrections.find((item: any) =>
                                 item.status === 'PENDING_REVIEW' && FINAL_TRIAGE_IDS.includes(item.modulo)
-                            ));
+                            );
+                            setUnderReview(Boolean(pendingCorrection));
+                            setReviewFormName(pendingCorrection?.nome_formulario || pendingCorrection?.modulo_nome || pendingCorrection?.modulo?.replaceAll('_', ' ') || '');
+                            setReviewRequestedAt(pendingCorrection?.data_solicitacao
+                                ? new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(pendingCorrection.data_solicitacao))
+                                : '');
                         }
                     } catch (error) {
                         console.error('Erro ao carregar perfil para a carteirinha:', error);
@@ -122,7 +130,7 @@ export default function VirtualCardScreen() {
     if (loading) {
         return (
             <SafeAreaView style={[Styles.centered, isDesktop && Styles.desktopScreen]} edges={['top']}>
-                {isDesktop && <DesktopAppSidebar name="Doador(a)" onNavigate={(route) => navigation.navigate(route)} />}
+                {isDesktop && <DesktopAppSidebar name="Doador(a)" activeRoute="Carteirinha" onNavigate={(route) => navigation.navigate(route)} />}
                 <View style={Styles.loadingBody}><ActivityIndicator color="#E0323C" size="large" /></View>
             </SafeAreaView>
         );
@@ -134,7 +142,7 @@ export default function VirtualCardScreen() {
                 <StatusBar barStyle="light-content" />
                 <StatusBarBackground color="#E0323C" />
                 {!isDesktop && <View style={Styles.hero} />}
-                {isDesktop && <DesktopAppSidebar name={profile.nome || 'Doador(a)'} onNavigate={(route) => navigation.navigate(route)} />}
+                {isDesktop && <DesktopAppSidebar name={profile.nome || 'Doador(a)'} activeRoute="Carteirinha" onNavigate={(route) => navigation.navigate(route)} />}
                 <View style={[Styles.emptyBody, isDesktop && Styles.emptyBodyDesktop]}>
                     <View style={Styles.emptyIcon}>
                         <Ionicons name="card-outline" size={42} color="#E0323C" />
@@ -157,10 +165,11 @@ export default function VirtualCardScreen() {
             <StatusBar barStyle="light-content" />
             <StatusBarBackground color="#E0323C" />
             {!isDesktop && <View style={Styles.hero} />}
-            {isDesktop && <DesktopAppSidebar name={profile.nome || 'Doador(a)'} onNavigate={(route) => navigation.navigate(route)} />}
+            {isDesktop && <DesktopAppSidebar name={profile.nome || 'Doador(a)'} activeRoute="Carteirinha" onNavigate={(route) => navigation.navigate(route)} />}
             <View style={Styles.mainContent}>
+                {isDesktop && <DesktopPageHeader title="Carteirinha virtual" subtitle="Seu resultado de triagem DoeMais" />}
                 <ScrollView contentContainerStyle={[Styles.content, isDesktop && Styles.contentDesktop]} showsVerticalScrollIndicator={false}>
-                    <View style={[Styles.pageHeading, isDesktop && Styles.pageHeadingDesktop]}>
+                    <View style={[Styles.pageHeading, isDesktop && Styles.pageHeadingDesktop, isDesktop && { display: 'none' }]}>
                         <Text style={[Styles.title, isDesktop && Styles.titleDesktop]}>Carteirinha virtual</Text>
                         <Text style={[Styles.subtitle, isDesktop && Styles.subtitleDesktop]}>Seu resultado de triagem DoeMais</Text>
                     </View>
@@ -172,7 +181,7 @@ export default function VirtualCardScreen() {
                             underReview={underReview}
                             desktop={isDesktop}
                         />
-                        <VirtualCardNotice underReview={underReview} desktop={isDesktop} />
+                        <VirtualCardNotice underReview={underReview} desktop={isDesktop} formName={reviewFormName} requestedAt={reviewRequestedAt} />
                     </View>
                 </ScrollView>
             </View>
