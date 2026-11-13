@@ -9,6 +9,8 @@ import styles from './StylesEligibily';
 import { api } from '../../services/api';
 import DesktopAppSidebar from '../../../components/DesktopAppSidebar';
 import DesktopPageHeader from '../../../components/DesktopPageHeader';
+import ScreenState from '../../../components/ScreenState';
+import EligibilityFormCard from '../../../components/EligibilityFormCard';
 
 const normalizeGender = (value: string | null | undefined): FormGender => {
     if (!value) return 'ALL';
@@ -229,24 +231,16 @@ export default function EligibilityFormsScreen() {
 
     if (loading) {
         return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FDFCFC' }}>
+            <View style={{ flex: 1 }}>
                 <StatusBar barStyle="light-content" />
-            <StatusBarBackground color="#E0323C" />
-                <Text style={{ fontSize: 16, color: '#999' }}>Carregando formulários...</Text>
+                <ScreenState type="loading" message="Carregando formulários..." />
             </View>
         );
     }
 
     if (errorMessage) {
         return (
-            <View style={styles.stateScreen}>
-                <Ionicons name="cloud-offline-outline" size={42} color="#E0323C" />
-                <Text style={styles.stateTitle}>Não foi possível carregar</Text>
-                <Text style={styles.stateText}>{errorMessage}</Text>
-                <TouchableOpacity style={styles.retryButton} onPress={() => { setLoading(true); setLoadVersion((value) => value + 1); }} accessibilityRole="button">
-                    <Text style={styles.retryButtonText}>Tentar novamente</Text>
-                </TouchableOpacity>
-            </View>
+            <ScreenState type="error" message={errorMessage} onRetry={() => { setLoading(true); setLoadVersion((value) => value + 1); }} />
         );
     }
 
@@ -278,32 +272,6 @@ export default function EligibilityFormsScreen() {
                     {visibleForms.map((module) => {
                         const stateInfo = getModuleState(module.id, latestForm, localHistory);
                         
-                        let cardBg = '#FFF';
-                        let cardBorderColor = 'transparent';
-                        let textColor = '#333';
-                        let descColor = '#666';
-                        let rightIcon = <Ionicons name="chevron-forward" size={24} color="#E0323C" />;
-                        let tintColor = '#E0323C';
-                        let iconBg = '#FFF2F3';
-
-                        if (stateInfo.status === 'blocked') {
-                            cardBg = '#FDECEF';
-                            cardBorderColor = '#EF9A9A';
-                            textColor = '#C62828';
-                            descColor = '#D32F2F';
-                            tintColor = '#C62828';
-                            iconBg = '#FFEBEE';
-                            rightIcon = <Ionicons name="close-circle" size={24} color="#C62828" />;
-                        } else if (stateInfo.status === 'approved') {
-                            cardBg = '#E8F8EE';
-                            cardBorderColor = '#A5D6A7';
-                            textColor = '#2E7D32';
-                            descColor = '#388E3C';
-                            tintColor = '#2E7D32';
-                            iconBg = '#E8F5E9';
-                            rightIcon = <Ionicons name="checkmark-circle" size={24} color="#2E7D32" />;
-                        }
-
                         const handlePress = () => {
                             if (stateInfo.status === 'blocked') {
                                 Alert.alert(
@@ -335,46 +303,7 @@ export default function EligibilityFormsScreen() {
                             },
                         });
 
-                        return (
-                            <View
-                                key={module.id}
-                                style={[styles.card, { backgroundColor: cardBg, borderColor: cardBorderColor, borderWidth: cardBorderColor !== 'transparent' ? 1 : 0 }]}
-                            >
-                                <TouchableOpacity
-                                    style={[
-                                        styles.cardMainAction,
-                                        stateInfo.status !== 'neutral' && styles.cardMainActionWithReview,
-                                    ]}
-                                    activeOpacity={0.85}
-                                    onPress={handlePress}
-                                >
-                                    <View style={[styles.cardIconWrap, { backgroundColor: iconBg }]}>
-                                        <Image source={module.image} style={[styles.cardIcon, { tintColor: tintColor }]} resizeMode="contain" />
-                                    </View>
-
-                                    <View style={styles.cardBody}>
-                                        <Text style={[styles.cardTitle, { color: textColor }]}>{module.title}</Text>
-                                        <Text style={[styles.cardDescription, { color: descColor }]}>
-                                            {stateInfo.status === 'blocked' ? stateInfo.message : module.description}
-                                        </Text>
-                                    </View>
-
-                                    {stateInfo.status === 'neutral' && rightIcon}
-                                </TouchableOpacity>
-
-                                {stateInfo.status !== 'neutral' && (
-                                    <TouchableOpacity
-                                        style={styles.reviewButton}
-                                        activeOpacity={0.8}
-                                        onPress={requestCorrection}
-                                        accessibilityRole="button"
-                                        accessibilityLabel={`Solicitar revisão do formulário ${module.title}`}
-                                    >
-                                        <Ionicons name="create-outline" size={20} color="#E0323C" />
-                                    </TouchableOpacity>
-                                )}
-                            </View>
-                        );
+                        return <EligibilityFormCard key={module.id} title={module.title} description={module.description} image={module.image} status={stateInfo.status} blockedMessage={stateInfo.message} onPress={handlePress} onReview={requestCorrection} />;
                     })}
                 </View>
             </ScrollView>

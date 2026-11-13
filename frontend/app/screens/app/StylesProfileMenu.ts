@@ -16,11 +16,6 @@ const styles = StyleSheet.create({
     name: { color: '#333', fontSize: 17, fontWeight: '800' },
     email: { color: '#77716A', fontSize: 13, marginTop: 4 },
     sectionTitle: { color: '#999', fontSize: 11, fontWeight: '800', letterSpacing: 0.8, marginBottom: 10 },
-    option: { minHeight: 76, flexDirection: 'row', alignItems: 'center', padding: 14, borderRadius: 18, backgroundColor: '#FFF', borderWidth: 1, borderColor: '#EEE9E3', marginBottom: 10 },
-    optionIcon: { width: 42, height: 42, borderRadius: 14, backgroundColor: '#FFF1F2', alignItems: 'center', justifyContent: 'center', marginRight: 12 },
-    optionText: { flex: 1 },
-    optionTitle: { color: '#333', fontSize: 15, fontWeight: '800' },
-    optionDescription: { color: '#77716A', fontSize: 12, lineHeight: 17, marginTop: 3 },
 });
 
 export default styles;

@@ -13,6 +13,7 @@ import { isValidAge, isValidWeight } from '../../utils/validators';
 import { mapRegisterServerError } from '../../utils/registerErrors';
 import { useKeyboardBehavior } from '../../hooks/useKeyboardBehavior';
 import DateOfBirthInput from '../../../components/DateOfBirthInput/DateOfBirthInput';
+import BloodTypeGrid from '../../../components/BloodTypeGrid';
 
 const BLOOD_TYPES = ['A+', 'O+', 'B+', 'AB+', 'A-', 'O-', 'B-', 'AB-'];
 
@@ -225,25 +226,7 @@ export default function CompleteProfileScreen() {
                             <Text style={Styles.sectionTitle}>Qual é o seu tipo sanguíneo?</Text>
                         </View>
 
-                        <View style={Styles.bloodGrid}>
-                            {BLOOD_TYPES.map((type) => (
-                                <TouchableOpacity
-                                    key={type}
-                                    style={[
-                                        Styles.bloodButton,
-                                        selectedBlood === type && Styles.bloodButtonSelected
-                                    ]}
-                                    onPress={() => handleSelectBlood(type)}
-                                >
-                                    <Text style={[
-                                        Styles.bloodText,
-                                        selectedBlood === type && Styles.bloodTextSelected
-                                    ]}>
-                                        {type}
-                                    </Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
+                        <BloodTypeGrid bloodTypes={BLOOD_TYPES} selected={selectedBlood} onSelect={handleSelectBlood} variant="form" />
 
                         {/* Não sei */}
                         <View style={Styles.checkboxContainer}>

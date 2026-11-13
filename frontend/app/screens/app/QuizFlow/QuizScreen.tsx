@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import DesktopAppSidebar from '../../../../components/DesktopAppSidebar';
 import DesktopPageHeader from '../../../../components/DesktopPageHeader';
 import FeedbackModal from '../../../../components/FeedbackModal';
+import QuizModal from '../../../../components/QuizModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const saveModuleResult = async (
@@ -564,27 +565,9 @@ export default function QuizScreen() {
             </View>
             </View>
 
-            <Modal visible={blockVisible} transparent animationType="fade" onRequestClose={exitToMenu}>
-                <View style={Styles.modalBackdrop}>
-                    <View style={[Styles.modalCard, isDesktop && Styles.modalCardDesktop]}>
-                        <Ionicons name="alert-circle-outline" size={60} color="#E0323C" />
-                        <Text style={Styles.modalTitle}>{module.title}: {module.blockTitle}</Text>
-                        <Text style={Styles.modalMessage}>{blockMessage || module.blockMessage}</Text>
-                        <Button title="Voltar ao menu" textColor="#FFF" width="100%" onPress={exitToMenu} />
-                    </View>
-                </View>
-            </Modal>
+            <QuizModal visible={blockVisible} onClose={exitToMenu} icon="alert-circle-outline" iconColor="#E0323C" title={`${module.title}: ${module.blockTitle}`} message={blockMessage || module.blockMessage} actionLabel="Voltar ao menu" onAction={exitToMenu} />
 
-            <Modal visible={successVisible} transparent animationType="fade" onRequestClose={exitAfterSuccess}>
-                <View style={Styles.modalBackdrop}>
-                    <View style={[Styles.modalCard, isDesktop && Styles.modalCardDesktop]}>
-                        <Ionicons name="checkmark-circle-outline" size={60} color="#2E7D32" />
-                        <Text style={Styles.modalTitle}>{module.title} concluído</Text>
-                        <Text style={Styles.modalMessage}>{module.successMessage}</Text>
-                        <Button title={module.id === 'TRIAGEM_HOMEM' || module.id === 'TRIAGEM_MULHER' ? 'Ver carteirinha' : 'Voltar aos formulários'} textColor="#FFF" width="100%" onPress={exitAfterSuccess} />
-                    </View>
-                </View>
-            </Modal>
+            <QuizModal visible={successVisible} onClose={exitAfterSuccess} icon="checkmark-circle-outline" iconColor="#2E7D32" title={`${module.title} concluído`} message={module.successMessage} actionLabel={module.id === 'TRIAGEM_HOMEM' || module.id === 'TRIAGEM_MULHER' ? 'Ver carteirinha' : 'Voltar aos formulários'} onAction={exitAfterSuccess} />
 
             <Modal visible={correctionVisible} transparent animationType="fade" onRequestClose={closeCorrection}>
                 <View style={Styles.modalBackdrop}>

@@ -2,13 +2,15 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { View, Text, ScrollView, TextInput, Image, TouchableOpacity, StatusBar, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import StatusBarBackground from '../../../components/StatusBarBackground';
-import { Ionicons, FontAwesome5 } from '@expo/vector-icons'; // Usando ícones padrão por enquanto
+import { Ionicons } from '@expo/vector-icons'; // Usando ícones padrão por enquanto
 import Styles from './StylesHome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { api } from '../../services/api';
 import DesktopAppSidebar from '../../../components/DesktopAppSidebar';
 import DesktopPageHeader from '../../../components/DesktopPageHeader';
+import ActivityCard from '../../../components/ActivityCard';
+import BloodTypeGrid from '../../../components/BloodTypeGrid';
 
 interface NewsItem {
     id: string;
@@ -319,19 +321,13 @@ export default function HomeScreen() {
                     <View style={Styles.activitiesGrid}>
                         <ActivityCard icon="water" label="Doador de Sangue" />
                         <ActivityCard icon="hand-holding-heart" label="Receber Sangue" />
-                        <ActivityCard icon="tint" label="Criar publicação" color="#E0323C" />
+                        <ActivityCard icon="tint" label="Criar publicação" highlight />
                         <ActivityCard icon="notes-medical" label="Sangue Doado" />
                     </View>
 
                     {/* Seção Grupo Sanguíneo */}
                     <Text style={Styles.sectionTitle}>Grupo sanguíneo</Text>
-                    <View style={Styles.bloodGrid}>
-                        {bloodTypes.map((type) => (
-                            <TouchableOpacity key={type} style={Styles.bloodButton}>
-                                <Text style={Styles.bloodButtonText}>{type}</Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
+                    <BloodTypeGrid bloodTypes={bloodTypes} />
 
                     {/* Seção de Notícias e Pedidos de Sangue */}
                     <Text style={Styles.sectionTitle}>Notícias e Pedidos de Sangue</Text>
@@ -400,12 +396,3 @@ export default function HomeScreen() {
     );
 }
 
-// Pequeno componente auxiliar para os botões de atividade
-const ActivityCard = ({ icon, label, color = '#f5f5f5' }: any) => (
-    <TouchableOpacity style={Styles.activityCard}>
-        <View style={[Styles.activityIconContainer, { backgroundColor: color === '#E0323C' ? '#FFF' : '#FFF0F0' }]}>
-            <FontAwesome5 name={icon} size={20} color={color === '#E0323C' ? '#E0323C' : '#E0323C'} />
-        </View>
-        <Text style={Styles.activityLabel}>{label}</Text>
-    </TouchableOpacity>
-);
