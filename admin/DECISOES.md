@@ -3,6 +3,8 @@
 Documento de discussão. Reúne as perguntas em aberto sobre o painel do agente de saúde, os cenários
 possíveis e os argumentos a favor e contra cada um. **Nada aqui está decidido.**
 
+> **AVISO PARA QUEM FOR EVOLUIR O PAINEL — solicitação de Arthur (13/11/2026):** o painel do hemocentro deve exibir os retestes solicitados voluntariamente pelo doador, identificando o formulário, a pergunta que motivou o reteste e as respostas original/corrigida. A integração deve usar a chave de serviço somente no servidor/proxy; ela nunca pode ser entregue ao navegador. Esta decisão substitui a discussão em aberto para este fluxo específico.
+
 ## 1. Contexto
 
 - O app do doador (Expo/React Native) e a API (Express, Prisma, PostgreSQL) já existem.
