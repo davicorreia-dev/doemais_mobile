@@ -197,6 +197,7 @@ export default function EligibilityFormsScreen() {
                                 status: result.status,
                                 date: new Date(result.data_preenchimento).getTime(),
                                 answers: result.respostas || {},
+                                blockedQuestion: result.pergunta_bloqueadora,
                             }])
                         );
                         setLocalHistory((current: any) => ({ ...current, ...persistedHistory }));
@@ -304,7 +305,10 @@ export default function EligibilityFormsScreen() {
 
                         const requestCorrection = () => navigation.navigate('QuizScreen', {
                             moduleId: module.id,
-                            correction: { originalAnswers: localHistory?.[module.id]?.answers || {} },
+                            correction: {
+                                originalAnswers: localHistory?.[module.id]?.answers || {},
+                                blockedQuestion: localHistory?.[module.id]?.blockedQuestion,
+                            },
                         });
 
                         return (
@@ -342,8 +346,7 @@ export default function EligibilityFormsScreen() {
                                         accessibilityRole="button"
                                         accessibilityLabel={`Solicitar revisão do formulário ${module.title}`}
                                     >
-                                        <Ionicons name="create-outline" size={14} color="#FFF" />
-                                        <Text style={styles.reviewButtonText}>Revisar</Text>
+                                        <Ionicons name="create-outline" size={20} color="#E0323C" />
                                     </TouchableOpacity>
                                 )}
                             </View>
