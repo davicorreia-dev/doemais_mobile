@@ -7,7 +7,8 @@ App mobile de doação de sangue: **Expo / React Native** (iOS, Android e web) +
 doemais_mobile/
 ├── frontend/            # app Expo (SDK 58, React Native 0.88)
 ├── backend/             # API Express + Prisma (veja backend/README.md)
-├── docker-compose.yml   # banco + backend + Expo, para desenvolvimento
+├── admin/               # painel do agente de saúde (React + Vite, protótipo; veja admin/README.md)
+├── docker-compose.yml   # banco + backend + Expo + painel admin, para desenvolvimento
 └── run.sh               # atalho: ./run.sh --local | --render
 ```
 
@@ -17,8 +18,8 @@ Requisitos: Docker com Compose v2 e o app **Expo Go SDK 58** no celular
 (Play Store / App Store). Celular e PC precisam estar na **mesma rede Wi-Fi**.
 
 ```bash
-./run.sh --local    # banco + backend + Expo, usando a API local (padrão)
-./run.sh --render   # só o Expo, usando a API publicada no Render
+./run.sh --local    # banco + backend + Expo + painel admin, usando a API local (padrão)
+./run.sh --render   # Expo + painel admin, usando a API publicada no Render
 ./run.sh --local -d # argumentos extras vão para o "docker compose up"
 ```
 
@@ -27,6 +28,7 @@ Requisitos: Docker com Compose v2 e o app **Expo Go SDK 58** no celular
 | App no celular | QR code em `docker compose logs frontend` ou `exp://<IP-DO-PC>:8081` no Expo Go |
 | App na web | `http://localhost:8081` |
 | API local | `http://<IP-DO-PC>:3000` (`/health` para checar) |
+| Painel admin | `http://localhost:5174` (só neste PC; dados fictícios) |
 | Banco local | só dentro do Docker (porta 5432 não é exposta), volume `pgdata` |
 
 O `run.sh` detecta o IP do PC (Linux e macOS). Se pegar o IP errado (VPN, várias placas):
