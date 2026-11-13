@@ -16,6 +16,7 @@ export const createTriagemResultado = async (doadorId: number, data: CreateTriag
       modulo: data.modulo,
       status: data.status,
       respostas: data.respostas as Prisma.InputJsonObject,
+      pergunta_bloqueadora: data.pergunta_bloqueadora as Prisma.InputJsonObject | undefined,
     },
   });
 };

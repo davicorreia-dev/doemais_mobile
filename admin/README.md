@@ -31,6 +31,12 @@ npm run build      # build de produção em admin/dist
 Para entrar: qualquer e-mail válido e qualquer senha, depois qualquer código de 6 dígitos e a escolha da
 unidade. A sessão fica no `localStorage` e o menu do perfil permite **restaurar os dados de demonstração**.
 
+### Retestes reais no painel local
+
+A tela **Retestes solicitados** usa o proxy do servidor Vite para acessar a API. Configure
+`HEMOCENTRO_SERVICE_API_KEY` no ambiente do backend e do serviço `admin`; a chave é adicionada pelo proxy
+e não é exposta ao navegador. Sem essa variável, a tela informa que a integração não está disponível.
+
 ## Como revisar
 
 - A faixa escura no topo mostra que é um protótipo e tem o interruptor **Mostrar MVP / Fase 2**, que exibe ou

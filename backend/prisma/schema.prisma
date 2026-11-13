@@ -37,6 +37,7 @@ model Triagem_Resultado {
   doador_id          Int      @map("doadorId")
   modulo             String
   respostas          Json
+  pergunta_bloqueadora Json?    @map("perguntaBloqueadora")
   status             String
   data_preenchimento DateTime @default(now()) @map("dataPreenchimento")
 
@@ -54,6 +55,7 @@ model Solicitacao_Correcao {
   respostas_originais   Json     @map("respostasOriginais")
   respostas_corrigidas  Json?    @map("respostasCorrigidas")
   perguntas_alteradas   Json?    @map("perguntasAlteradas")
+  contexto_reteste      Json?    @map("contextoReteste")
   status                String   @default("PENDING_REVIEW")
   criado_em             DateTime @default(now()) @map("criadoEm")
   resolvido_em          DateTime? @map("resolvidoEm")

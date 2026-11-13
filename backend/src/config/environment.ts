@@ -10,6 +10,7 @@ interface EnvironmentConfig {
   NODE_ENV: string;
   CORS_ORIGIN: string;
   FRONTEND_URL: string;
+  HEMOCENTRO_SERVICE_API_KEY?: string;
 }
 
 function validateEnvironment(): EnvironmentConfig {
@@ -39,6 +40,7 @@ function validateEnvironment(): EnvironmentConfig {
     NODE_ENV: process.env.NODE_ENV || 'development',
     CORS_ORIGIN: process.env.CORS_ORIGIN || 'http://localhost:3001',
     FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:8081',
+    HEMOCENTRO_SERVICE_API_KEY: process.env.HEMOCENTRO_SERVICE_API_KEY,
   };
 }
 

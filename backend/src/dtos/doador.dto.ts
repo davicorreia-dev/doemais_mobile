@@ -309,6 +309,10 @@ export class CreateTriagemResultadoDto {
 
   @IsObject({ message: 'As respostas da triagem são inválidas.' })
   respostas!: Record<string, unknown>;
+
+  @IsOptional()
+  @IsObject({ message: 'A pergunta bloqueadora é inválida.' })
+  pergunta_bloqueadora?: Record<string, unknown>;
 }
 
 export class CreateSolicitacaoCorrecaoDto {
@@ -320,6 +324,8 @@ export class CreateSolicitacaoCorrecaoDto {
   comentario?: string;
   @IsObject()
   respostas_originais!: Record<string, unknown>;
+  @IsOptional() @IsObject()
+  contexto_reteste?: Record<string, unknown>;
 }
 
 export class FinalizarSolicitacaoCorrecaoDto {
