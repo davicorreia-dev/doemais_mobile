@@ -32,36 +32,6 @@ const Styles = StyleSheet.create({
         color: '#353535',
     },
 
-    // Grade de tipos de Sangue
-    bloodGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
-        rowGap: 15,
-    },
-    bloodButton: {
-        width: '23%',
-        height: 50,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: '#E0323C',
-        backgroundColor: '#fff',
-        padding: 0,
-    },
-    bloodButtonSelected: {
-        backgroundColor: '#E0323C',
-    },
-    bloodText: {
-        fontSize: 18,
-        fontFamily: 'Lexend_600SemiBold',
-        color: '#E0323C',
-        textAlign: 'center',
-    },
-    bloodTextSelected: {
-        color: '#fff',
-    },
     checkboxContainer: {
         flexDirection: 'row',
         alignItems: 'center',

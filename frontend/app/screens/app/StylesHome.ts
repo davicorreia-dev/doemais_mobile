@@ -121,27 +121,6 @@ const Styles = StyleSheet.create({
         textAlign: 'center',
     },
 
-    // Blood Grid
-    bloodGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
-        gap: 10,
-    },
-    bloodButton: {
-        width: '22%',
-        backgroundColor: '#E0323C',
-        aspectRatio: 1, // Quadrado
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 10,
-        marginBottom: 10,
-    },
-    bloodButtonText: {
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: 16,
-    },
 
     // Visto Recentemente
     recentCard: {

@@ -10,6 +10,7 @@ import { api } from '../../services/api';
 import DesktopAppSidebar from '../../../components/DesktopAppSidebar';
 import DesktopPageHeader from '../../../components/DesktopPageHeader';
 import ActivityCard from '../../../components/ActivityCard';
+import BloodTypeGrid from '../../../components/BloodTypeGrid';
 
 interface NewsItem {
     id: string;
@@ -326,13 +327,7 @@ export default function HomeScreen() {
 
                     {/* Seção Grupo Sanguíneo */}
                     <Text style={Styles.sectionTitle}>Grupo sanguíneo</Text>
-                    <View style={Styles.bloodGrid}>
-                        {bloodTypes.map((type) => (
-                            <TouchableOpacity key={type} style={Styles.bloodButton}>
-                                <Text style={Styles.bloodButtonText}>{type}</Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
+                    <BloodTypeGrid bloodTypes={bloodTypes} />
 
                     {/* Seção de Notícias e Pedidos de Sangue */}
                     <Text style={Styles.sectionTitle}>Notícias e Pedidos de Sangue</Text>
