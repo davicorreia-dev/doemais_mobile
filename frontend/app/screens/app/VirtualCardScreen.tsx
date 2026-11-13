@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, StatusBar, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StatusBar, Text, View, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -7,6 +7,8 @@ import { useFocusEffect } from '@react-navigation/native';
 
 import { api } from '../../services/api';
 import StatusBarBackground from '../../../components/StatusBarBackground';
+import VirtualDonorCard from '../../../components/VirtualDonorCard';
+import VirtualCardNotice from '../../../components/VirtualCardNotice';
 import Styles from './StylesVirtualCard';
 
 type Profile = {
@@ -29,6 +31,8 @@ const formatApprovalDate = (timestamp?: number) => {
 };
 
 export default function VirtualCardScreen() {
+    const { width } = useWindowDimensions();
+    const isDesktop = width >= 768;
     const [profile, setProfile] = useState<Profile>({});
     const [approvalDate, setApprovalDate] = useState<number | null>(null);
     const [underReview, setUnderReview] = useState(false);
@@ -147,55 +151,20 @@ export default function VirtualCardScreen() {
             <StatusBar barStyle="light-content" />
             <StatusBarBackground color="#E0323C" />
             <View style={Styles.hero} />
-            <ScrollView contentContainerStyle={Styles.content} showsVerticalScrollIndicator={false}>
-                <Text style={Styles.title}>Carteirinha virtual</Text>
-                <Text style={Styles.subtitle}>Seu resultado de triagem DoeMais</Text>
-
-                <View style={Styles.card}>
-                    <View style={Styles.cardAccent} />
-                    <View style={Styles.brandRow}>
-                            <View style={Styles.brandLogoWrap}>
-                                <Image
-                                    source={require('../../../assets/images/doe-logo.png')}
-                                    style={Styles.brandLogo}
-                                    resizeMode="contain"
-                                />
-                        </View>
-                        <Text style={Styles.cardType}>CARTEIRINHA DIGITAL</Text>
-                    </View>
-
-                    <View style={Styles.cardMain}>
-                        <View>
-                            <Text style={Styles.fieldLabel}>DOADOR(A)</Text>
-                            <Text style={Styles.name} numberOfLines={2}>{profile.nome || 'Doador(a)'}</Text>
-                        </View>
-                        <View style={Styles.bloodBadge}>
-                            <Ionicons name="water" size={19} color="#E0323C" />
-                            <Text style={Styles.bloodType}>{bloodType}</Text>
-                        </View>
-                    </View>
-
-                    <View style={Styles.divider} />
-
-                    <View style={Styles.cardFooter}>
-                        <View>
-                            <Text style={Styles.fieldLabel}>TRIAGEM CONCLUÍDA EM</Text>
-                            <Text style={Styles.date}>{formatApprovalDate(approvalDate)}</Text>
-                        </View>
-                        <View style={[Styles.approvedSeal, underReview && Styles.reviewSeal]}>
-                            <Ionicons name={underReview ? "time" : "checkmark-circle"} size={18} color={underReview ? "#8A5A13" : "#22753A"} />
-                            <Text style={[Styles.approvedText, underReview && Styles.reviewText]}>{underReview ? 'EM REVISÃO' : 'APTO(A)'}</Text>
-                        </View>
-                    </View>
+            <ScrollView contentContainerStyle={[Styles.content, isDesktop && Styles.contentDesktop]} showsVerticalScrollIndicator={false}>
+                <View style={[Styles.pageHeading, isDesktop && Styles.pageHeadingDesktop]}>
+                    <Text style={[Styles.title, isDesktop && Styles.titleDesktop]}>Carteirinha virtual</Text>
+                    <Text style={[Styles.subtitle, isDesktop && Styles.subtitleDesktop]}>Seu resultado de triagem DoeMais</Text>
                 </View>
-
-                <View style={Styles.notice}>
-                    <Ionicons name="information-circle-outline" size={21} color="#A12C34" />
-                    <Text style={Styles.noticeText}>
-                        {underReview
-                            ? 'Uma correção foi enviada. Aguarde a revisão do hemocentro antes de usar esta carteirinha.'
-                            : 'Esta carteirinha registra a aprovação no questionário de triagem e não substitui a avaliação presencial do hemocentro.'}
-                    </Text>
+                <View style={Styles.cardColumn}>
+                    <VirtualDonorCard
+                        name={profile.nome || 'Doador(a)'}
+                        bloodType={bloodType}
+                        approvalDate={formatApprovalDate(approvalDate)}
+                        underReview={underReview}
+                        desktop={isDesktop}
+                    />
+                    <VirtualCardNotice underReview={underReview} desktop={isDesktop} />
                 </View>
             </ScrollView>
         </SafeAreaView>
