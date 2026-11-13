@@ -1,6 +1,6 @@
-# Use ./run.sh --local  (db + backend + Expo, API local)
-#     ./run.sh --render (só o Expo, API no Render)
-# db e backend ficam no profile "local"; o frontend sempre sobe.
+# Use ./run.sh --local  (db + backend + Expo + painel admin, API local)
+#     ./run.sh --render (Expo + painel admin, API no Render)
+# db e backend ficam no profile "local"; frontend e admin sempre sobem.
 services:
   db:
     image: postgres:16
@@ -30,7 +30,7 @@ services:
       NODE_ENV: development
       PORT: "3000"
       # origens permitidas (separadas por vírgula): o app web do Expo roda na 8081
-      CORS_ORIGIN: http://localhost:8081,http://${HOST_IP:-localhost}:8081
+      CORS_ORIGIN: http://localhost:8081,http://${HOST_IP:-localhost}:8081,http://localhost:5174
     ports:
       - "3000:3000"
 
@@ -52,6 +52,17 @@ services:
     tty: true
     volumes:
       - ./frontend:/app
+      - /app/node_modules
+
+  admin:
+    build: ./admin
+    ports:
+      # só no próprio PC: o painel é um protótipo, sem autenticação real
+      - "127.0.0.1:5174:5174"
+    environment:
+      VITE_USE_POLLING: "1"
+    volumes:
+      - ./admin:/app
       - /app/node_modules
 
 volumes:
