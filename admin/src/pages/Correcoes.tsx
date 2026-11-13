@@ -1,71 +1,68 @@
-import { useState } from 'react';
-import { Check, CircleCheck } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { Check, CircleCheck, RefreshCw } from 'lucide-react';
 import { Card, Chip, Field, PageHead, Pills } from '../components/ui';
-import { useStore } from '../state/store';
-import { donorById } from '../data/mock';
+
+type Answer = string | number | boolean | null;
+type RetestContext = { formulario?: string; pergunta_bloqueadora?: { id: string; text: string; answer: Answer; message?: string } };
+type Correction = {
+    id: number; modulo: string; motivo: string; comentario?: string;
+    status: 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED';
+    respostas_originais: Record<string, Answer>; respostas_corrigidas?: Record<string, Answer> | null; perguntas_alteradas?: string[] | null;
+    contexto_reteste?: RetestContext; doador: { nome: string; tipo_sanguineo?: string };
+};
+
+const answer = (value: Answer | undefined) => value === true ? 'Sim' : value === false ? 'Não' : value == null ? '—' : String(value);
 
 export default function Corrections() {
-    const { corrections, resolveCorrection, toast } = useStore();
+    const [items, setItems] = useState<Correction[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
     const [tab, setTab] = useState<'pend' | 'done'>('pend');
-    const list = corrections.filter((c) => (tab === 'pend' ? c.status === 'PENDING_REVIEW' : c.status !== 'PENDING_REVIEW'));
-    const [selId, setSelId] = useState<number | null>(null);
-    const sel = list.find((c) => c.id === selId) ?? list[0];
+    const [selectedId, setSelectedId] = useState<number | null>(null);
     const [note, setNote] = useState('');
-    const [err, setErr] = useState('');
-    const pick = (id: number) => { setSelId(id); setNote(''); setErr(''); };
-    const decide = (status: 'APPROVED' | 'REJECTED') => {
-        if (!sel) return;
-        if (status === 'REJECTED' && note.trim().length < 5) { setErr('Informe o motivo da recusa (mínimo 5 caracteres).'); toast('Observação obrigatória para recusar.', 'err'); return; }
-        resolveCorrection(sel.id, status, note.trim());
-        setNote(''); setErr(''); setSelId(null);
+    const load = useCallback(async () => {
+        setLoading(true); setError('');
+        try {
+            const response = await fetch('/hemocentro-api/correcoes');
+            if (!response.ok) throw new Error('Não foi possível carregar os retestes. Verifique a chave de integração do painel.');
+            setItems(await response.json());
+        } catch (cause: any) { setError(cause.message || 'Não foi possível carregar os retestes.'); }
+        finally { setLoading(false); }
+    }, []);
+    useEffect(() => { void load(); }, [load]);
+    const list = items.filter((item) => tab === 'pend' ? item.status === 'PENDING_REVIEW' : item.status !== 'PENDING_REVIEW');
+    const selected = list.find((item) => item.id === selectedId) ?? list[0];
+    const resolve = async (status: 'APPROVED' | 'REJECTED') => {
+        if (!selected) return;
+        const response = await fetch(`/hemocentro-api/correcoes/${selected.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status, responsavel: 'Agente do hemocentro', observacao: note.trim() || undefined }) });
+        if (!response.ok) { setError('Não foi possível registrar a decisão.'); return; }
+        setItems((current) => current.map((item) => item.id === selected.id ? { ...item, status } : item));
+        setNote(''); setSelectedId(null);
     };
-    const pendCount = corrections.filter((c) => c.status === 'PENDING_REVIEW').length;
-    return (
-        <>
-            <PageHead title="Correções de respostas" plan="mvp" sub="Doadores que pediram revisão de uma triagem já enviada. Analise e decida." />
-            <Pills items={[{ id: 'pend' as const, label: `Aguardando análise (${pendCount})` }, { id: 'done' as const, label: `Resolvidas (${corrections.length - pendCount})` }]} value={tab} onChange={(v) => { setTab(v); setSelId(null); }} />
-            <div className="grid mt" style={{ gridTemplateColumns: '380px 1fr', alignItems: 'start' }}>
-                <Card style={{ padding: 16 }}>
-                    {list.length === 0 && <div className="empty"><CircleCheck size={32} color="#2e7d32" /><p style={{ marginTop: 10 }}>Tudo em dia! Nenhuma correção aqui.</p></div>}
-                    {list.map((c) => {
-                        const d = donorById(c.donorId);
-                        const late = c.hoursAgo > 48;
-                        return (
-                            <button key={c.id} className={`sel-card ${sel?.id === c.id ? 'on' : ''}`} style={{ marginBottom: 10 }} onClick={() => pick(c.id)}>
-                                <div className="row between"><b>{d.name}</b><Chip tone={c.status === 'APPROVED' ? 'green' : c.status === 'REJECTED' ? 'red' : late ? 'amber' : 'gray'}>{c.status === 'PENDING_REVIEW' ? `há ${c.hoursAgo}h` : c.status === 'APPROVED' ? 'Aprovada' : 'Recusada'}</Chip></div>
-                                <div style={{ color: 'var(--primary)', fontWeight: 600, fontSize: 12, margin: '8px 0 6px' }}>Módulo: {c.module}</div>
-                                <div className="small muted">“{c.reason.length > 60 ? c.reason.slice(0, 60) + '…' : c.reason}”</div>
-                            </button>
-                        );
-                    })}
-                </Card>
-                {sel && (
-                    <Card>
-                        <div className="row between">
-                            <h3 style={{ fontSize: 18 }}>Solicitação #{sel.id} · {sel.module}</h3>
-                            {sel.status === 'PENDING_REVIEW' ? <Chip tone={sel.hoursAgo > 48 ? 'amber' : 'gray'}>{`há ${sel.hoursAgo}h${sel.hoursAgo > 48 ? ' · acima da meta' : ''}`}</Chip> : <Chip tone={sel.status === 'APPROVED' ? 'green' : 'red'}>{sel.status === 'APPROVED' ? 'Aprovada' : 'Recusada'}</Chip>}
-                        </div>
-                        <p className="small muted" style={{ margin: '6px 0 16px' }}>Doador: {donorById(sel.donorId).name} · {donorById(sel.donorId).blood}{sel.resolvedAt ? ` · resolvida por ${sel.responsible} em ${sel.resolvedAt}` : ''}</p>
-                        <div className="note gray" style={{ flexDirection: 'column', gap: 6 }}><b style={{ fontSize: 10, letterSpacing: 0.8, color: '#8a857e' }}>MOTIVO INFORMADO</b><span style={{ fontSize: 13, color: '#353535' }}>{sel.reason}</span></div>
-                        <h4 style={{ margin: '22px 0 10px' }}>Comparação das respostas</h4>
-                        <div className="diff-row" style={{ background: '#faf8f5' }}><b className="small muted">PERGUNTA</b><b className="small muted">ORIGINAL</b><b className="small muted">CORRIGIDA</b></div>
-                        {sel.diff.map((r, i) => {
-                            const ch = r.original !== r.corrected;
-                            return <div key={i} className={`diff-row ${ch ? 'changed' : ''}`}><b style={{ fontSize: 13 }}>{r.q}</b><Chip tone={ch ? 'red' : 'gray'}>{r.original}</Chip><Chip tone={ch ? 'green' : 'gray'}>{r.corrected}</Chip></div>;
-                        })}
-                        <div className="note green mt" style={{ flexDirection: 'column', gap: 4 }}><b>Impacto: com a correção, a triagem de {sel.module} passa de {sel.resultBefore} para {sel.resultAfter}.</b><span>Verifique o comprovante ou confirme com o doador antes de aprovar.</span></div>
-                        {sel.status === 'PENDING_REVIEW' ? (
-                            <>
-                                <div className="mt2"><Field label="Observação do agente (obrigatória ao recusar)" error={err}><textarea className={`textarea ${err ? 'invalid' : ''}`} value={note} onChange={(e) => { setNote(e.target.value); setErr(''); }} /></Field></div>
-                                <div className="row" style={{ justifyContent: 'flex-end', marginTop: 18 }}>
-                                    <button className="btn danger" onClick={() => decide('REJECTED')}>Recusar</button>
-                                    <button className="btn" onClick={() => decide('APPROVED')}><Check size={18} />Aprovar correção</button>
-                                </div>
-                            </>
-                        ) : sel.note && <div className="note gray mt2"><span><b>Observação:</b> {sel.note}</span></div>}
-                    </Card>
-                )}
-            </div>
-        </>
-    );
+    const pending = items.filter((item) => item.status === 'PENDING_REVIEW').length;
+    const question = selected?.contexto_reteste?.pergunta_bloqueadora;
+    return <>
+        <PageHead title="Retestes solicitados" plan="mvp" sub="Solicitações feitas pelos doadores após uma resposta de pré-triagem." actions={<button className="btn outline" onClick={() => void load()}><RefreshCw size={17} />Atualizar</button>} />
+        <Pills items={[{ id: 'pend' as const, label: `Aguardando análise (${pending})` }, { id: 'done' as const, label: `Resolvidas (${items.length - pending})` }]} value={tab} onChange={(value) => { setTab(value); setSelectedId(null); }} />
+        {error && <div className="note red mt">{error}</div>}
+        {loading ? <div className="empty">Carregando retestes…</div> : <div className="grid mt" style={{ gridTemplateColumns: '380px 1fr', alignItems: 'start' }}>
+            <Card style={{ padding: 16 }}>
+                {list.length === 0 && <div className="empty"><CircleCheck size={32} color="#2e7d32" /><p style={{ marginTop: 10 }}>Nenhum reteste nesta fila.</p></div>}
+                {list.map((item) => <button key={item.id} className={`sel-card ${selected?.id === item.id ? 'on' : ''}`} style={{ marginBottom: 10 }} onClick={() => { setSelectedId(item.id); setNote(''); }}>
+                    <div className="row between"><b>{item.doador.nome}</b><Chip tone={item.status === 'PENDING_REVIEW' ? 'amber' : item.status === 'APPROVED' ? 'green' : 'red'}>{item.status === 'PENDING_REVIEW' ? 'Reteste solicitado' : item.status === 'APPROVED' ? 'Aprovado' : 'Recusado'}</Chip></div>
+                    <div style={{ color: 'var(--primary)', fontWeight: 600, fontSize: 12, margin: '8px 0 6px' }}>{item.contexto_reteste?.formulario || item.modulo}</div><div className="small muted">{item.motivo}</div>
+                </button>)}
+            </Card>
+            {selected && <Card>
+                <div className="row between"><h3 style={{ fontSize: 18 }}>Reteste #{selected.id} · {selected.contexto_reteste?.formulario || selected.modulo}</h3><Chip tone={selected.status === 'PENDING_REVIEW' ? 'amber' : selected.status === 'APPROVED' ? 'green' : 'red'}>{selected.status === 'PENDING_REVIEW' ? 'Reteste solicitado' : selected.status}</Chip></div>
+                <p className="small muted" style={{ margin: '6px 0 16px' }}>Doador: {selected.doador.nome} · {selected.doador.tipo_sanguineo || 'Tipo sanguíneo não informado'}</p>
+                <div className="note gray" style={{ flexDirection: 'column', gap: 6 }}><b style={{ fontSize: 10, letterSpacing: 0.8, color: '#8a857e' }}>MOTIVO INFORMADO</b><span style={{ fontSize: 13, color: '#353535' }}>{selected.motivo}{selected.comentario ? ` — ${selected.comentario}` : ''}</span></div>
+                {question && <div className="note red mt" style={{ flexDirection: 'column', gap: 6 }}><b style={{ fontSize: 10, letterSpacing: 0.8 }}>PERGUNTA QUE EXIGIU RETESTE</b><span><b>{question.text}</b></span><span className="small">Resposta original: <b>{answer(question.answer)}</b>{question.message ? ` · ${question.message}` : ''}</span></div>}
+                <h4 style={{ margin: '22px 0 10px' }}>Respostas alteradas no reteste</h4><div className="diff-row" style={{ background: '#faf8f5' }}><b className="small muted">CAMPO</b><b className="small muted">ORIGINAL</b><b className="small muted">RETESTE</b></div>
+                {(selected.perguntas_alteradas || []).length === 0 && <p className="small muted">O doador terminou o reteste sem alterar respostas.</p>}
+                {(selected.perguntas_alteradas || []).map((id) => <div key={id} className="diff-row changed"><b style={{ fontSize: 13 }}>{question?.id === id ? question.text : id}</b><Chip tone="red">{answer(selected.respostas_originais[id])}</Chip><Chip tone="green">{answer(selected.respostas_corrigidas?.[id])}</Chip></div>)}
+                {selected.status === 'PENDING_REVIEW' && <><div className="mt2"><Field label="Observação do agente"><textarea className="textarea" value={note} onChange={(event) => setNote(event.target.value)} /></Field></div><div className="row" style={{ justifyContent: 'flex-end', marginTop: 18 }}><button className="btn danger" onClick={() => void resolve('REJECTED')}>Recusar</button><button className="btn" onClick={() => void resolve('APPROVED')}><Check size={18} />Aprovar reteste</button></div></>}
+            </Card>}
+        </div>}
+    </>;
 }

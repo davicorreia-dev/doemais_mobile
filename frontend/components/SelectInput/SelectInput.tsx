@@ -6,7 +6,9 @@ import {
     TouchableOpacity,
     Modal,
     FlatList,
-    StyleSheet
+    StyleSheet,
+    type StyleProp,
+    type ViewStyle,
 } from 'react-native';
 import { formColumn } from '../../app/utils/responsive';
 
@@ -20,16 +22,18 @@ interface SelectInputProps {
     options: Option[];
     value: string;
     onChange: (value: string) => void;
+    containerStyle?: StyleProp<ViewStyle>;
+    inputStyle?: StyleProp<ViewStyle>;
 }
 
-export default function SelectInput({ label, options, value, onChange }: SelectInputProps) {
+export default function SelectInput({ label, options, value, onChange, containerStyle, inputStyle }: SelectInputProps) {
     const [open, setOpen] = useState(false);
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, containerStyle]}>
             <Text style={styles.label}>{label}</Text>
 
-            < TouchableOpacity style={styles.input} onPress={() => setOpen(true)
+            < TouchableOpacity style={[styles.input, inputStyle]} onPress={() => setOpen(true)
             }>
                 <Text style={{ color: value ? '#000' : '#999' }}>
                     {value || 'Selecione...'}

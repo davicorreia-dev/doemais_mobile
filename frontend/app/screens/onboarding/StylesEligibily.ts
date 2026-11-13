@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
         gap: 14,
     },
     cardMainActionWithReview: {
-        paddingRight: 92,
+        paddingRight: 48,
     },
     cardTitle: {
         fontSize: 16,
@@ -104,19 +104,11 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 12,
         right: 12,
-        height: 32,
-        paddingHorizontal: 10,
-        borderRadius: 16,
-        backgroundColor: '#E0323C',
+        width: 40,
+        height: 40,
+        borderRadius: 20,
         alignItems: 'center',
         justifyContent: 'center',
-        flexDirection: 'row',
-        gap: 5,
-    },
-    reviewButtonText: {
-        color: '#FFF',
-        fontSize: 11,
-        fontWeight: '800',
     },
 });
 

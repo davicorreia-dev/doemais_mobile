@@ -8,7 +8,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const saveModuleResult = async (
     moduleId: string,
     status: 'approved' | 'blocked',
-    answers: Record<string, unknown>
+    answers: Record<string, unknown>,
+    blockedQuestion?: { id: string; text: string; answer: unknown; message: string }
 ) => {
     try {
         const userRaw = await AsyncStorage.getItem('@doemais:user');
@@ -23,6 +24,7 @@ const saveModuleResult = async (
             status,
             date: Date.now(),
             answers,
+            blockedQuestion,
         };
         await AsyncStorage.setItem(key, JSON.stringify(history));
 
@@ -31,6 +33,7 @@ const saveModuleResult = async (
                 modulo: moduleId,
                 status,
                 respostas: answers,
+                pergunta_bloqueadora: blockedQuestion,
             });
         } catch (error) {
             // O cache local mantém a experiência utilizável quando não houver conexão.
@@ -75,7 +78,10 @@ import { clamp, topInset } from '../../../utils/responsive';
 
 type RouteParams = {
     moduleId?: string;
-    correction?: { originalAnswers: Record<string, unknown> };
+    correction?: {
+        originalAnswers: Record<string, unknown>;
+        blockedQuestion?: { id: string; text: string; answer: unknown; message: string };
+    };
 };
 
 function getBlockMessage(question: QuizQuestion, fallback: string) {
@@ -195,14 +201,6 @@ export default function QuizScreen() {
                 await api(`/api/doadores/correcoes/${correctionId}/finalizar`, 'PATCH', { respostas_corrigidas: finalAnswers });
             }
             
-            const isFinalTriage = module.id === 'TRIAGEM_HOMEM' || module.id === 'TRIAGEM_MULHER';
-            // No web, Alert pode não executar o callback do botão como no app nativo.
-            // A triagem final precisa abrir a carteirinha imediatamente após a aprovação.
-            if (isFinalTriage) {
-                navigation.navigate('MainTabs', { screen: 'Carteirinha' });
-                return;
-            }
-
             setSuccessVisible(true);
         } catch (error) {
             console.error("Erro ao salvar triagem:", error);
@@ -220,6 +218,10 @@ export default function QuizScreen() {
         setInputValue('');
         setSelectedMonthLabel('');
         setAnswers({}); // Limpa as respostas ao sair
+        if (module.id === 'TRIAGEM_HOMEM' || module.id === 'TRIAGEM_MULHER') {
+            navigation.navigate('MainTabs', { screen: 'Carteirinha' });
+            return;
+        }
         navigation.goBack();
     };
 
@@ -239,6 +241,10 @@ export default function QuizScreen() {
                 motivo: correctionReason,
                 comentario: correctionComment.trim() || undefined,
                 respostas_originais: correction?.originalAnswers || {},
+                contexto_reteste: correction?.blockedQuestion ? {
+                    pergunta_bloqueadora: correction.blockedQuestion,
+                    formulario: module.title,
+                } : undefined,
             });
             const request = response.data || response;
             setCorrectionId(request.id);
@@ -258,7 +264,12 @@ export default function QuizScreen() {
         setBlockMessage(message || module.blockMessage);
         
         // Grava o bloqueio localmente no AsyncStorage
-        saveModuleResult(module.id, 'blocked', finalAnswers).catch(e => console.error(e));
+        saveModuleResult(module.id, 'blocked', finalAnswers, {
+            id: currentQuestion.id,
+            text: currentQuestion.questionText.replace('{{month}}', selectedMonthLabel || 'o mês selecionado'),
+            answer: finalAnswers[currentQuestion.id],
+            message: message || module.blockMessage,
+        }).catch(e => console.error(e));
         if (correctionId) {
             api(`/api/doadores/correcoes/${correctionId}/finalizar`, 'PATCH', { respostas_corrigidas: finalAnswers })
                 .catch((error) => console.error('Erro ao finalizar correção:', error));
@@ -338,13 +349,6 @@ export default function QuizScreen() {
             submitAnswersToAPI(newAnswers).catch(e => console.error("Erro ao registrar bloqueio:", e));
             // E exibimos a tela de bloqueio
             openBlock(result.message, newAnswers);
-            return;
-        }
-
-        // Se responder 'Não' (false) na primeira pergunta de triagem (h1 ou w1),
-        // significa que não doou nos últimos 60/90 dias. Portanto, está aprovado e não precisa detalhar o mês!
-        if ((currentQuestion.id === 'h1' || currentQuestion.id === 'w1') && answer === false) {
-            finishFlow(newAnswers);
             return;
         }
 
@@ -554,7 +558,7 @@ export default function QuizScreen() {
                 <View style={Styles.modalBackdrop}>
                     <View style={Styles.modalCard}>
                         <Ionicons name="alert-circle-outline" size={60} color="#E0323C" />
-                        <Text style={Styles.modalTitle}>{module.blockTitle}</Text>
+                        <Text style={Styles.modalTitle}>{module.title}: {module.blockTitle}</Text>
                         <Text style={Styles.modalMessage}>{blockMessage || module.blockMessage}</Text>
                         <Button title="Voltar ao menu" textColor="#FFF" width="100%" onPress={exitToMenu} />
                     </View>
@@ -565,9 +569,9 @@ export default function QuizScreen() {
                 <View style={Styles.modalBackdrop}>
                     <View style={Styles.modalCard}>
                         <Ionicons name="checkmark-circle-outline" size={60} color="#2E7D32" />
-                        <Text style={Styles.modalTitle}>{module.successTitle}</Text>
+                        <Text style={Styles.modalTitle}>{module.title} concluído</Text>
                         <Text style={Styles.modalMessage}>{module.successMessage}</Text>
-                        <Button title="Voltar aos formulários" textColor="#FFF" width="100%" onPress={exitAfterSuccess} />
+                        <Button title={module.id === 'TRIAGEM_HOMEM' || module.id === 'TRIAGEM_MULHER' ? 'Ver carteirinha' : 'Voltar aos formulários'} textColor="#FFF" width="100%" onPress={exitAfterSuccess} />
                     </View>
                 </View>
             </Modal>

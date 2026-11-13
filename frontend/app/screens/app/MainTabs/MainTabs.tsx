@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Text, View } from 'react-native';
+import { Animated, Easing, Text, View, useWindowDimensions } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
@@ -80,6 +80,8 @@ function TabIcon({ routeName, focused, color, size, cardUnlocked, badge }: TabIc
 }
 
 export default function MainTabs() {
+    const { width } = useWindowDimensions();
+    const isDesktop = width >= 768;
     const [remainingForms, setRemainingForms] = useState(0);
     const [hasPendingReview, setHasPendingReview] = useState(false);
     const [cardUnlocked, setCardUnlocked] = useState(false);
@@ -136,7 +138,7 @@ export default function MainTabs() {
                         {route.name}
                     </Text>
                 ),
-                tabBarStyle: styles.tabBar,
+                tabBarStyle: route.name === 'Carteirinha' && isDesktop ? { display: 'none' } : styles.tabBar,
                 tabBarIcon: ({ focused, color, size }) => (
                     <TabIcon
                         routeName={route.name}
