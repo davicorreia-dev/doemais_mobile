@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Sobe o projeto com Docker, escolhendo qual API o app usa.
 #
-#   ./run.sh --local   banco + backend + Expo, API local (padrão)
-#   ./run.sh --render  só o Expo, API no Render
+#   ./run.sh --local   banco + backend + Expo + painel admin, API local (padrão)
+#   ./run.sh --render  Expo + painel admin, API no Render
 #
 # Argumentos extras vão para o "docker compose up". Ex.: ./run.sh --render -d
 # Variáveis opcionais: HOST_IP (IP do PC na rede), RENDER_URL.
@@ -43,7 +43,20 @@ else
   PROFILE=(--profile local)
 fi
 
-echo "Modo: $MODE | API: $API_URL | Expo: exp://$HOST_IP:8081"
-echo "(QR code nos logs do serviço 'frontend')"
+echo "Modo: $MODE | API: $API_URL"
+echo
+echo "================ Links de acesso ================"
+echo "App (web)          http://localhost:8081"
+echo "App (celular)      exp://$HOST_IP:8081   (QR code: docker compose logs frontend)"
+if [ "$MODE" = local ]; then
+  echo "API                http://localhost:3000   |   http://$HOST_IP:3000"
+  echo "API (saúde)        http://localhost:3000/health"
+  echo "Banco (Postgres)   só dentro do Docker (serviço 'db', sem porta publicada)"
+else
+  echo "API (Render)       $API_URL"
+fi
+echo "Painel admin       http://localhost:5174   (só neste PC; protótipo com dados fictícios)"
+echo "================================================="
+echo
 echo "Se o app já estava aberto no celular (ou trocou de modo): feche-o por completo e reabra, senão ele segue com o JS/API antigos."
 docker compose "${PROFILE[@]}" up --build -V "$@"
