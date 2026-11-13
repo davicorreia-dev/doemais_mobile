@@ -9,6 +9,7 @@ import styles from './StylesEligibily';
 import { api } from '../../services/api';
 import DesktopAppSidebar from '../../../components/DesktopAppSidebar';
 import DesktopPageHeader from '../../../components/DesktopPageHeader';
+import ScreenState from '../../../components/ScreenState';
 
 const normalizeGender = (value: string | null | undefined): FormGender => {
     if (!value) return 'ALL';
@@ -229,24 +230,16 @@ export default function EligibilityFormsScreen() {
 
     if (loading) {
         return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FDFCFC' }}>
+            <View style={{ flex: 1 }}>
                 <StatusBar barStyle="light-content" />
-            <StatusBarBackground color="#E0323C" />
-                <Text style={{ fontSize: 16, color: '#999' }}>Carregando formulários...</Text>
+                <ScreenState type="loading" message="Carregando formulários..." />
             </View>
         );
     }
 
     if (errorMessage) {
         return (
-            <View style={styles.stateScreen}>
-                <Ionicons name="cloud-offline-outline" size={42} color="#E0323C" />
-                <Text style={styles.stateTitle}>Não foi possível carregar</Text>
-                <Text style={styles.stateText}>{errorMessage}</Text>
-                <TouchableOpacity style={styles.retryButton} onPress={() => { setLoading(true); setLoadVersion((value) => value + 1); }} accessibilityRole="button">
-                    <Text style={styles.retryButtonText}>Tentar novamente</Text>
-                </TouchableOpacity>
-            </View>
+            <ScreenState type="error" message={errorMessage} onRetry={() => { setLoading(true); setLoadVersion((value) => value + 1); }} />
         );
     }
 
