@@ -11,6 +11,12 @@ const Styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingBottom: 40,
     },
+    desktopHeading: { height: 74, backgroundColor: '#E0323C', alignItems: 'center', justifyContent: 'center' },
+    desktopHeadingText: { color: '#FFF', fontFamily: 'Lexend_600SemiBold', fontSize: 22 },
+    contentDesktop: { width: '100%', maxWidth: 860, alignSelf: 'center', marginTop: 34, padding: 34, borderRadius: 20, backgroundColor: '#FFF', shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 3 },
+    desktopTitle: { color: '#353535', fontFamily: 'Lexend_600SemiBold', fontSize: 18, marginBottom: 22 },
+    desktopFieldsRow: { flexDirection: 'row', gap: 16, alignItems: 'flex-start' },
+    desktopField: { flex: 1 },
     sectionHeader: {
         flexDirection: 'row',
         alignItems: 'center',

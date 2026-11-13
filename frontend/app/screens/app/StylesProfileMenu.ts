@@ -2,8 +2,11 @@ import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
     screen: { flex: 1, backgroundColor: '#F7F7F7' },
+    desktopScreen: { flexDirection: 'row', backgroundColor: '#F7F6F4' },
+    desktopMain: { flex: 1 },
     hero: { height: 35, backgroundColor: '#E0323C', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 },
     content: { paddingHorizontal: 22, paddingTop: 24, paddingBottom: 36 },
+    contentDesktop: { width: '100%', maxWidth: 860, alignSelf: 'center', paddingHorizontal: 42, paddingTop: 36, paddingBottom: 56 },
     title: { color: '#333', fontSize: 24, fontWeight: '800', textAlign: 'center' },
     subtitle: { color: '#666', fontSize: 14, textAlign: 'center', marginTop: 6, marginBottom: 28 },
     profileSummary: { flexDirection: 'row', alignItems: 'center', padding: 18, borderRadius: 20, backgroundColor: '#FFF', borderWidth: 1, borderColor: '#EEE9E3', marginBottom: 28 },

@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Image, ScrollView, StatusBar, Text, TouchableOpacity, View, Alert } from 'react-native';
+import { Image, ScrollView, StatusBar, Text, TouchableOpacity, View, Alert, useWindowDimensions } from 'react-native';
 import StatusBarBackground from '../../../components/StatusBarBackground';
 import { NavigationProp, ParamListBase, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { QUIZ_MODULES, type FormGender, type QuizModule } from '../app/QuizFlow/quizData';
 import styles from './StylesEligibily';
 import { api } from '../../services/api';
+import DesktopAppSidebar from '../../../components/DesktopAppSidebar';
+import DesktopPageHeader from '../../../components/DesktopPageHeader';
 
 const normalizeGender = (value: string | null | undefined): FormGender => {
     if (!value) return 'ALL';
@@ -125,6 +127,8 @@ const getModuleState = (moduleId: string, latestForm: any, localHistory: any): M
 
 export default function EligibilityFormsScreen() {
     const navigation = useNavigation<NavigationProp<ParamListBase>>();
+    const { width } = useWindowDimensions();
+    const isDesktop = width >= 768;
     
     const [gender, setGender] = useState<FormGender>('ALL');
     const [loading, setLoading] = useState(true);
@@ -230,12 +234,15 @@ export default function EligibilityFormsScreen() {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, isDesktop && styles.desktopShell]}>
             <StatusBar barStyle="light-content" />
             <StatusBarBackground color="#E0323C" />
-            <View style={styles.hero} />
+            {!isDesktop && <View style={styles.hero} />}
+            {isDesktop && <DesktopAppSidebar name="Doador(a)" activeRoute="Elegibilidade" onNavigate={(target) => navigation.navigate(target)} />}
+            <View style={isDesktop && styles.desktopMain}>
+            {isDesktop && <DesktopPageHeader title="Elegibilidade" subtitle="Preencha os formulários antes de doar" />}
 
-            <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+            <ScrollView contentContainerStyle={[styles.content, isDesktop && styles.contentDesktop]} showsVerticalScrollIndicator={false}>
                 <Text style={styles.title}>Antes de doar, precisamos de algumas informações importantes.</Text>
 
                 <View style={styles.bulletRow}>
@@ -354,6 +361,7 @@ export default function EligibilityFormsScreen() {
                     })}
                 </View>
             </ScrollView>
+            </View>
         </View>
     );
 }

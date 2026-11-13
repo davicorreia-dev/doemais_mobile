@@ -3,6 +3,8 @@ import { Alert, Image, Modal, ScrollView, StatusBar, Text, TouchableOpacity, Vie
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NavigationProp, ParamListBase, useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import DesktopAppSidebar from '../../../../components/DesktopAppSidebar';
+import DesktopPageHeader from '../../../../components/DesktopPageHeader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const saveModuleResult = async (
@@ -93,6 +95,7 @@ export default function QuizScreen() {
 
     // Topo vermelho responsivo: acompanha a tela e respeita o notch
     const { width: winWidth, height: winHeight } = useWindowDimensions();
+    const isDesktop = winWidth >= 768;
     const insets = useSafeAreaInsets();
     const safeTop = topInset(insets.top);
     const headerSize = clamp(winHeight * 0.28, 190, 280);
@@ -527,10 +530,14 @@ export default function QuizScreen() {
     };
 
     return (
-        <View style={Styles.container}>
+        <View style={[Styles.container, isDesktop && Styles.desktopShell]}>
             <StatusBar barStyle="light-content" />
 
-            <View style={[Styles.header, { height: safeTop + headerSize, paddingTop: safeTop + 18, borderBottomLeftRadius: headerRadius, borderBottomRightRadius: headerRadius }]}>
+            {isDesktop && <DesktopAppSidebar name="Doador(a)" activeRoute="Elegibilidade" onNavigate={(target) => navigation.navigate(target)} />}
+            <View style={isDesktop && Styles.desktopMain}>
+            {isDesktop && <DesktopPageHeader title={module.title} subtitle="Responda com atenção para concluir sua triagem" />}
+
+            {!isDesktop && <View style={[Styles.header, { height: safeTop + headerSize, paddingTop: safeTop + 18, borderBottomLeftRadius: headerRadius, borderBottomRightRadius: headerRadius }]}>
                 <TouchableOpacity style={[Styles.navButton, Styles.navButtonLeft, { top: safeTop + 20, width: navSize, height: navSize }]} onPress={handlePrevious} disabled={isSubmitting}>
                     <Ionicons name="chevron-back" size={28} color="#FFF" />
                 </TouchableOpacity>
@@ -542,21 +549,22 @@ export default function QuizScreen() {
                 <View style={[Styles.headerIconContainer, { width: circleSize, height: circleSize, borderRadius: circleSize / 2, marginTop: clamp(winHeight * 0.05, 28, 60) }]}>
                     <Image source={module.image} style={[Styles.headerImage, { width: circleSize * 0.56, height: circleSize * 0.56 }]} resizeMode="contain" />
                 </View>
-            </View>
+            </View>}
 
-            <View style={Styles.content}>
-                <ScrollView contentContainerStyle={Styles.scrollContent} showsVerticalScrollIndicator={false}>
-                    <View style={Styles.questionCard}>
+            <View style={[Styles.content, isDesktop && Styles.desktopContent]}>
+                <ScrollView contentContainerStyle={[Styles.scrollContent, isDesktop && Styles.desktopScrollContent]} showsVerticalScrollIndicator={false}>
+                    <View style={[Styles.questionCard, isDesktop && Styles.desktopQuestionCard]}>
                         <Text style={Styles.questionIndex}>{questionIndex + 1}.</Text>
                         <Text style={Styles.questionText}>{currentQuestion.questionText.replace('{{month}}', selectedMonthLabel || 'o mês selecionado')}</Text>
                         {renderQuestionBody()}
                     </View>
                 </ScrollView>
             </View>
+            </View>
 
             <Modal visible={blockVisible} transparent animationType="fade" onRequestClose={exitToMenu}>
                 <View style={Styles.modalBackdrop}>
-                    <View style={Styles.modalCard}>
+                    <View style={[Styles.modalCard, isDesktop && Styles.modalCardDesktop]}>
                         <Ionicons name="alert-circle-outline" size={60} color="#E0323C" />
                         <Text style={Styles.modalTitle}>{module.title}: {module.blockTitle}</Text>
                         <Text style={Styles.modalMessage}>{blockMessage || module.blockMessage}</Text>
@@ -567,7 +575,7 @@ export default function QuizScreen() {
 
             <Modal visible={successVisible} transparent animationType="fade" onRequestClose={exitAfterSuccess}>
                 <View style={Styles.modalBackdrop}>
-                    <View style={Styles.modalCard}>
+                    <View style={[Styles.modalCard, isDesktop && Styles.modalCardDesktop]}>
                         <Ionicons name="checkmark-circle-outline" size={60} color="#2E7D32" />
                         <Text style={Styles.modalTitle}>{module.title} concluído</Text>
                         <Text style={Styles.modalMessage}>{module.successMessage}</Text>
@@ -578,7 +586,7 @@ export default function QuizScreen() {
 
             <Modal visible={correctionVisible} transparent animationType="fade" onRequestClose={closeCorrection}>
                 <View style={Styles.modalBackdrop}>
-                    <View style={Styles.modalCard}>
+                    <View style={[Styles.modalCard, isDesktop && Styles.modalCardDesktop]}>
                         <TouchableOpacity
                             style={Styles.modalCloseButton}
                             onPress={closeCorrection}

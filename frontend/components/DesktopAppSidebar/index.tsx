@@ -5,6 +5,7 @@ import styles from './styles';
 
 type DesktopAppSidebarProps = {
     name: string;
+    activeRoute?: 'Início' | 'Elegibilidade' | 'Carteirinha' | 'Mais';
     onNavigate: (route: 'Início' | 'Elegibilidade' | 'Carteirinha' | 'Mais') => void;
 };
 
@@ -15,7 +16,7 @@ const items: Array<{ label: 'Início' | 'Elegibilidade' | 'Carteirinha' | 'Mais'
     { label: 'Mais', icon: 'settings-outline' },
 ];
 
-export default function DesktopAppSidebar({ name, onNavigate }: DesktopAppSidebarProps) {
+export default function DesktopAppSidebar({ name, activeRoute = 'Carteirinha', onNavigate }: DesktopAppSidebarProps) {
     const initials = name.split(' ').filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'D';
     return (
         <View style={styles.sidebar}>
@@ -23,7 +24,7 @@ export default function DesktopAppSidebar({ name, onNavigate }: DesktopAppSideba
                 <Image source={require('../../assets/images/doe-logo.png')} style={styles.logo} resizeMode="contain" />
                 <View style={styles.navigation}>
                     {items.map((item) => {
-                        const active = item.label === 'Carteirinha';
+                        const active = item.label === activeRoute;
                         return <TouchableOpacity key={item.label} style={[styles.item, active && styles.itemActive]} onPress={() => onNavigate(item.label)} accessibilityRole="tab" accessibilityState={{ selected: active }}>
                             <Ionicons name={item.icon} size={18} color={active ? '#FFFFFF' : '#77716A'} />
                             <Text style={[styles.itemText, active && styles.itemTextActive]}>{item.label}</Text>

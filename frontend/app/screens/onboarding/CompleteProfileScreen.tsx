@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert, KeyboardAvoidingView, Modal, TextInput } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, KeyboardAvoidingView, Modal, TextInput, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
@@ -17,6 +17,8 @@ import DateOfBirthInput from '../../../components/DateOfBirthInput/DateOfBirthIn
 const BLOOD_TYPES = ['A+', 'O+', 'B+', 'AB+', 'A-', 'O-', 'B-', 'AB-'];
 
 export default function CompleteProfileScreen() {
+    const { width } = useWindowDimensions();
+    const isDesktop = width >= 768;
     const navigation = useNavigation<any>();
     const route = useRoute();
     const keyboardBehavior = useKeyboardBehavior();
@@ -180,6 +182,7 @@ export default function CompleteProfileScreen() {
                 }}
                 containerStyle={{ backgroundColor: '#E0323C' }}
             />
+            {isDesktop && <View style={Styles.desktopHeading}><Text style={Styles.desktopHeadingText}>Complete seu perfil</Text></View>}
 
 
             <KeyboardAvoidingView
@@ -188,16 +191,16 @@ export default function CompleteProfileScreen() {
             >
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
 
-                    <View style={Styles.content}>
+                    <View style={[Styles.content, isDesktop && Styles.contentDesktop]}>
 
-                        <DateOfBirthInput
-                            value={birthDate}
-                            onChange={(value) => { setBirthDate(value); setBirthDateError(''); }}
-                            error={birthDateError}
-                        />
+                        {isDesktop && <Text style={Styles.desktopTitle}>Informações pessoais</Text>}
+
+                        <View style={isDesktop && Styles.desktopFieldsRow}>
+
+                            <View style={isDesktop && Styles.desktopField}><DateOfBirthInput value={birthDate} onChange={(value) => { setBirthDate(value); setBirthDateError(''); }} error={birthDateError} /></View>
 
                         {/* Gênero */}
-                        <TouchableOpacity onPress={() => setModalVisible(true)} activeOpacity={0.8}>
+                        <TouchableOpacity style={isDesktop && Styles.desktopField} onPress={() => setModalVisible(true)} activeOpacity={0.8}>
                             <View pointerEvents="none">
                                 <Input
                                     label="Gênero*"
@@ -208,17 +211,13 @@ export default function CompleteProfileScreen() {
                         </TouchableOpacity>
 
                         {/* Peso */}
-                        <Text style={Styles.weightLabel}>Peso (kg)*</Text>
-                        <View style={Styles.weightInputContainer}>
-                            <TextInput
-                                style={Styles.weightTextInput}
-                                placeholder="Ex: 70"
-                                placeholderTextColor="#C4C4C4"
-                                keyboardType="numeric"
-                                value={weight}
-                                onChangeText={setWeight}
-                            />
-                            <Text style={Styles.kgText}>kg</Text>
+                        <View style={isDesktop && Styles.desktopField}>
+                            <Text style={Styles.weightLabel}>Peso (kg)*</Text>
+                            <View style={Styles.weightInputContainer}>
+                                <TextInput style={Styles.weightTextInput} placeholder="Ex: 70" placeholderTextColor="#C4C4C4" keyboardType="numeric" value={weight} onChangeText={setWeight} />
+                                <Text style={Styles.kgText}>kg</Text>
+                            </View>
+                        </View>
                         </View>
 
                         {/* Sangue */}

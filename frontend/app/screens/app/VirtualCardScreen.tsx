@@ -10,6 +10,7 @@ import StatusBarBackground from '../../../components/StatusBarBackground';
 import VirtualDonorCard from '../../../components/VirtualDonorCard';
 import VirtualCardNotice from '../../../components/VirtualCardNotice';
 import DesktopAppSidebar from '../../../components/DesktopAppSidebar';
+import DesktopPageHeader from '../../../components/DesktopPageHeader';
 import Styles from './StylesVirtualCard';
 
 type Profile = {
@@ -122,7 +123,7 @@ export default function VirtualCardScreen() {
     if (loading) {
         return (
             <SafeAreaView style={[Styles.centered, isDesktop && Styles.desktopScreen]} edges={['top']}>
-                {isDesktop && <DesktopAppSidebar name="Doador(a)" onNavigate={(route) => navigation.navigate(route)} />}
+                {isDesktop && <DesktopAppSidebar name="Doador(a)" activeRoute="Carteirinha" onNavigate={(route) => navigation.navigate(route)} />}
                 <View style={Styles.loadingBody}><ActivityIndicator color="#E0323C" size="large" /></View>
             </SafeAreaView>
         );
@@ -134,7 +135,7 @@ export default function VirtualCardScreen() {
                 <StatusBar barStyle="light-content" />
                 <StatusBarBackground color="#E0323C" />
                 {!isDesktop && <View style={Styles.hero} />}
-                {isDesktop && <DesktopAppSidebar name={profile.nome || 'Doador(a)'} onNavigate={(route) => navigation.navigate(route)} />}
+                {isDesktop && <DesktopAppSidebar name={profile.nome || 'Doador(a)'} activeRoute="Carteirinha" onNavigate={(route) => navigation.navigate(route)} />}
                 <View style={[Styles.emptyBody, isDesktop && Styles.emptyBodyDesktop]}>
                     <View style={Styles.emptyIcon}>
                         <Ionicons name="card-outline" size={42} color="#E0323C" />
@@ -157,10 +158,11 @@ export default function VirtualCardScreen() {
             <StatusBar barStyle="light-content" />
             <StatusBarBackground color="#E0323C" />
             {!isDesktop && <View style={Styles.hero} />}
-            {isDesktop && <DesktopAppSidebar name={profile.nome || 'Doador(a)'} onNavigate={(route) => navigation.navigate(route)} />}
+            {isDesktop && <DesktopAppSidebar name={profile.nome || 'Doador(a)'} activeRoute="Carteirinha" onNavigate={(route) => navigation.navigate(route)} />}
             <View style={Styles.mainContent}>
+                {isDesktop && <DesktopPageHeader title="Carteirinha virtual" subtitle="Seu resultado de triagem DoeMais" />}
                 <ScrollView contentContainerStyle={[Styles.content, isDesktop && Styles.contentDesktop]} showsVerticalScrollIndicator={false}>
-                    <View style={[Styles.pageHeading, isDesktop && Styles.pageHeadingDesktop]}>
+                    <View style={[Styles.pageHeading, isDesktop && Styles.pageHeadingDesktop, isDesktop && { display: 'none' }]}>
                         <Text style={[Styles.title, isDesktop && Styles.titleDesktop]}>Carteirinha virtual</Text>
                         <Text style={[Styles.subtitle, isDesktop && Styles.subtitleDesktop]}>Seu resultado de triagem DoeMais</Text>
                     </View>

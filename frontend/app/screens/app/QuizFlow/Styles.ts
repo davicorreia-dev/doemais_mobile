@@ -5,6 +5,11 @@ const Styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F7F7F7',
     },
+    desktopShell: { flexDirection: 'row', backgroundColor: '#F7F6F4' },
+    desktopMain: { flex: 1 },
+    desktopContent: { flex: 1 },
+    desktopScrollContent: { alignItems: 'center', paddingTop: 52, paddingBottom: 64 },
+    desktopQuestionCard: { width: 640, minHeight: 430, paddingVertical: 34, paddingHorizontal: 36 },
     header: {
         height: 250,
         backgroundColor: '#E0323C',
@@ -259,6 +264,8 @@ const Styles = StyleSheet.create({
         alignItems: 'center',
         gap: 12,
     },
+    // Mantém os diálogos do Pen compactos no desktop, sem ocupar toda a largura.
+    modalCardDesktop: { maxWidth: 460 },
     modalCloseButton: {
         position: 'absolute',
         top: 12,

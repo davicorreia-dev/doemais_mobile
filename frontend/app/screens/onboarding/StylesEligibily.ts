@@ -5,6 +5,8 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F7F7F7',
     },
+    desktopShell: { flexDirection: 'row', backgroundColor: '#F7F6F4' },
+    desktopMain: { flex: 1 },
     hero: {
         height: 35,
         backgroundColor: '#E0323C',
@@ -16,6 +18,7 @@ const styles = StyleSheet.create({
         paddingTop: 24,
         paddingBottom: 36,
     },
+    contentDesktop: { width: '100%', maxWidth: 860, alignSelf: 'center', paddingHorizontal: 42, paddingTop: 40, paddingBottom: 56 },
     title: {
         fontSize: 24,
         lineHeight: 32,
