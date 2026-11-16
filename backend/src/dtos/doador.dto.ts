@@ -24,6 +24,7 @@ import {
   IsEnum,
   IsIn,
   IsObject,
+  IsBoolean,
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 import {
@@ -32,6 +33,13 @@ import {
   IsValidDonorWeight,
   IsValidBloodType,
 } from '../utils/validators';
+
+const toBoolean = ({ value }: { value: unknown }): unknown => {
+  if (value === true || value === false) return value;
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  return value;
+};
 
 /**
  * DTO para registro de novo doador
@@ -63,7 +71,7 @@ export class RegisterDoadorDto {
   @MinLength(8, { message: 'A senha deve ter no mínimo 8 caracteres.' })
   @MaxLength(128, { message: 'A senha deve ter no máximo 128 caracteres.' })
   @Matches(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
     {
       message:
         'A senha deve conter: uma letra maiúscula, uma minúscula, um número e um caractere especial (@$!%*?&).',
@@ -167,6 +175,9 @@ export class UpdateDoadorDto {
   @IsOptional()
   @MinLength(3, { message: 'O nome deve ter no mínimo 3 caracteres.' })
   @MaxLength(100, { message: 'O nome deve ter no máximo 100 caracteres.' })
+  @Matches(/^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ ]+$/, {
+    message: 'O nome deve conter apenas letras e espaços.',
+  })
   nome?: string;
 
   @IsEmail({}, { message: 'O e-mail informado não é válido.' })
@@ -222,7 +233,8 @@ export class UpdateDoadorDto {
  */
 export class CreateFormularioElegibilidadeDto {
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(toBoolean)
+  @IsBoolean({ message: 'O campo teve_resfriado deve ser booleano.' })
   teve_resfriado?: boolean;
 
   @IsOptional()
@@ -231,7 +243,8 @@ export class CreateFormularioElegibilidadeDto {
   data_fim_sintomas_resfriado?: Date;
 
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(toBoolean)
+  @IsBoolean({ message: 'O campo esta_gravida deve ser booleano.' })
   esta_gravida?: boolean;
 
   @IsOptional()
@@ -240,11 +253,13 @@ export class CreateFormularioElegibilidadeDto {
   data_parto?: Date;
 
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(toBoolean)
+  @IsBoolean({ message: 'O campo esta_amamentando deve ser booleano.' })
   esta_amamentando?: boolean;
 
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(toBoolean)
+  @IsBoolean({ message: 'O campo fez_tatuagem deve ser booleano.' })
   fez_tatuagem?: boolean;
 
   @IsOptional()
@@ -253,7 +268,8 @@ export class CreateFormularioElegibilidadeDto {
   data_tatuagem?: Date;
 
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(toBoolean)
+  @IsBoolean({ message: 'O campo fez_piercing deve ser booleano.' })
   fez_piercing?: boolean;
 
   @IsOptional()
@@ -262,7 +278,8 @@ export class CreateFormularioElegibilidadeDto {
   data_piercing?: Date;
 
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(toBoolean)
+  @IsBoolean({ message: 'O campo esteve_area_malaria deve ser booleano.' })
   esteve_area_malaria?: boolean;
 
   @IsOptional()
@@ -271,7 +288,8 @@ export class CreateFormularioElegibilidadeDto {
   data_retorno_area_malaria?: Date;
 
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(toBoolean)
+  @IsBoolean({ message: 'O campo teve_hepatite deve ser booleano.' })
   teve_hepatite?: boolean;
 
   @IsOptional()
@@ -285,11 +303,13 @@ export class CreateFormularioElegibilidadeDto {
   tipo_hepatite?: string;
 
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(toBoolean)
+  @IsBoolean({ message: 'O campo usou_drogas_injetaveis deve ser booleano.' })
   usou_drogas_injetaveis?: boolean;
 
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(toBoolean)
+  @IsBoolean({ message: 'O campo teve_malaria deve ser booleano.' })
   teve_malaria?: boolean;
 }
 
