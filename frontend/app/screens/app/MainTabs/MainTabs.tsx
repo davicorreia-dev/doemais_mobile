@@ -11,6 +11,7 @@ import VirtualCardScreen from '../VirtualCardScreen';
 import ProfileMenuScreen from '../ProfileMenuScreen';
 import { QUIZ_MODULES, type FormGender } from '../QuizFlow/quizData';
 import { api } from '../../../services/api';
+import { getStoredUser } from '../../../services/session';
 import styles from './Styles';
 
 const Tab = createBottomTabNavigator();
@@ -88,7 +89,7 @@ export default function MainTabs() {
 
     const loadTabStatus = useCallback(async () => {
         try {
-            const savedUserRaw = await AsyncStorage.getItem('@doemais:user');
+            const savedUserRaw = await getStoredUser();
             const savedUser = savedUserRaw ? JSON.parse(savedUserRaw) : null;
             const historyRaw = savedUser?.id
                 ? await AsyncStorage.getItem(`@doemais:quiz_history:${savedUser.id}`)

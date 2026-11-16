@@ -29,11 +29,15 @@ function validateEnvironment(): EnvironmentConfig {
     );
   }
 
+  if (process.env.NODE_ENV === 'production' && !process.env.CORS_ORIGIN) {
+    throw new Error('CORS_ORIGIN deve ser configurada em produção.');
+  }
+
   return {
     DATABASE_URL: process.env.DATABASE_URL!,
     ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET!,
     ACCESS_TOKEN_EXPIRATION_SECONDS:
-      process.env.ACCESS_TOKEN_EXPIRATION_SECONDS || '7d',
+      process.env.ACCESS_TOKEN_EXPIRATION_SECONDS || '15m',
     REFRESH_TOKEN_EXPIRATION_DAYS:
       process.env.REFRESH_TOKEN_EXPIRATION_DAYS || '7',
     PORT: process.env.PORT || '3000',

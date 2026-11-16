@@ -1,16 +1,22 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+    ACCESS_TOKEN_KEY,
+    REFRESH_TOKEN_KEY,
+    clearStoredSession,
+    getSessionToken,
+    getStoredUser,
+    setSessionToken,
+} from './session';
 
 // Configuração da API do Render com suporte para variáveis de ambiente locais
 // EXPO_PUBLIC_API_URL_OVERRIDE é definida pelo docker-compose (./run.sh --local | --render) e tem prioridade
 const API_URL = process.env.EXPO_PUBLIC_API_URL_OVERRIDE || process.env.EXPO_PUBLIC_API_URL || 'https://doemais-mobile.onrender.com';
 
-const SESSION_KEYS = ['@doemais:token', '@doemais:refreshToken', '@doemais:user'];
-
-export const clearSession = () => AsyncStorage.multiRemove(SESSION_KEYS);
+export const clearSession = clearStoredSession;
 
 export const refreshStoredSession = async (): Promise<boolean> => {
-    const refreshToken = await AsyncStorage.getItem('@doemais:refreshToken');
-    const user = await AsyncStorage.getItem('@doemais:user');
+    const refreshToken = await getSessionToken(REFRESH_TOKEN_KEY);
+    const user = await getStoredUser();
 
     if (!refreshToken || !user) {
         await clearSession();
@@ -29,14 +35,19 @@ export const refreshStoredSession = async (): Promise<boolean> => {
     }
 
     const refreshData = await refreshResponse.json();
-    const newAccessToken = refreshData?.data?.accessToken ?? refreshData?.accessToken;
+    const refreshedSession = refreshData?.data ?? refreshData;
+    const newAccessToken = refreshedSession?.accessToken;
+    const newRefreshToken = refreshedSession?.refreshToken;
 
     if (!newAccessToken) {
         await clearSession();
         return false;
     }
 
-    await AsyncStorage.setItem('@doemais:token', newAccessToken);
+    await setSessionToken(ACCESS_TOKEN_KEY, newAccessToken);
+    if (newRefreshToken) {
+        await setSessionToken(REFRESH_TOKEN_KEY, newRefreshToken);
+    }
     return true;
 };
 
@@ -47,7 +58,7 @@ export const api = async (endpoint: string, method: string = 'GET', body?: any, 
     const url = `${API_URL}${endpoint}`;
 
     // Recuperar o JWT salvo no dispositivo
-    const token = await AsyncStorage.getItem('@doemais:token');
+    const token = await getSessionToken(ACCESS_TOKEN_KEY);
 
     const headers: Record<string, string> = {
         'Content-Type': 'application/json',

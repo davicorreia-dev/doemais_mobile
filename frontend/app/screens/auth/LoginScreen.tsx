@@ -12,6 +12,7 @@ import SocialButton from "../../../components/SocialButton";
 import Button from "../../../components/Button";
 
 import { api } from "../../services/api";
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, setSessionToken, setStoredUser } from '../../services/session';
 import { StatusBar } from "expo-status-bar";
 import z from "zod";
 import { useForm, Controller } from "react-hook-form";
@@ -76,10 +77,10 @@ export default function LoginScreen() {
             const parsedResponse = loginResponseSchema.parse(responseData);
 
             if (parsedResponse.accessToken) {
-                await AsyncStorage.setItem('@doemais:token', parsedResponse.accessToken);
-                await AsyncStorage.setItem('@doemais:user', JSON.stringify(parsedResponse.doador));
+                await setSessionToken(ACCESS_TOKEN_KEY, parsedResponse.accessToken);
+                await setStoredUser(JSON.stringify(parsedResponse.doador));
                 if (parsedResponse.refreshToken) {
-                    await AsyncStorage.setItem('@doemais:refreshToken', parsedResponse.refreshToken);
+                    await setSessionToken(REFRESH_TOKEN_KEY, parsedResponse.refreshToken);
                 }
 
                 const onboardingKey = `@doemais:onboarding_completed:${parsedResponse.doador.id}`;

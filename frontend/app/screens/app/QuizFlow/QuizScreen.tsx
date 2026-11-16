@@ -16,7 +16,7 @@ const saveModuleResult = async (
     blockedQuestion?: { id: string; text: string; answer: unknown; message: string }
 ) => {
     try {
-        const userRaw = await AsyncStorage.getItem('@doemais:user');
+        const userRaw = await getStoredUser();
         if (!userRaw) return;
         const user = JSON.parse(userRaw);
         const userId = user.id;
@@ -78,6 +78,7 @@ import Input from '../../../../components/Input';
 import Styles from './Styles';
 import { QUIZ_MODULES, type QuizQuestion } from './quizData';
 import { api } from '../../../services/api'; // <-- Adicionado o import da API
+import { getStoredUser } from '../../../services/session';
 import { clamp, topInset } from '../../../utils/responsive';
 
 type RouteParams = {

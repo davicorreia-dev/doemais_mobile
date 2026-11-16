@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { QUIZ_MODULES, type FormGender, type QuizModule } from '../app/QuizFlow/quizData';
 import styles from './StylesEligibily';
 import { api } from '../../services/api';
+import { getStoredUser, setStoredUser } from '../../services/session';
 import DesktopAppSidebar from '../../../components/DesktopAppSidebar';
 import DesktopPageHeader from '../../../components/DesktopPageHeader';
 import ScreenState from '../../../components/ScreenState';
@@ -145,7 +146,7 @@ export default function EligibilityFormsScreen() {
                 setErrorMessage('');
                 try {
                     // 1. Carrega gênero do cache local e pega o ID do usuário
-                    const userData = await AsyncStorage.getItem('@doemais:user');
+                    const userData = await getStoredUser();
                     let userId = '';
                     if (userData) {
                         const parsedUser = JSON.parse(userData);
@@ -185,9 +186,9 @@ export default function EligibilityFormsScreen() {
                             if (userData) {
                                 const parsedUser = JSON.parse(userData);
                                 parsedUser.genero = userDataApi.genero;
-                                await AsyncStorage.setItem('@doemais:user', JSON.stringify(parsedUser));
+                                await setStoredUser(JSON.stringify(parsedUser));
                             } else {
-                                await AsyncStorage.setItem('@doemais:user', JSON.stringify(userDataApi));
+                                await setStoredUser(JSON.stringify(userDataApi));
                             }
                         }
                     }

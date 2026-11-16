@@ -12,6 +12,22 @@ enum LogLevel {
   ERROR = 'ERROR',
 }
 
+const SENSITIVE_KEYS = new Set([
+  'senha', 'password', 'token', 'refreshtoken', 'accesstoken', 'cpf', 'email',
+  'telefone', 'respostas', 'respostas_originais', 'respostas_corrigidas',
+  'reseturl',
+]);
+
+const sanitize = (value: unknown): unknown => {
+  if (Array.isArray(value)) return value.map(sanitize);
+  if (!value || typeof value !== 'object') return value;
+
+  return Object.fromEntries(Object.entries(value as Record<string, unknown>).map(([key, item]) => [
+    key,
+    SENSITIVE_KEYS.has(key.toLowerCase()) ? '[REDACTED]' : sanitize(item),
+  ]));
+};
+
 export class Logger {
   private static formatTimestamp(): string {
     return new Date().toISOString();
@@ -25,7 +41,7 @@ export class Logger {
   ): string {
     let log = `[${this.formatTimestamp()}] [${level}] [${module}] ${message}`;
     if (data) {
-      log += ` ${JSON.stringify(data)}`;
+      log += ` ${JSON.stringify(sanitize(data))}`;
     }
     return log;
   }

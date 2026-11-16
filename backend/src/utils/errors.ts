@@ -22,3 +22,8 @@ export class BadRequestError extends CustomError {
     super(message, 400); // 400 Bad Request
   }
 }
+export class ForbiddenError extends CustomError {
+  constructor(message: string = 'Acesso não permitido.') {
+    super(message, 403);
+  }
+}

@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 import { api } from '../../services/api';
+import { getStoredUser } from '../../services/session';
 import StatusBarBackground from '../../../components/StatusBarBackground';
 import VirtualDonorCard from '../../../components/VirtualDonorCard';
 import VirtualCardNotice from '../../../components/VirtualCardNotice';
@@ -51,7 +52,7 @@ export default function VirtualCardScreen() {
                 setLoading(true);
 
                 try {
-                    const savedUserRaw = await AsyncStorage.getItem('@doemais:user');
+                    const savedUserRaw = await getStoredUser();
                     const savedUser = savedUserRaw ? JSON.parse(savedUserRaw) : null;
                     const userId = savedUser?.id;
 
