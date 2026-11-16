@@ -5,10 +5,9 @@ import prisma from '../config/prisma';
 import env from '../config/environment';
 import CONSTANTS from '../config/constants';
 import { AuthResponse, DoadorResponse } from '../types/index';
-import jwt from 'jsonwebtoken';
-import { randomBytes } from 'crypto';
-import { createHash } from 'crypto';
+import { createHash, randomBytes } from 'crypto';
 import Logger from '../utils/logger';
+import { createRefreshToken, hashOpaqueToken, issueAccessToken } from '../utils/tokens';
 
 const PASSWORD_RESET_TTL_MS = 60 * 60 * 1000;
 
@@ -48,7 +47,6 @@ export const registerDoador = async (
       id: true,
       nome: true,
       email: true,
-      cpf: true,
       telefone: true,
       cidade: true,
       cep: true,
@@ -58,20 +56,10 @@ export const registerDoador = async (
     },
   });
 
-  // Mantive a segurança no login
-  const accessTokenSecret = process.env.JWT_SECRET || env.ACCESS_TOKEN_SECRET;
-  if (!accessTokenSecret) {
-    throw new Error('Chave do Access Token não configurada.');
-  }
-
-  // Gera Access Token (Nova funcionalidade da main)
-  const payload = { doadorId: newDoador.id };
-  const accessToken = jwt.sign(payload, accessTokenSecret, {
-    expiresIn: CONSTANTS.JWT.EXPIRES_IN,
-  } as any);
+  const accessToken = issueAccessToken(newDoador.id);
 
   // Gera Refresh Token
-  const refreshToken = randomBytes(64).toString('hex');
+  const refreshToken = createRefreshToken();
   const expiresAt = new Date();
   expiresAt.setDate(
     expiresAt.getDate() + CONSTANTS.JWT.REFRESH_EXPIRES_IN_DAYS
@@ -80,7 +68,7 @@ export const registerDoador = async (
   // Cria novo refresh token
   await prisma.refreshToken.create({
     data: {
-      token: refreshToken,
+      token: hashOpaqueToken(refreshToken),
       expiresAt,
       doadorId: newDoador.id,
     },
@@ -112,17 +100,9 @@ export const loginDoador = async (
     throw new UnauthorizedError('Credenciais inválidas.');
   }
 
-  const accessTokenSecret = process.env.JWT_SECRET || env.ACCESS_TOKEN_SECRET;
-  if (!accessTokenSecret) {
-    throw new Error('Chave do Access Token não configurada.');
-  }
+  const accessToken = issueAccessToken(doador.id);
 
-  const payload = { doadorId: doador.id };
-  const accessToken = jwt.sign(payload, accessTokenSecret, {
-    expiresIn: CONSTANTS.JWT.EXPIRES_IN,
-  } as any);
-
-  const refreshToken = randomBytes(64).toString('hex');
+  const refreshToken = createRefreshToken();
   const expiresAt = new Date();
   expiresAt.setDate(
     expiresAt.getDate() + CONSTANTS.JWT.REFRESH_EXPIRES_IN_DAYS
@@ -134,7 +114,7 @@ export const loginDoador = async (
 
   await prisma.refreshToken.create({
     data: {
-      token: refreshToken,
+      token: hashOpaqueToken(refreshToken),
       expiresAt,
       doadorId: doador.id,
     },
@@ -144,7 +124,6 @@ export const loginDoador = async (
     id: doador.id,
     nome: doador.nome,
     email: doador.email,
-    cpf: doador.cpf,
     telefone: doador.telefone,
     cidade: doador.cidade,
     cep: doador.cep,
@@ -163,7 +142,7 @@ export const loginDoador = async (
 
 export const refreshAccessToken = async (
   tokenData: RefreshTokenDto
-): Promise<{ accessToken: string; expiresIn: string }> => {
+): Promise<{ accessToken: string; refreshToken: string; expiresIn: string }> => {
   const { refreshToken } = tokenData;
 
   if (!refreshToken) {
@@ -171,7 +150,7 @@ export const refreshAccessToken = async (
   }
 
   const savedToken = await prisma.refreshToken.findUnique({
-    where: { token: refreshToken },
+    where: { token: hashOpaqueToken(refreshToken) },
   });
 
   if (!savedToken) {
@@ -183,18 +162,24 @@ export const refreshAccessToken = async (
     throw new UnauthorizedError('Refresh token expirado.');
   }
 
-  const accessTokenSecret = process.env.JWT_SECRET || env.ACCESS_TOKEN_SECRET;
-  if (!accessTokenSecret) {
-    throw new Error('Chave do Access Token não configurada.');
-  }
+  const newRefreshToken = createRefreshToken();
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + CONSTANTS.JWT.REFRESH_EXPIRES_IN_DAYS);
 
-  const payload = { doadorId: savedToken.doadorId };
-  const newAccessToken = jwt.sign(payload, accessTokenSecret, {
-    expiresIn: CONSTANTS.JWT.EXPIRES_IN,
-  } as any);
+  await prisma.$transaction([
+    prisma.refreshToken.delete({ where: { id: savedToken.id } }),
+    prisma.refreshToken.create({
+      data: {
+        token: hashOpaqueToken(newRefreshToken),
+        expiresAt,
+        doadorId: savedToken.doadorId,
+      },
+    }),
+  ]);
 
   return {
-    accessToken: newAccessToken,
+    accessToken: issueAccessToken(savedToken.doadorId),
+    refreshToken: newRefreshToken,
     expiresIn: CONSTANTS.JWT.EXPIRES_IN,
   };
 };
@@ -209,7 +194,7 @@ export const logout = async (
   }
 
   const result = await prisma.refreshToken.deleteMany({
-    where: { token: refreshToken },
+    where: { token: hashOpaqueToken(refreshToken) },
   });
 
   if (result.count === 0) {

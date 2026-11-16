@@ -8,7 +8,6 @@ export interface DoadorResponse {
   id: number;
   nome: string;
   email: string;
-  cpf: string;
   telefone?: string | null;
   cidade?: string | null;
   cep?: string | null;

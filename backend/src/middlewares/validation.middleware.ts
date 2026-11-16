@@ -6,7 +6,11 @@ import { BadRequestError } from '../utils/errors';
 function validationMiddleware<T>(type: any): (req: Request, res: Response, next: NextFunction) => void {
   return (req: Request, res: Response, next: NextFunction) => {
     const dto = plainToInstance(type, req.body);
-    validate(dto).then((errors: ValidationError[]) => {
+    validate(dto, {
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: true,
+    }).then((errors: ValidationError[]) => {
 
       if (errors.length > 0) {
         const errorMessages = errors.map(error =>

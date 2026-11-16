@@ -5,10 +5,27 @@ import { BadRequestError, UnauthorizedError } from '../utils/errors';
 const changes = (before: Record<string, unknown>, after: Record<string, unknown>) =>
   Object.keys({ ...before, ...after }).filter((key) => before[key] !== after[key]);
 
-export const create = async (doadorId: number, data: any) => {
+interface CreateCorrectionData {
+  modulo: string;
+  motivo: string;
+  comentario?: string;
+  respostas_originais: Record<string, unknown>;
+  contexto_reteste?: Record<string, unknown>;
+}
+
+export const create = async (doadorId: number, data: CreateCorrectionData) => {
   const pending = await prisma.solicitacao_Correcao.findFirst({ where: { doador_id: doadorId, modulo: data.modulo, status: 'PENDING_REVIEW' } });
   if (pending) throw new BadRequestError('Já existe uma solicitação de correção pendente para este formulário.');
-  return prisma.solicitacao_Correcao.create({ data: { doador_id: doadorId, ...data } });
+  return prisma.solicitacao_Correcao.create({
+    data: {
+      doador_id: doadorId,
+      modulo: data.modulo,
+      motivo: data.motivo,
+      comentario: data.comentario,
+      respostas_originais: data.respostas_originais as Prisma.InputJsonObject,
+      contexto_reteste: data.contexto_reteste as Prisma.InputJsonObject | undefined,
+    },
+  });
 };
 export const finish = async (doadorId: number, id: number, answers: Record<string, unknown>) => {
   const request = await prisma.solicitacao_Correcao.findFirst({ where: { id, doador_id: doadorId, status: 'PENDING_REVIEW' } });
