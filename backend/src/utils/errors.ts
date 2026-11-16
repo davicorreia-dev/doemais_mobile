@@ -27,3 +27,8 @@ export class ForbiddenError extends CustomError {
     super(message, 403);
   }
 }
+export class NotFoundError extends CustomError {
+  constructor(message: string = 'Recurso não encontrado.') {
+    super(message, 404);
+  }
+}

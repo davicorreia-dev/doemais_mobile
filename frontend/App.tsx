@@ -36,7 +36,7 @@ import { refreshStoredSession } from './app/services/api';
 const Stack = createNativeStackNavigator();
 
 const linking: any = {
-  prefixes: [],
+  prefixes: ['doemais://'],
   config: {
     screens: {
       AuthChoice: '',

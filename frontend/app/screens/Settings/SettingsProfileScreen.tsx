@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, ScrollView, KeyboardAvoidingView, Platform, Alert, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, KeyboardAvoidingView, Alert, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Header from '../../../components/Header';
 import Styles from './Styles';
@@ -9,7 +9,6 @@ import Input from '../../../components/Input';
 import SelectInput from '../../../components/SelectInput/SelectInput';
 import Button from '../../../components/Button';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '../../services/api';
 import z from 'zod';
 import { useForm, Controller } from 'react-hook-form';
@@ -134,7 +133,7 @@ export default function SettingsProfileScreen() {
             navigation.goBack();
         } catch (error: any) {
             console.error("Erro ao salvar o perfil", error);
-            Alert.alert("Erro", error.message || "Não foi possível salvar o perfil.", error);
+            Alert.alert("Erro", error.message || "Não foi possível salvar o perfil.");
         } finally {
             setLoading(false);
         }

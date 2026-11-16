@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
     ACCESS_TOKEN_KEY,
     REFRESH_TOKEN_KEY,
@@ -14,7 +13,9 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL_OVERRIDE || process.env.EXPO_PUB
 
 export const clearSession = clearStoredSession;
 
-export const refreshStoredSession = async (): Promise<boolean> => {
+let refreshInFlight: Promise<boolean> | null = null;
+
+const refreshSession = async (): Promise<boolean> => {
     const refreshToken = await getSessionToken(REFRESH_TOKEN_KEY);
     const user = await getStoredUser();
 
@@ -49,6 +50,21 @@ export const refreshStoredSession = async (): Promise<boolean> => {
         await setSessionToken(REFRESH_TOKEN_KEY, newRefreshToken);
     }
     return true;
+};
+
+/**
+ * Compartilha a renovação em andamento. O backend rotaciona o refresh token;
+ * sem isso, duas respostas 401 simultâneas poderiam usar o mesmo token antigo
+ * e a segunda acabaria limpando uma sessão que já foi renovada pela primeira.
+ */
+export const refreshStoredSession = (): Promise<boolean> => {
+    if (!refreshInFlight) {
+        refreshInFlight = refreshSession().finally(() => {
+            refreshInFlight = null;
+        });
+    }
+
+    return refreshInFlight;
 };
 
 /**

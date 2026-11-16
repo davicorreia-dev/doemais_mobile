@@ -70,9 +70,11 @@ app.get('/health', (req, res) => {
 // Middleware de autenticação com whitelist de rotas públicas
 app.use((req, res, next) => {
   // Verifica se a rota é pública
-  const isPublicRoute = CONSTANTS.PUBLIC_ROUTES.some(
-    (route) => req.path === route || req.path.startsWith(route)
-  );
+  // Rotas públicas precisam corresponder exatamente. A única exceção é o
+  // namespace de integração, que é autenticado pela sua própria API key.
+  const isPublicRoute =
+    CONSTANTS.PUBLIC_ROUTES.includes(req.path) ||
+    req.path.startsWith('/api/doadores/integracoes/hemocentros/');
 
   // Se for rota pública, passa direto
   if (isPublicRoute) {
