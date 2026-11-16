@@ -6,7 +6,8 @@ import { Ionicons } from '@expo/vector-icons'; // Usando ícones padrão por enq
 import Styles from './StylesHome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { api } from '../../services/api';
+import { api, clearSession } from '../../services/api';
+import { REFRESH_TOKEN_KEY, getSessionToken } from '../../services/session';
 import DesktopAppSidebar from '../../../components/DesktopAppSidebar';
 import DesktopPageHeader from '../../../components/DesktopPageHeader';
 import ActivityCard from '../../../components/ActivityCard';
@@ -244,7 +245,7 @@ export default function HomeScreen() {
 
     const handleLogout = async () => {
         try {
-            const refreshToken = await AsyncStorage.getItem('@doemais:refreshToken');
+            const refreshToken = await getSessionToken(REFRESH_TOKEN_KEY);
             if (refreshToken) {
                 // Invalida o token no backend
                 await api('/api/auth/logout', 'POST', { refreshToken });
@@ -253,9 +254,7 @@ export default function HomeScreen() {
             console.error("Erro ao fazer logout no servidor:", error);
         } finally {
             // Limpa tudo localmente independentemente do sucesso da API
-            await AsyncStorage.removeItem('@doemais:token');
-            await AsyncStorage.removeItem('@doemais:refreshToken');
-            await AsyncStorage.removeItem('@doemais:user');
+            await clearSession();
 
             navigation.reset({
                 index: 0,
