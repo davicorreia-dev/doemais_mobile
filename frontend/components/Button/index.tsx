@@ -18,6 +18,9 @@ type ButtonProps = {
 export default function Button({ title, backgroundColor, textColor, onPress, borderRadius, width, disabled, style}: ButtonProps) {
     return (
         <TouchableOpacity onPress={onPress} disabled={disabled}
+            accessibilityRole="button"
+            accessibilityLabel={title}
+            accessibilityState={{ disabled: Boolean(disabled) }}
             //props do button para passar em outras telas
             style={[
                 styles.button,
