@@ -16,8 +16,8 @@ export default function DesktopPageHeader({ title, subtitle }: DesktopPageHeader
                 <Text style={styles.subtitle}>{subtitle}</Text>
             </View>
             <View style={styles.actions}>
-                <View style={styles.iconButton}><Ionicons name="chatbubble-outline" size={19} color="#5F5953" /></View>
-                <View style={styles.iconButton}><Ionicons name="notifications-outline" size={19} color="#5F5953" /></View>
+                <View style={styles.iconButton} accessibilityElementsHidden accessible={false}><Ionicons name="chatbubble-outline" size={19} color="#5F5953" /></View>
+                <View style={styles.iconButton} accessibilityElementsHidden accessible={false}><Ionicons name="notifications-outline" size={19} color="#5F5953" /></View>
             </View>
         </View>
     );

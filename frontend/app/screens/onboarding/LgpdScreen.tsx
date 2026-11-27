@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, Alert } from 'react-native';
+import { View, Text, Alert, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Checkbox from 'expo-checkbox';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -27,7 +27,7 @@ export default function LgpdScreen() {
     };
 
     return (
-        <View style={Styles.container}>
+        <ScrollView contentContainerStyle={Styles.container}>
             <View style={Styles.iconContainer}>
                 <Ionicons name="lock-closed" size={50} color="#fff" />
             </View>
@@ -57,6 +57,6 @@ export default function LgpdScreen() {
                 textColor="#fff"
                 onPress={handleContinue}
             />
-        </View>
+        </ScrollView>
     );
 }
