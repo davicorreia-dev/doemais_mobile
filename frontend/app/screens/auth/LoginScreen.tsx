@@ -50,6 +50,7 @@ export default function LoginScreen() {
     });
 
     const [loading, setLoading] = useState(false);
+    const [loginError, setLoginError] = useState('');
 
     const [fontsLoaded] = useFonts({
         Lexend_100Thin,
@@ -62,6 +63,7 @@ export default function LoginScreen() {
     });
 
     const onSubmit = async (data: LoginFormData) => {
+        setLoginError('');
         const payload = {
             email: data.email.trim().toLowerCase(),
             senha: data.password
@@ -101,6 +103,7 @@ export default function LoginScreen() {
             const msg = error.message.includes('401') || error.message.includes('404')
                 ? 'E-mail ou senha incorretos.'
                 : error.message;
+            setLoginError(msg || 'Não foi possível entrar. Tente novamente.');
             Alert.alert('Falha no Login', msg);
         } finally {
             setLoading(false);
@@ -165,6 +168,12 @@ export default function LoginScreen() {
                                     />
                                 )}
                             />
+
+                            {loginError ? (
+                                <Text style={Styles.loginError} accessibilityRole="alert" accessibilityLiveRegion="assertive">
+                                    {loginError}
+                                </Text>
+                            ) : null}
 
                             <View style={[formColumn, { alignItems: 'flex-end', marginTop: 10 }]}>
                                 <Text style={Styles.ForgetPassword}

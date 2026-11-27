@@ -29,6 +29,16 @@ const Styles = StyleSheet.create({
         fontFamily: 'Lexend_500Medium',
         color: "#E0323C",
     },
+    loginError: {
+        width: '100%',
+        maxWidth: 400,
+        marginTop: 8,
+        paddingHorizontal: 12,
+        color: '#C62828',
+        fontFamily: 'Lexend_500Medium',
+        fontSize: 13,
+        textAlign: 'left',
+    },
     SocialbuttonsContainer: {
         gap: 20,
         marginTop: 25,

@@ -6,12 +6,14 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 
 import Button from '../../../components/Button';
 import Styles from './StylesLgpd';
+import { decodeRegistrationData, encodeRegistrationData } from '../../utils/registrationParams';
 
 export default function LgpdScreen() {
     const navigation = useNavigation<any>();
     const route = useRoute();
 
-    const { basicData } = (route.params as any) || {};
+    const routeParams = (route.params as { basicData?: Record<string, string>; basicDataJson?: string } | undefined) ?? {};
+    const basicData = decodeRegistrationData(routeParams.basicDataJson ?? routeParams.basicData);
 
     const [isChecked, setChecked] = useState(false);
 
@@ -22,7 +24,7 @@ export default function LgpdScreen() {
         }
 
         navigation.navigate("CompleteProfileScreen", {
-            basicData: basicData
+            basicDataJson: basicData ? encodeRegistrationData(basicData) : undefined,
         });
     };
 

@@ -12,6 +12,7 @@ import Button from '../../../components/Button';
 import { formColumn } from '../../utils/responsive';
 import { useKeyboardBehavior } from '../../hooks/useKeyboardBehavior';
 import Styles from './RegisterAddressStyles';
+import { decodeRegistrationData, encodeRegistrationData, type RegistrationData } from '../../utils/registrationParams';
 
 const addressSchema = z.object({
     cep: z.string()
@@ -29,7 +30,8 @@ export default function RegisterAddressScreen() {
     const navigation = useNavigation<any>();
     const route = useRoute();
     const keyboardBehavior = useKeyboardBehavior();
-    const { basicData } = (route.params as { basicData?: Record<string, string> } | undefined) ?? {};
+    const routeParams = (route.params as { basicData?: RegistrationData; basicDataJson?: string } | undefined) ?? {};
+    const basicData = decodeRegistrationData(routeParams.basicDataJson ?? routeParams.basicData);
     const [lookingUpCep, setLookingUpCep] = useState(false);
     const cepRequestId = useRef(0);
 
@@ -78,11 +80,11 @@ export default function RegisterAddressScreen() {
         }
 
         navigation.navigate('LgpdScreen', {
-            basicData: {
+            basicDataJson: encodeRegistrationData({
                 ...basicData,
                 cep: data.cep.replace(/\D/g, ''),
                 cidade: data.cidade.trim(),
-            },
+            }),
         });
     };
 
