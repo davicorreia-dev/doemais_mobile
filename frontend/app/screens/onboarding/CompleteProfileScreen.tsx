@@ -14,6 +14,7 @@ import { mapRegisterServerError } from '../../utils/registerErrors';
 import { useKeyboardBehavior } from '../../hooks/useKeyboardBehavior';
 import DateOfBirthInput from '../../../components/DateOfBirthInput/DateOfBirthInput';
 import BloodTypeGrid from '../../../components/BloodTypeGrid';
+import { decodeRegistrationData, encodeRegistrationData } from '../../utils/registrationParams';
 
 const BLOOD_TYPES = ['A+', 'O+', 'B+', 'AB+', 'A-', 'O-', 'B-', 'AB-'];
 
@@ -25,7 +26,8 @@ export default function CompleteProfileScreen() {
     const keyboardBehavior = useKeyboardBehavior();
 
     //Recebe os dados da RegisterScreen 
-    const { basicData } = (route.params as any) || {};
+    const routeParams = (route.params as { basicData?: Record<string, string>; basicDataJson?: string } | undefined) ?? {};
+    const basicData = decodeRegistrationData(routeParams.basicDataJson ?? routeParams.basicData);
 
     const [birthDate, setBirthDate] = useState('');
     const [birthDateError, setBirthDateError] = useState('');
@@ -129,7 +131,7 @@ export default function CompleteProfileScreen() {
                 tipo_sanguineo: unknownBlood ? 'NDA' : selectedBlood
             };
 
-            console.log("Enviando cadastro para:", payload.email);
+            console.log("Enviando cadastro para:", basicData.email);
 
             await api('/api/auth/register', 'POST', payload);
 
@@ -156,7 +158,7 @@ export default function CompleteProfileScreen() {
                     Object.values(fieldErrors).join('\n'),
                     [{
                         text: "Corrigir",
-                        onPress: () => navigation.navigate("Register", { prefill: basicData, fieldErrors })
+                        onPress: () => navigation.navigate("Register", { prefillJson: basicData ? encodeRegistrationData(basicData) : undefined, fieldErrors })
                     }]
                 );
                 return;
