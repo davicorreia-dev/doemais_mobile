@@ -79,10 +79,10 @@ export default function ForgetPasswordScreen() {
 
                                 <View style={formColumn}>
                                     <Button
-                                        title={loading ? "Enviando..." : "Redefinir senha"}
+                                        title="Redefinir senha"
                                         textColor="#fff"
                                         onPress={handleSubmit}
-                                        disabled={loading}
+                                        loading={loading}
                                     />
                                 </View>
                             </>

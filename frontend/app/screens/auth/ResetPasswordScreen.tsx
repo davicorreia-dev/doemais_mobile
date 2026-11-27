@@ -69,7 +69,7 @@ export default function ResetPasswordScreen() {
                             <Input label="Confirmar nova senha" secureTextEntry value={confirmation} onChangeText={setConfirmation} error={error} />
                         </View>
                         <View style={Styles.buttonContainer}>
-                            <Button title={loading ? 'Redefinindo...' : 'Confirmar nova senha'} textColor="#fff" onPress={submit} disabled={loading} />
+                            <Button title="Confirmar nova senha" textColor="#fff" onPress={submit} loading={loading} />
                         </View>
                     </View>
                 </ScrollView>
