@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, DimensionValue, StyleProp, ViewStyle } from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity, DimensionValue, StyleProp, ViewStyle } from "react-native";
 import styles from "./styles";
 import { colors } from '../../theme/tokens';
 
@@ -12,16 +12,18 @@ type ButtonProps = {
     borderRadius?: number;
     width?: DimensionValue;
     disabled?: boolean;
+    loading?: boolean;
     style?: StyleProp<ViewStyle>;
 };
 
 
-export default function Button({ title, backgroundColor, textColor, onPress, borderRadius, width, disabled, style}: ButtonProps) {
+export default function Button({ title, backgroundColor, textColor, onPress, borderRadius, width, disabled, loading, style}: ButtonProps) {
+    const isDisabled = Boolean(disabled || loading);
     return (
-        <TouchableOpacity onPress={onPress} disabled={disabled}
+        <TouchableOpacity onPress={onPress} disabled={isDisabled}
             accessibilityRole="button"
             accessibilityLabel={title}
-            accessibilityState={{ disabled: Boolean(disabled) }}
+            accessibilityState={{ disabled: isDisabled, busy: Boolean(loading) }}
             //props do button para passar em outras telas
             style={[
                 styles.button,
@@ -29,14 +31,12 @@ export default function Button({ title, backgroundColor, textColor, onPress, bor
                     backgroundColor: backgroundColor || colors.primary,
                     borderRadius: borderRadius || styles.button.borderRadius,
                     width: width || styles.button.width,
-                    opacity: disabled ? 0.5 : 1 
+                    opacity: isDisabled ? 0.5 : 1
                 },
                 style
             ]}>
 
-            <Text style={[styles.TextLogin, { color: textColor || styles.TextLogin.color || colors.surface }]}>
-                {title}
-            </Text>
+            {loading ? <ActivityIndicator color={textColor || colors.surface} /> : <Text style={[styles.TextLogin, { color: textColor || styles.TextLogin.color || colors.surface }]}>{title}</Text>}
         </TouchableOpacity>
     )
 }

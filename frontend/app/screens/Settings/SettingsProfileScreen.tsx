@@ -294,11 +294,12 @@ export default function SettingsProfileScreen() {
 
                         <View style={[Styles.actionRow, isDesktop && Styles.actionRowDesktop, { marginTop: 10, marginBottom: 20 }]}>
                             <Button
-                                title={loading ? "Salvando..." : "Salvar"}
+                                title="Salvar"
                                 textColor="#FFF"
                                 borderRadius={28}
                                 onPress={handleSubmit(onSubmit)}
-                                disabled={loading || profileLoading || Boolean(profileError)}
+                                loading={loading}
+                                disabled={profileLoading || Boolean(profileError)}
                                 style={isDesktop ? Styles.saveButtonDesktop : undefined}
                             />
                             {isDesktop && (
