@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useKeyboardBehavior } from '../../hooks/useKeyboardBehavior';
+import { decodeRegistrationData, encodeRegistrationData } from '../../utils/registrationParams';
 
 // Regras espelhadas do RegisterDoadorDto do backend, para que nenhuma validação
 // de servidor sobre estes campos só apareça no fim do fluxo de cadastro.
@@ -51,6 +52,7 @@ type RegisterRouteParams = {
         cep?: string;
         cidade?: string;
     };
+    prefillJson?: string;
     fieldErrors?: RegisterFieldErrors;
 };
 
@@ -60,7 +62,9 @@ export default function RegisterScreen() {
     const route = useRoute();
     const keyboardBehavior = useKeyboardBehavior();
 
-    const { prefill, fieldErrors } = (route.params as RegisterRouteParams | undefined) ?? {};
+    const params = (route.params as RegisterRouteParams | undefined) ?? {};
+    const prefill = decodeRegistrationData<NonNullable<RegisterRouteParams['prefill']>>(params.prefillJson ?? params.prefill);
+    const { fieldErrors } = params;
     const [addressData, setAddressData] = useState<{ cep?: string; cidade?: string }>({});
 
     const { control, handleSubmit, setError, reset, formState: { errors } } = useForm<RegisterFormData>({
@@ -118,7 +122,7 @@ export default function RegisterScreen() {
         };
 
         navigation.navigate("RegisterAddressScreen", {
-            basicData: payload
+            basicDataJson: encodeRegistrationData(payload),
         });
     };
 
