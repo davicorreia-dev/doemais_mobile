@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useFonts, Lexend_100Thin, Lexend_200ExtraLight, Lexend_300Light, Lexend_400Regular, Lexend_500Medium, Lexend_600SemiBold, Lexend_700Bold } from "@expo-google-fonts/lexend";
 import { Ionicons } from "@expo/vector-icons";
 import { barHeight, clamp, headerHeight, topInset } from "../../app/utils/responsive";
+import { colors } from "../../theme/tokens";
 
 //props do header
 type HeaderProps = {
@@ -79,7 +80,7 @@ export default function Header({ title, onBack, subtitle, titleColor, subtitleCo
                 <Ionicons
                     name={icon || "arrow-back"}
                     size={iconSize}
-                    color={iconColor || "#E0323C"}
+                    color={iconColor || colors.primary}
                 />
             </TouchableOpacity>}
 

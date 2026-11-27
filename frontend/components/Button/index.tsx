@@ -1,5 +1,6 @@
 import { Text, TouchableOpacity, DimensionValue, StyleProp, ViewStyle } from "react-native";
 import styles from "./styles";
+import { colors } from '../../theme/tokens';
 
 
 //props dos botões
@@ -25,7 +26,7 @@ export default function Button({ title, backgroundColor, textColor, onPress, bor
             style={[
                 styles.button,
                 {
-                    backgroundColor: backgroundColor || styles.button.backgroundColor,
+                    backgroundColor: backgroundColor || colors.primary,
                     borderRadius: borderRadius || styles.button.borderRadius,
                     width: width || styles.button.width,
                     opacity: disabled ? 0.5 : 1 
@@ -33,7 +34,7 @@ export default function Button({ title, backgroundColor, textColor, onPress, bor
                 style
             ]}>
 
-            <Text style={[styles.TextLogin, { color: textColor || styles.TextLogin.color }]}>
+            <Text style={[styles.TextLogin, { color: textColor || styles.TextLogin.color || colors.surface }]}>
                 {title}
             </Text>
         </TouchableOpacity>
