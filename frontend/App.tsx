@@ -10,12 +10,8 @@ import AuthChoiceScreen from './app/screens/auth/AuthChoiceScreen';
 import LoginScreen from './app/screens/auth/LoginScreen';
 import RegisterScreen from './app/screens/auth/RegisterScreen';
 import RegisterAddressScreen from './app/screens/auth/RegisterAddressScreen';
-import ForgotPasswordCodeScreen from './app/screens/auth/ForgotPasswordCodeScreen';
 import ForgetPasswordScreen from './app/screens/auth/ForgetPasswordScreen';
-import ForgetPasswordChoiceScreen from './app/screens/auth/ForgetPasswordChoiceScreen';
-import NewPasswordScreen from './app/screens/auth/NewPasswordScreen';
 import ResetPasswordScreen from './app/screens/auth/ResetPasswordScreen';
-import PasswordResetSuccessScreen from './app/screens/auth/PasswordResetSuccessScreen';
 import LgpdScreen from './app/screens/onboarding/LgpdScreen';
 import RegisterSuccessScreen from './app/screens/auth/RegisterSuccessScreen';
 import CompleteProfileScreen from './app/screens/onboarding/CompleteProfileScreen';
@@ -93,11 +89,7 @@ export default function App() {
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="RegisterAddressScreen" component={RegisterAddressScreen} />
         <Stack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPasswordCodeScreen} />
-        <Stack.Screen name="ForgetPasswordChoiceScreen" component={ForgetPasswordChoiceScreen} />
-        <Stack.Screen name="NewPasswordScreen" component={NewPasswordScreen} />
         <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
-        <Stack.Screen name="PasswordResetSuccessScreen" component={PasswordResetSuccessScreen} />
         <Stack.Screen name="LgpdScreen" component={LgpdScreen} />
         <Stack.Screen name="CompleteProfileScreen" component={CompleteProfileScreen} />
 

@@ -10,13 +10,14 @@ const isWeb = Platform.OS === 'web';
 const webSession = new Map<string, string>();
 
 export const getSessionToken = async (key: typeof ACCESS_TOKEN_KEY | typeof REFRESH_TOKEN_KEY) =>
-  isWeb ? webSession.get(key) ?? null : SecureStore.getItemAsync(key);
+  isWeb && key === REFRESH_TOKEN_KEY ? null : isWeb ? webSession.get(key) ?? null : SecureStore.getItemAsync(key);
 
 export const setSessionToken = async (
   key: typeof ACCESS_TOKEN_KEY | typeof REFRESH_TOKEN_KEY,
   value: string,
 ) => {
   if (isWeb) {
+    if (key === REFRESH_TOKEN_KEY) return;
     webSession.set(key, value);
     return;
   }
@@ -25,6 +26,7 @@ export const setSessionToken = async (
 
 export const removeSessionToken = async (key: typeof ACCESS_TOKEN_KEY | typeof REFRESH_TOKEN_KEY) => {
   if (isWeb) {
+    if (key === REFRESH_TOKEN_KEY) return;
     webSession.delete(key);
     return AsyncStorage.removeItem(key);
   }

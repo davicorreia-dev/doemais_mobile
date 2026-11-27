@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { View, Text, ScrollView, TextInput, Image, TouchableOpacity, StatusBar, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, TextInput, Image, TouchableOpacity, StatusBar, useWindowDimensions, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import StatusBarBackground from '../../../components/StatusBarBackground';
 import { Ionicons } from '@expo/vector-icons'; // Usando ícones padrão por enquanto
@@ -246,9 +246,9 @@ export default function HomeScreen() {
     const handleLogout = async () => {
         try {
             const refreshToken = await getSessionToken(REFRESH_TOKEN_KEY);
-            if (refreshToken) {
+            if (Platform.OS === 'web' || refreshToken) {
                 // Invalida o token no backend
-                await api('/api/auth/logout', 'POST', { refreshToken });
+                await api('/api/auth/logout', 'POST', Platform.OS === 'web' ? undefined : { refreshToken });
             }
         } catch (error) {
             console.error("Erro ao fazer logout no servidor:", error);

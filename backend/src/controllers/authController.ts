@@ -9,6 +9,7 @@ import {
   confirmPasswordReset,
 } from '../services/authService';
 import ApiResponseHandler from '../utils/response';
+import { clearRefreshCookie, getRefreshCookie, isBrowserRequest, setRefreshCookie } from '../utils/refreshCookie';
 
 /**
  * Registra um novo doador
@@ -49,6 +50,13 @@ export const login = async (
     const loginData: LoginDoadorDto = req.body;
     const result = await loginDoador(loginData);
 
+    if (isBrowserRequest(req)) {
+      setRefreshCookie(res, result.refreshToken);
+      const { refreshToken: _refreshToken, ...browserResult } = result;
+      ApiResponseHandler.success(res, 'Login realizado com sucesso.', browserResult, 200);
+      return;
+    }
+
     ApiResponseHandler.success(
       res,
       'Login realizado com sucesso.',
@@ -71,8 +79,18 @@ export const refresh = async (
   next: NextFunction
 ) => {
   try {
-    const tokenData: RefreshTokenDto = req.body;
+    const tokenData: RefreshTokenDto = {
+      ...(req.body ?? {}),
+      refreshToken: req.body?.refreshToken || getRefreshCookie(req),
+    };
     const result = await refreshAccessToken(tokenData);
+
+    if (isBrowserRequest(req)) {
+      setRefreshCookie(res, result.refreshToken);
+      const { refreshToken: _refreshToken, ...browserResult } = result;
+      ApiResponseHandler.success(res, 'Token renovado com sucesso.', browserResult, 200);
+      return;
+    }
 
     ApiResponseHandler.success(
       res,
@@ -96,8 +114,19 @@ export const logoutUser = async (
   next: NextFunction
 ) => {
   try {
-    const tokenData: RefreshTokenDto = req.body;
+    const tokenData: RefreshTokenDto = {
+      ...(req.body ?? {}),
+      refreshToken: req.body?.refreshToken || getRefreshCookie(req),
+    };
+
+    if (!tokenData.refreshToken && isBrowserRequest(req)) {
+      clearRefreshCookie(res);
+      ApiResponseHandler.success(res, 'Logout realizado com sucesso.', null, 200);
+      return;
+    }
+
     const result = await logout(tokenData);
+    if (isBrowserRequest(req)) clearRefreshCookie(res);
 
     ApiResponseHandler.success(
       res,

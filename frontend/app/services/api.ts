@@ -5,7 +5,9 @@ import {
     getSessionToken,
     getStoredUser,
     setSessionToken,
+    setStoredUser,
 } from './session';
+import { Platform } from 'react-native';
 
 // Configuração da API do Render com suporte para variáveis de ambiente locais
 // EXPO_PUBLIC_API_URL_OVERRIDE é definida pelo docker-compose (./run.sh --local | --render) e tem prioridade
@@ -19,7 +21,7 @@ const refreshSession = async (): Promise<boolean> => {
     const refreshToken = await getSessionToken(REFRESH_TOKEN_KEY);
     const user = await getStoredUser();
 
-    if (!refreshToken || !user) {
+  if (Platform.OS !== 'web' && (!refreshToken || !user)) {
         await clearSession();
         return false;
     }
@@ -27,7 +29,8 @@ const refreshSession = async (): Promise<boolean> => {
     const refreshResponse = await fetch(`${API_URL}/api/auth/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken }),
+    credentials: 'include',
+    body: refreshToken ? JSON.stringify({ refreshToken }) : undefined,
     });
 
     if (!refreshResponse.ok) {
@@ -48,6 +51,9 @@ const refreshSession = async (): Promise<boolean> => {
     await setSessionToken(ACCESS_TOKEN_KEY, newAccessToken);
     if (newRefreshToken) {
         await setSessionToken(REFRESH_TOKEN_KEY, newRefreshToken);
+    }
+    if (refreshedSession?.doador) {
+      await setStoredUser(JSON.stringify(refreshedSession.doador));
     }
     return true;
 };
@@ -91,6 +97,7 @@ export const api = async (endpoint: string, method: string = 'GET', body?: any, 
         const response = await fetch(url, {
             method,
             headers,
+            credentials: 'include',
             body: body ? JSON.stringify(body) : undefined,
         });
 
