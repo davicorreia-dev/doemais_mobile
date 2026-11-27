@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, ScrollView, KeyboardAvoidingView, Alert, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
@@ -35,7 +35,10 @@ export default function SettingsProfileScreen() {
     const subtitleSize = clamp(width * 0.037, 13, 16);
     const isDesktop = width >= 768;
     const [loading, setLoading] = useState(false);
+    const [profileLoading, setProfileLoading] = useState(true);
+    const [profileError, setProfileError] = useState('');
     const [cep, setCep] = useState('');
+    const cepRequestId = useRef(0);
     const keyboardBehavior = useKeyboardBehavior();
 
     const handleCepChange = async (text: string, onChangeCity: (value: string) => void) => {
@@ -47,12 +50,16 @@ export default function SettingsProfileScreen() {
             masked = `${clean.substring(0, 5)}-${clean.substring(5)}`;
         }
         setCep(masked);
+        setValue('city', '', { shouldDirty: true, shouldValidate: false });
+        clearErrors('city');
 
         if (clean.length === 8) {
+            const requestId = ++cepRequestId.current;
             try {
                 const response = await fetch(`https://viacep.com.br/ws/${clean}/json/`);
                 if (response.ok) {
                     const data = await response.json();
+                    if (requestId !== cepRequestId.current) return;
                     if (!data.erro && data.localidade && data.uf) {
                         onChangeCity(`${data.localidade} - ${data.uf}`);
                     } else {
@@ -60,12 +67,12 @@ export default function SettingsProfileScreen() {
                     }
                 }
             } catch (err) {
-                console.error("Erro ao buscar CEP:", err);
+                if (requestId === cepRequestId.current) console.error("Erro ao buscar CEP:", err);
             }
         }
     };
 
-    const { control, handleSubmit, reset, formState: { errors } } = useForm<UpdateProfileData>({
+    const { control, handleSubmit, reset, setValue, clearErrors, formState: { errors } } = useForm<UpdateProfileData>({
         resolver: zodResolver(updateprofile),
         defaultValues: {
             name: "",
@@ -78,6 +85,8 @@ export default function SettingsProfileScreen() {
 
     useEffect(() => {
         async function loadProfileData() {
+            setProfileLoading(true);
+            setProfileError('');
             try {
                 // Busca os dados completos e REAIS do banco de dados (Render)
                 const response = await api('/api/doadores/me', 'GET');
@@ -97,6 +106,9 @@ export default function SettingsProfileScreen() {
                 }
             } catch (error) {
                 console.error("Erro ao carregar dados do perfil", error);
+                setProfileError('Não foi possível carregar seu perfil. Tente novamente.');
+            } finally {
+                setProfileLoading(false);
             }
         }
         loadProfileData();
@@ -179,6 +191,13 @@ export default function SettingsProfileScreen() {
                             Quase pronto para configurar seu perfil, preencha as informações abaixo.
                             Apenas 3 etapas.
                         </Text>
+
+                        {profileError && (
+                            <View style={{ marginBottom: 16 }} accessibilityLiveRegion="polite">
+                                <Text style={{ color: '#B42318', textAlign: 'center', marginBottom: 8 }}>{profileError}</Text>
+                                <Button title="Tentar novamente" onPress={() => navigation.replace('SettingsProfileScreen')} />
+                            </View>
+                        )}
                         
                         <TouchableOpacity
                             style={[Styles.photoShortcut, isDesktop && Styles.photoShortcutDesktop]}
@@ -225,21 +244,15 @@ export default function SettingsProfileScreen() {
                                 </View>
 
                                 <View style={isDesktop ? Styles.desktopRow : undefined}>
-                                <Controller
-                                    control={control}
-                                    name="city"
-                                    render={({ field: { onChange, value } }) => (
-                                        <View style={[Styles.fieldGroup, isDesktop && Styles.desktopField]}>
-                                            <Input
-                                                label="CEP (Para auto-preencher)"
-                                                keyboardType="numeric"
-                                                value={cep}
-                                                placeholder="Ex: 50000-000"
-                                                onChangeText={(text) => handleCepChange(text, onChange)}
-                                            />
-                                        </View>
-                                    )}
-                                />
+                                <View style={[Styles.fieldGroup, isDesktop && Styles.desktopField]}>
+                                    <Input
+                                        label="CEP (Para auto-preencher)"
+                                        keyboardType="numeric"
+                                        value={cep}
+                                        placeholder="Ex: 50000-000"
+                                        onChangeText={(text) => handleCepChange(text, (city) => setValue('city', city, { shouldDirty: true, shouldValidate: true }))}
+                                    />
+                                </View>
                                 <Controller
                                     control={control}
                                     name="city"
@@ -285,7 +298,7 @@ export default function SettingsProfileScreen() {
                                 textColor="#FFF"
                                 borderRadius={28}
                                 onPress={handleSubmit(onSubmit)}
-                                disabled={loading}
+                                disabled={loading || profileLoading || Boolean(profileError)}
                                 style={isDesktop ? Styles.saveButtonDesktop : undefined}
                             />
                             {isDesktop && (

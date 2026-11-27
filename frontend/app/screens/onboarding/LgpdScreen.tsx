@@ -44,6 +44,8 @@ export default function LgpdScreen() {
                     value={isChecked}
                     onValueChange={setChecked}
                     color={isChecked ? '#E0323C' : undefined}
+                    accessibilityLabel="Aceitar política de privacidade"
+                    accessibilityState={{ checked: isChecked }}
                 />
                 <Text style={Styles.checkboxText}>
                     Li e concordo com a <Text style={Styles.linkText}>política de privacidade.</Text>

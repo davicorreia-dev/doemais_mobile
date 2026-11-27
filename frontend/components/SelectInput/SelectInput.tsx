@@ -33,15 +33,21 @@ export default function SelectInput({ label, options, value, onChange, container
         <View style={[styles.container, containerStyle]}>
             <Text style={styles.label}>{label}</Text>
 
-            < TouchableOpacity style={[styles.input, inputStyle]} onPress={() => setOpen(true)
-            }>
+            <TouchableOpacity
+                style={[styles.input, inputStyle]}
+                onPress={() => setOpen(true)}
+                accessibilityRole="combobox"
+                accessibilityLabel={label}
+                accessibilityState={{ expanded: open }}
+                accessibilityValue={{ text: value || 'Nenhuma opção selecionada' }}
+            >
                 <Text style={{ color: value ? '#000' : '#999' }}>
                     {value || 'Selecione...'}
                 </Text>
                 <Ionicons name="chevron-down" size={20} color="#353535" />
             </TouchableOpacity>
 
-            < Modal visible={open} transparent animationType="fade" >
+            <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
                 <TouchableOpacity
                     style={styles.overlay}
                     onPress={() => setOpen(false)}
@@ -57,6 +63,9 @@ export default function SelectInput({ label, options, value, onChange, container
                                         onChange(item.value);
                                         setOpen(false);
                                     }}
+                                    accessibilityRole="radio"
+                                    accessibilityLabel={item.label}
+                                    accessibilityState={{ selected: value === item.value }}
                                 >
                                     <Text>{item.label} </Text>
                                 </TouchableOpacity>

@@ -201,7 +201,7 @@ export default function CompleteProfileScreen() {
                             <View style={isDesktop && Styles.desktopField}><DateOfBirthInput value={birthDate} onChange={(value) => { setBirthDate(value); setBirthDateError(''); }} error={birthDateError} /></View>
 
                         {/* Gênero */}
-                        <TouchableOpacity style={isDesktop && Styles.desktopField} onPress={() => setModalVisible(true)} activeOpacity={0.8}>
+                        <TouchableOpacity style={isDesktop && Styles.desktopField} onPress={() => setModalVisible(true)} activeOpacity={0.8} accessibilityRole="combobox" accessibilityLabel="Gênero" accessibilityState={{ expanded: modalVisible }}>
                             <View pointerEvents="none">
                                 <Input
                                     label="Gênero*"
@@ -215,7 +215,7 @@ export default function CompleteProfileScreen() {
                         <View style={isDesktop && Styles.desktopField}>
                             <Text style={Styles.weightLabel}>Peso (kg)*</Text>
                             <View style={Styles.weightInputContainer}>
-                                <TextInput style={Styles.weightTextInput} placeholder="Ex: 70" placeholderTextColor="#C4C4C4" keyboardType="numeric" value={weight} onChangeText={setWeight} />
+                                <TextInput style={Styles.weightTextInput} placeholder="Ex: 70" placeholderTextColor="#C4C4C4" keyboardType="numeric" value={weight} onChangeText={setWeight} accessibilityLabel="Peso em quilogramas" />
                                 <Text style={Styles.kgText}>kg</Text>
                             </View>
                         </View>
@@ -234,6 +234,8 @@ export default function CompleteProfileScreen() {
                                 value={unknownBlood}
                                 onValueChange={handleUnknownChange}
                                 color={unknownBlood ? '#E0323C' : undefined}
+                                accessibilityLabel="Não sei meu tipo sanguíneo"
+                                accessibilityState={{ checked: unknownBlood }}
                             />
                             <Text style={Styles.checkboxText}>Não sei meu tipo sanguíneo</Text>
                         </View>

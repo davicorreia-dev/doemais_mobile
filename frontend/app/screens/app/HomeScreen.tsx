@@ -135,11 +135,18 @@ export default function HomeScreen() {
     const [bloodType, setBloodType] = useState<string>('-');
     const [userCity, setUserCity] = useState<string>('');
     const [externalNews, setExternalNews] = useState<NewsItem[]>([]);
+    const [newsLoading, setNewsLoading] = useState(true);
+    const [newsError, setNewsError] = useState('');
+    const [profileError, setProfileError] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
+        const controller = new AbortController();
         async function fetchExternalNews() {
+            setNewsLoading(true);
+            setNewsError('');
             try {
-                const res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://g1.globo.com/rss/g1/ciencia-e-saude/');
+                const res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://g1.globo.com/rss/g1/ciencia-e-saude/', { signal: controller.signal });
                 if (res.ok) {
                     const data = await res.json();
                     if (data.status === 'ok' && Array.isArray(data.items)) {
@@ -159,42 +166,52 @@ export default function HomeScreen() {
                         });
                         setExternalNews(parsedItems);
                     }
+                } else {
+                    setNewsError('Não foi possível atualizar as notícias.');
                 }
             } catch (err) {
-                console.log("Erro ao buscar notícias externas do G1:", err);
+                if (!controller.signal.aborted) setNewsError('Não foi possível atualizar as notícias.');
+            } finally {
+                if (!controller.signal.aborted) setNewsLoading(false);
             }
         }
         fetchExternalNews();
+        return () => controller.abort();
     }, []);
 
     const filteredNews = useMemo(() => {
         const allRequests = NEWS_DATABASE.filter(item => item.category === 'Pedido');
         const globalNews = externalNews.length > 0 ? externalNews : NEWS_DATABASE.filter(item => item.category === 'Notícia');
 
-        if (!userCity) {
-            return [...allRequests, ...globalNews];
-        }
+        const query = searchQuery.trim().toLowerCase();
+        const searchableNews = query
+            ? [...allRequests, ...globalNews].filter((item) => `${item.title} ${item.description} ${item.location}`.toLowerCase().includes(query))
+            : [...allRequests, ...globalNews];
+
+        if (!userCity) return searchableNews;
 
         const cityPrefix = userCity.split(' - ')[0].toLowerCase().trim();
-        const localRequests = allRequests.filter(item => 
+        const localRequests = searchableNews.filter(item => item.category === 'Pedido' &&
             item.location.toLowerCase().includes(cityPrefix)
         );
 
-        const otherRequests = allRequests.filter(item => 
+        const otherRequests = searchableNews.filter(item => item.category === 'Pedido' &&
             !item.location.toLowerCase().includes(cityPrefix)
         );
+        const globalItems = searchableNews.filter(item => item.category === 'Notícia');
 
         if (localRequests.length > 0) {
-            return [...localRequests, ...globalNews, ...otherRequests];
+            return [...localRequests, ...globalItems, ...otherRequests];
         } else {
-            return [...otherRequests, ...globalNews];
+            return [...otherRequests, ...globalItems];
         }
-    }, [userCity, externalNews]);
+    }, [userCity, externalNews, searchQuery]);
 
 
     useFocusEffect(
         useCallback(() => {
             async function loadProfileData() {
+                setProfileError('');
                 try {
                     // 1. Carrega a imagem
                     const savedUri = await AsyncStorage.getItem('@profile_image');
@@ -225,6 +242,7 @@ export default function HomeScreen() {
                     }
                 } catch (error) {
                     console.log("Erro ao carregar dados do perfil:", error);
+                    setProfileError('Não foi possível atualizar seus dados de perfil.');
                 }
             }
             loadProfileData();
@@ -237,9 +255,6 @@ export default function HomeScreen() {
         { label: 'Doadores', value: '2K+', color: '#E0323C' },
         { label: 'Vidas Salvas', value: '13', color: '#999' },
         { label: 'Post diário', value: '20', color: '#8C6E6E' },
-        { label: 'Doadores', value: '1K+', color: '#E0323C' },
-        { label: 'Vidas Salvas', value: '7', color: '#555' },
-        { label: 'Publicações', value: '20', color: '#3E2C2C' },
     ];
 
 
@@ -278,7 +293,7 @@ export default function HomeScreen() {
                     <View style={Styles.headerTop}>
                         <View style={Styles.userInfo}>
                             {/* Placeholder para Foto ou Foto Real com navegação */}
-                            <TouchableOpacity onPress={() => navigation.navigate('SettingsProfileScreen')}>
+                            <TouchableOpacity onPress={() => navigation.navigate('SettingsProfileScreen')} accessibilityRole="button" accessibilityLabel="Abrir configurações do perfil">
                                 {profileImage ? (
                                     <Image source={{ uri: profileImage }} style={Styles.avatarPlaceholder} />
                                 ) : (
@@ -295,8 +310,7 @@ export default function HomeScreen() {
                             </View>
                         </View>
                         <View style={Styles.headerIcons}>
-                            <TouchableOpacity><Ionicons name="mail-outline" size={24} color="#333" style={{ marginRight: 0 }} /></TouchableOpacity>
-                            <TouchableOpacity onPress={handleLogout}><Ionicons name="log-out-outline" size={24} color="#333" style={{ marginRight: 0 }} />
+                            <TouchableOpacity onPress={handleLogout} accessibilityRole="button" accessibilityLabel="Sair"><Ionicons name="log-out-outline" size={24} color="#333" style={{ marginRight: 0 }} />
                             </TouchableOpacity>
 
                         </View>
@@ -308,6 +322,9 @@ export default function HomeScreen() {
                         <TextInput
                             placeholder="Buscar Sangue"
                             style={Styles.searchInput}
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
+                            accessibilityLabel="Buscar pedidos e notícias"
                         />
                     </View>
                 </View>}
@@ -330,6 +347,9 @@ export default function HomeScreen() {
 
                     {/* Seção de Notícias e Pedidos de Sangue */}
                     <Text style={Styles.sectionTitle}>Notícias e Pedidos de Sangue</Text>
+                    {profileError && <Text style={{ color: '#B42318', marginBottom: 8 }} accessibilityLiveRegion="polite">{profileError}</Text>}
+                    {newsLoading && <Text style={{ color: '#666', marginBottom: 8 }} accessibilityLiveRegion="polite">Atualizando notícias...</Text>}
+                    {newsError && <Text style={{ color: '#B42318', marginBottom: 8 }} accessibilityLiveRegion="polite">{newsError} Exibindo conteúdo disponível.</Text>}
                     {userCity ? (
                         <Text style={{ fontSize: 12, color: '#666', marginTop: -10, marginBottom: 12 }}>
                             Pedidos em: <Text style={{ fontWeight: 'bold', color: '#E0323C' }}>{userCity}</Text>

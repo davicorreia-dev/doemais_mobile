@@ -86,8 +86,10 @@ export default function MainTabs() {
     const [remainingForms, setRemainingForms] = useState(0);
     const [hasPendingReview, setHasPendingReview] = useState(false);
     const [cardUnlocked, setCardUnlocked] = useState(false);
+    const requestId = useRef(0);
 
     const loadTabStatus = useCallback(async () => {
+        const currentRequest = ++requestId.current;
         try {
             const savedUserRaw = await getStoredUser();
             const savedUser = savedUserRaw ? JSON.parse(savedUserRaw) : null;
@@ -100,6 +102,8 @@ export default function MainTabs() {
                 api('/api/doadores/triagens/atual', 'GET', undefined, false, true).catch(() => null),
                 api('/api/doadores/correcoes', 'GET', undefined, false, true).catch(() => null),
             ]);
+
+            if (currentRequest !== requestId.current) return;
 
             const profile = profileResponse?.data || profileResponse || savedUser;
             const triages = { ...localTriages, ...(triageResponse?.data || triageResponse || {}) };
@@ -139,7 +143,7 @@ export default function MainTabs() {
                         {route.name}
                     </Text>
                 ),
-                tabBarStyle: route.name === 'Carteirinha' && isDesktop ? { display: 'none' } : styles.tabBar,
+                tabBarStyle: isDesktop ? { display: 'none' } : styles.tabBar,
                 tabBarIcon: ({ focused, color, size }) => (
                     <TabIcon
                         routeName={route.name}

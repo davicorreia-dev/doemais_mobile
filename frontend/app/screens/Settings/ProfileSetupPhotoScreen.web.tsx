@@ -37,6 +37,10 @@ export default function ProfileSetupPhotoScreen({ navigation }: any) {
             const persistentUri = asset.base64 && asset.mimeType
                 ? `data:${asset.mimeType};base64,${asset.base64}`
                 : asset.uri;
+            if (persistentUri.length > 3_000_000) {
+                Alert.alert('Imagem muito grande', 'Escolha uma foto menor para continuar.');
+                return;
+            }
             setImage(persistentUri);
         }
     }
@@ -65,10 +69,10 @@ export default function ProfileSetupPhotoScreen({ navigation }: any) {
                     <Text style={Styles.subtitle}>É opcional. Você pode preencher depois.</Text>
                 </View>
                 <View style={{ flex: 1, justifyContent: 'center' }}>
-                    <TouchableOpacity onPress={removeImage} accessibilityLabel="Remover foto de perfil">
+                    <TouchableOpacity onPress={removeImage} accessibilityRole="button" accessibilityLabel="Remover foto de perfil">
                         <Ionicons style={Styles.removeimage} name="trash" size={20} marginBottom={10} color="#E0323C" />
                     </TouchableOpacity>
-                    <TouchableOpacity style={Styles.imageContainer} onPress={handlePickImage} accessibilityRole="button">
+                    <TouchableOpacity style={Styles.imageContainer} onPress={handlePickImage} accessibilityRole="button" accessibilityLabel="Selecionar foto de perfil">
                         {image ? <Image source={{ uri: image }} style={Styles.image} /> : <Text style={Styles.placeholder}>Selecionar foto</Text>}
                     </TouchableOpacity>
                 </View>
