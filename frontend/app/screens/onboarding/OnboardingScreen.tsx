@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, Image, StatusBar, useWindowDimensions } from 'react-native';
+import { View, Text, Image, StatusBar, useWindowDimensions, ScrollView } from 'react-native';
 import StatusBarBackground from '../../../components/StatusBarBackground';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -53,7 +53,7 @@ export default function OnboardingScreen() {
     const progressPercent = ((currentIndex + 1) / slides.length) * 100;
 
     return (
-        <View style={Styles.container}>
+        <ScrollView style={Styles.container} contentContainerStyle={{ flexGrow: 1 }}>
             <StatusBar barStyle="dark-content" />
             <StatusBarBackground color="#fff" />
 
@@ -87,6 +87,6 @@ export default function OnboardingScreen() {
                     borderRadius={25}
                 />
             </View>
-        </View>
+        </ScrollView>
     );
 }

@@ -1,4 +1,4 @@
-import { Alert, Image, Text, View } from "react-native";
+import { Alert, Image, Text, View, ScrollView } from "react-native";
 import Button from "../../../components/Button";
 import Styles from "./AuthChoiceStyles"
 import StylesButton from "../../../components/SocialButton/styles";
@@ -14,7 +14,7 @@ export default function AuthChoiceScreen({ navigation }: any) {
 
     return (
 
-        <View style={Styles.container}>
+        <ScrollView contentContainerStyle={Styles.container} keyboardShouldPersistTaps="handled">
 
             <Image style={Styles.image} source={require("../../../assets/images/Logo - Horizontal.png")} />
 
@@ -59,6 +59,6 @@ export default function AuthChoiceScreen({ navigation }: any) {
                 />
             </View>
 
-        </View>
+        </ScrollView>
     )
 }

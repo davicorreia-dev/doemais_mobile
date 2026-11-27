@@ -16,6 +16,8 @@ type InputProps = {
     error?: string;
     containerStyle?: StyleProp<ViewStyle>;
     inputContainerStyle?: StyleProp<ViewStyle>;
+    accessibilityLabel?: string;
+    accessibilityHint?: string;
 };
 
 export default function Input({ 
@@ -30,6 +32,8 @@ export default function Input({
     error,
     containerStyle,
     inputContainerStyle,
+    accessibilityLabel,
+    accessibilityHint,
 }: InputProps) {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -49,11 +53,15 @@ export default function Input({
                     onChangeText={onChangeText}
                     autoCapitalize={autoCapitalize}
                     autoCorrect={autoCorrect}
+                    accessibilityLabel={accessibilityLabel || label}
+                    accessibilityHint={error ? `${accessibilityHint ? `${accessibilityHint}. ` : ''}Erro: ${error}` : accessibilityHint}
                 />
                 {secureTextEntry && (
                     <TouchableOpacity
                         style={styles.iconContainer}
                         onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                        accessibilityRole="button"
+                        accessibilityLabel={isPasswordVisible ? 'Ocultar senha' : 'Mostrar senha'}
                     >
                         <Ionicons
                             name={isPasswordVisible ? 'eye-off' : 'eye'}
@@ -63,7 +71,7 @@ export default function Input({
                     </TouchableOpacity>
                 )}
             </View>
-            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            {error ? <Text style={styles.errorText} accessibilityLiveRegion="polite">{error}</Text> : null}
         </View>
     );
 }

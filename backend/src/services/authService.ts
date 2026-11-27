@@ -142,7 +142,7 @@ export const loginDoador = async (
 
 export const refreshAccessToken = async (
   tokenData: RefreshTokenDto
-): Promise<{ accessToken: string; refreshToken: string; expiresIn: string }> => {
+): Promise<{ accessToken: string; refreshToken: string; expiresIn: string; doador: DoadorResponse }> => {
   const { refreshToken } = tokenData;
 
   if (!refreshToken) {
@@ -160,6 +160,25 @@ export const refreshAccessToken = async (
   if (new Date() > savedToken.expiresAt) {
     await prisma.refreshToken.delete({ where: { id: savedToken.id } });
     throw new UnauthorizedError('Refresh token expirado.');
+  }
+
+  const doador = await prisma.doador.findUnique({
+    where: { id: savedToken.doadorId },
+    select: {
+      id: true,
+      nome: true,
+      email: true,
+      telefone: true,
+      cidade: true,
+      cep: true,
+      tipo_sanguineo: true,
+      criado_em: true,
+      genero: true,
+    },
+  });
+
+  if (!doador) {
+    throw new UnauthorizedError('Doador da sessão não encontrado.');
   }
 
   const newRefreshToken = createRefreshToken();
@@ -181,6 +200,7 @@ export const refreshAccessToken = async (
     accessToken: issueAccessToken(savedToken.doadorId),
     refreshToken: newRefreshToken,
     expiresIn: CONSTANTS.JWT.EXPIRES_IN,
+    doador: doador as unknown as DoadorResponse,
   };
 };
 

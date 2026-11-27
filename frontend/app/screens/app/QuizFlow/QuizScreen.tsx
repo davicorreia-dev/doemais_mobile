@@ -191,7 +191,8 @@ export default function QuizScreen() {
             try {
                 await api('/api/doadores/elegibilidade', 'POST', payloadLimpo);
             } catch (err) {
-                 console.error("Erro na API de elegibilidade:", err);
+                console.error("Erro na API de elegibilidade:", err);
+                throw err;
             }
         }
     };

@@ -38,6 +38,7 @@ export default function Header({ title, onBack, subtitle, titleColor, subtitleCo
 
 
     const navigation = useNavigation<any>();
+    const canNavigateBack = Boolean(onBack) || navigation.canGoBack();
 
     // Responsividade: a barra acompanha o tamanho da tela e a área do sistema (notch/status bar)
     const { width, height } = useWindowDimensions();
@@ -62,7 +63,7 @@ export default function Header({ title, onBack, subtitle, titleColor, subtitleCo
                 containerStyle,
             ]}
         >
-            <TouchableOpacity onPress={() => {
+            {canNavigateBack && <TouchableOpacity onPress={() => {
                 if (onBack) {
                     onBack();
                 } else if (navigation.canGoBack()) {
@@ -71,6 +72,8 @@ export default function Header({ title, onBack, subtitle, titleColor, subtitleCo
             }}
                 style={styles.iconBack}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                accessibilityRole="button"
+                accessibilityLabel="Voltar"
             >
 
                 <Ionicons
@@ -78,7 +81,7 @@ export default function Header({ title, onBack, subtitle, titleColor, subtitleCo
                     size={iconSize}
                     color={iconColor || "#E0323C"}
                 />
-            </TouchableOpacity>
+            </TouchableOpacity>}
 
             {!isBarOnly && (
                 <View style={styles.textContainer}>

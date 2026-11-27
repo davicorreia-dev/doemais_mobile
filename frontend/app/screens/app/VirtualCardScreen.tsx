@@ -10,6 +10,7 @@ import { getStoredUser } from '../../services/session';
 import StatusBarBackground from '../../../components/StatusBarBackground';
 import VirtualDonorCard from '../../../components/VirtualDonorCard';
 import VirtualCardNotice from '../../../components/VirtualCardNotice';
+import ScreenState from '../../../components/ScreenState';
 import DesktopAppSidebar from '../../../components/DesktopAppSidebar';
 import DesktopPageHeader from '../../../components/DesktopPageHeader';
 import Styles from './StylesVirtualCard';
@@ -43,6 +44,7 @@ export default function VirtualCardScreen() {
     const [reviewFormName, setReviewFormName] = useState('');
     const [reviewRequestedAt, setReviewRequestedAt] = useState('');
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
     useFocusEffect(
         useCallback(() => {
@@ -50,6 +52,7 @@ export default function VirtualCardScreen() {
 
             const loadCard = async () => {
                 setLoading(true);
+                setError('');
 
                 try {
                     const savedUserRaw = await getStoredUser();
@@ -112,9 +115,11 @@ export default function VirtualCardScreen() {
                         }
                     } catch (error) {
                         console.error('Erro ao carregar perfil para a carteirinha:', error);
+                        if (active) setError('Não foi possível carregar sua carteirinha.');
                     }
                 } catch (error) {
                     console.error('Erro ao carregar a carteirinha:', error);
+                    if (active) setError('Não foi possível carregar sua carteirinha.');
                 } finally {
                     if (active) setLoading(false);
                 }
@@ -133,6 +138,21 @@ export default function VirtualCardScreen() {
             <SafeAreaView style={[Styles.centered, isDesktop && Styles.desktopScreen]} edges={['top']}>
                 {isDesktop && <DesktopAppSidebar name="Doador(a)" activeRoute="Carteirinha" onNavigate={(route) => navigation.navigate(route)} />}
                 <View style={Styles.loadingBody}><ActivityIndicator color="#E0323C" size="large" /></View>
+            </SafeAreaView>
+        );
+    }
+
+    if (error) {
+        return (
+            <SafeAreaView style={[Styles.centered, isDesktop && Styles.desktopScreen]} edges={['top']}>
+                {isDesktop && <DesktopAppSidebar name={profile.nome || 'Doador(a)'} activeRoute="Carteirinha" onNavigate={(route) => navigation.navigate(route)} />}
+                <ScreenState
+                    type="error"
+                    title="Carteirinha indisponível"
+                    message={error}
+                    onRetry={() => navigation.navigate('Carteirinha')}
+                    desktop={isDesktop}
+                />
             </SafeAreaView>
         );
     }

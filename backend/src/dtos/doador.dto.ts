@@ -139,7 +139,7 @@ export class LoginDoadorDto {
  */
 export class RefreshTokenDto {
   @IsString({ message: 'O refresh token deve ser uma string.' })
-  @IsNotEmpty({ message: 'O refresh token é obrigatório.' })
+  @IsOptional()
   refreshToken!: string;
 }
 

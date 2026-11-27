@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { KeyboardAvoidingView, ScrollView, View, Text } from "react-native";
 import { StatusBar } from "expo-status-bar";
@@ -48,6 +48,8 @@ type RegisterRouteParams = {
         cpf?: string;
         senha?: string;
         telefone?: string;
+        cep?: string;
+        cidade?: string;
     };
     fieldErrors?: RegisterFieldErrors;
 };
@@ -59,6 +61,7 @@ export default function RegisterScreen() {
     const keyboardBehavior = useKeyboardBehavior();
 
     const { prefill, fieldErrors } = (route.params as RegisterRouteParams | undefined) ?? {};
+    const [addressData, setAddressData] = useState<{ cep?: string; cidade?: string }>({});
 
     const { control, handleSubmit, setError, reset, formState: { errors } } = useForm<RegisterFormData>({
         resolver: zodResolver(registerSchema),
@@ -78,6 +81,7 @@ export default function RegisterScreen() {
         if (!fieldErrors) return;
 
         if (prefill) {
+            setAddressData({ cep: prefill.cep, cidade: prefill.cidade });
             // reset() limpa os erros, então precisa vir antes do setError
             reset({
                 name: prefill.nome ?? '',
@@ -108,10 +112,12 @@ export default function RegisterScreen() {
             email,
             cpf: data.cpf.replace(/\D/g, ''),
             senha: data.password,
-            telefone: data.phone ? data.phone.replace(/\D/g, '') : ''
+            telefone: data.phone ? data.phone.replace(/\D/g, '') : '',
+            ...(addressData.cep ? { cep: addressData.cep } : {}),
+            ...(addressData.cidade ? { cidade: addressData.cidade } : {}),
         };
 
-        navigation.navigate("LgpdScreen", {
+        navigation.navigate("RegisterAddressScreen", {
             basicData: payload
         });
     };
@@ -138,6 +144,14 @@ export default function RegisterScreen() {
                     <View style={{ paddingHorizontal: 30, marginTop: 35 }}>
                         <Text style={Styles.HeaderTitle}>Crie sua conta</Text>
                         <Text style={Styles.HeaderSubtitle}>Vamos fazer o bem juntos.</Text>
+                        <View
+                            style={Styles.progressTrack}
+                            accessibilityRole="progressbar"
+                            accessibilityLabel="Progresso do cadastro"
+                            accessibilityValue={{ min: 0, max: 100, now: 50, text: '50%' }}
+                        >
+                            <View style={[Styles.progressFill, { width: '50%' }]} />
+                        </View>
                     </View>
 
                     <View style={Styles.InputContainer}>
