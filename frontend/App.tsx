@@ -9,6 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AuthChoiceScreen from './app/screens/auth/AuthChoiceScreen';
 import LoginScreen from './app/screens/auth/LoginScreen';
 import RegisterScreen from './app/screens/auth/RegisterScreen';
+import RegisterAddressScreen from './app/screens/auth/RegisterAddressScreen';
 import ForgotPasswordCodeScreen from './app/screens/auth/ForgotPasswordCodeScreen';
 import ForgetPasswordScreen from './app/screens/auth/ForgetPasswordScreen';
 import ForgetPasswordChoiceScreen from './app/screens/auth/ForgetPasswordChoiceScreen';
@@ -90,6 +91,7 @@ export default function App() {
         <Stack.Screen name="AuthChoice" component={AuthChoiceScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen name="RegisterAddressScreen" component={RegisterAddressScreen} />
         <Stack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordCodeScreen} />
         <Stack.Screen name="ForgetPasswordChoiceScreen" component={ForgetPasswordChoiceScreen} />

@@ -37,6 +37,22 @@ const Styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
 
+    progressTrack: {
+        marginTop: 16,
+        height: 8,
+        width: '100%',
+        maxWidth: 400,
+        alignSelf: 'center',
+        borderRadius: 999,
+        overflow: 'hidden',
+        backgroundColor: '#F2D5D7',
+    },
+    progressFill: {
+        height: '100%',
+        borderRadius: 999,
+        backgroundColor: '#E0323C',
+    },
+
     ContainerTerms: {
         marginTop: 40,
         alignContent: 'center',
